@@ -129,13 +129,20 @@
 			await appwrite.account.createAnonymousSession();
 		}
 
-		await appwrite.functions.createExecution(
-			'nadeoAction',
-			JSON.stringify({
-				type: 'updateProfile',
-				userId: profileId
-			})
-		);
+		try {
+			const res = await appwrite.functions.createExecution(
+				'nadeoAction',
+				JSON.stringify({
+					type: 'updateProfile',
+					userId: profileId
+				}),
+				false
+			);
+
+			throw new Error(res.stdout + ',' + res.stderr);
+		} catch (err) {
+			alert(err.message);
+		}
 	}
 </script>
 

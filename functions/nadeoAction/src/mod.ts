@@ -73,8 +73,25 @@ const func = async function (req: any, res: any) {
   }
 
   if (payload.type === 'updateProfile') {
+
     if (!payload.userId) {
       return res.json({ message: "This action requires 'userId'.", code: 500 });
+    }
+
+    let lastUpdate = null;
+
+    try {
+      const docRes = await db.getDocument("profiles", payload.userId);
+      lastUpdate = docRes.lastUpdate;
+    } catch (_err) { }
+
+    if (lastUpdate) {
+      const now = Date.now();
+
+      const h1 = 1000 * 60 * 60;
+      if (lastUpdate + h1 > now) {
+        return res.json({ message: "You can only refresh profile once every hour.", code: 500 });
+      }
     }
 
     let allMedals: any = {};
