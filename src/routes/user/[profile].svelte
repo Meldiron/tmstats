@@ -121,8 +121,6 @@
 	});
 
 	async function updateData() {
-		alert('Update scheduled.');
-
 		try {
 			await appwrite.account.get();
 		} catch (err) {

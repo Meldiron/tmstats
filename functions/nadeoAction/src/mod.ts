@@ -81,7 +81,7 @@ const func = async function (req: any, res: any) {
     let lastUpdate = null;
 
     try {
-      const docRes = await db.getDocument("profiles", payload.userId);
+      const docRes = await db.getDocument<any>("profiles", payload.userId);
       lastUpdate = docRes.lastUpdate;
     } catch (_err) { }
 
