@@ -84,6 +84,29 @@
 		for (const month of months) {
 			const number = month.month;
 
+			const data = Object.keys(dataSet)
+				.filter((d) => {
+					const m = d.split('-')[1];
+					return +m === number;
+				})
+				.map((key) => {
+					return {
+						date: moment(key, 'D-M-YYYY').toDate(),
+						value: dataSet[key]
+					};
+				});
+
+			const colors = [
+				'#374151', // Finish Only, same as empty
+				'#cd7f32', // Bronze
+				'#ffffff', // Silver
+				'#ffd700', // Gold
+				'#14b583' // Author
+			].filter((c, cIndex) => {
+				const hasIndex = data.find((r) => r.value === cIndex);
+				return hasIndex;
+			});
+
 			const map = new SvelteHeatmap({
 				props: {
 					allowOverflow: true,
@@ -91,19 +114,8 @@
 					cellRadius: 2,
 					monthLabelHeight: 0,
 					dayLabelWidth: 0,
-					colors: [
-						'#374151', // Finish Only, same as empty
-						'#cd7f32', // Bronze
-						'#ffffff', // Silver
-						'#ffd700', // Gold
-						'#14b583' // Author
-					],
-					data: Object.keys(dataSet).map((key) => {
-						return {
-							date: moment(key, 'D-M-YYYY').toDate(),
-							value: dataSet[key]
-						};
-					}),
+					colors,
+					data,
 					emptyColor: '#374151',
 					fontColor: '#ffffff',
 					monthGap: 0,

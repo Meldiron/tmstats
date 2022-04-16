@@ -27,7 +27,8 @@ const func = async function (req: any, res: any) {
     !req.env['APPWRITE_FUNCTION_ENDPOINT'] ||
     !req.env['APPWRITE_FUNCTION_PROJECT_ID'] ||
     !req.env['APPWRITE_FUNCTION_API_KEY'] ||
-    !req.env['NADE_AUTH']
+    !req.env['NADE_AUTH'] ||
+    !req.env['ADMIN_PASS']
   ) {
     return res.json({ message: "Missing environment variables", code: 500 });
   }
@@ -90,7 +91,10 @@ const func = async function (req: any, res: any) {
 
       const h1 = 1000 * 60 * 60;
       if (lastUpdate + h1 > now) {
-        return res.json({ message: "You can only refresh profile once every hour.", code: 500 });
+        const adminPass = req.env['ADMIN_PASS'] as string;
+        if (!payload.password || payload.password !== adminPass) {
+          return res.json({ message: "You can only refresh profile once every hour.", code: 500 });
+        }
       }
     }
 
