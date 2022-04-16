@@ -84,7 +84,7 @@
 		for (const month of months) {
 			const number = month.month;
 
-			const data = Object.keys(dataSet)
+			let data = Object.keys(dataSet)
 				.filter((d) => {
 					const m = d.split('-')[1];
 					return +m === number;
@@ -102,10 +102,49 @@
 				'#ffffff', // Silver
 				'#ffd700', // Gold
 				'#14b583' // Author
-			].filter((c, cIndex) => {
-				const hasIndex = data.find((r) => r.value === cIndex);
-				return hasIndex;
-			});
+			];
+
+			const isAuthorMissing = data.find((d) => d.value === 4) === undefined;
+			const isGoldMissing = data.find((d) => d.value === 3) === undefined;
+			const isSilverMissing = data.find((d) => d.value === 2) === undefined;
+			const isBronzeMissing = data.find((d) => d.value === 1) === undefined;
+
+			if (isAuthorMissing) {
+				colors.splice(4, 1);
+			}
+
+			if (isGoldMissing) {
+				colors.splice(3, 1);
+
+				data = data.map((d) => {
+					if (d.value > 3) {
+						d.value--;
+					}
+					return d;
+				});
+			}
+
+			if (isSilverMissing) {
+				colors.splice(2, 1);
+
+				data = data.map((d) => {
+					if (d.value > 2) {
+						d.value--;
+					}
+					return d;
+				});
+			}
+
+			if (isBronzeMissing) {
+				colors.splice(1, 1);
+
+				data = data.map((d) => {
+					if (d.value > 1) {
+						d.value--;
+					}
+					return d;
+				});
+			}
 
 			const map = new SvelteHeatmap({
 				props: {
