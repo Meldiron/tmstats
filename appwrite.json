@@ -1,0 +1,69 @@
+{
+	"projectId": "trackmaniaDailyStats",
+	"projectName": "trackmaniaDailyStats",
+	"collections": [
+		{
+			"$id": "profiles",
+			"$read": ["role:all"],
+			"$write": [],
+			"name": "profiles",
+			"enabled": true,
+			"permission": "collection",
+			"attributes": [
+				{
+					"key": "lastUpdate",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": 0,
+					"max": 9007199254740991,
+					"default": null
+				},
+				{
+					"key": "medals",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 999999,
+					"default": null
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "nadeoCache",
+			"$read": [],
+			"$write": [],
+			"name": "nadeoCache",
+			"enabled": true,
+			"permission": "collection",
+			"attributes": [
+				{
+					"key": "value",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 999999,
+					"default": null
+				}
+			],
+			"indexes": []
+		}
+	],
+	"functions": [
+		{
+			"$id": "nadeoAction",
+			"name": "nadeoAction",
+			"runtime": "deno-1.14",
+			"path": "functions/nadeoAction",
+			"entrypoint": "src/mod.ts",
+			"execute": ["role:all"],
+			"events": [],
+			"schedule": "",
+			"timeout": 15
+		}
+	]
+}
