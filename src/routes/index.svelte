@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 
-	import { Appwrite, Query } from 'appwrite';
+	import { Appwrite } from 'appwrite';
 	import { Utils } from '../utils';
 
 	const appwrite = new Appwrite();
@@ -12,7 +12,16 @@
 
 	let leaderboard = [];
 
-	onMount(async () => {
+	let orerByAttr = 'points';
+
+	function orderBy(sort: string) {
+		return () => {
+			orerByAttr = sort;
+			onMountFunction();
+		};
+	}
+
+	const onMountFunction = async () => {
 		const docs = await appwrite.database.listDocuments(
 			'profiles',
 			[],
@@ -20,12 +29,14 @@
 			undefined,
 			undefined,
 			undefined,
-			['score'],
+			[orerByAttr === 'points' ? 'score' : orerByAttr],
 			['DESC']
 		);
 
 		leaderboard = docs.documents;
-	});
+	};
+
+	onMount(onMountFunction);
 </script>
 
 <div class="max-w-5xl w-full mx-auto mt-6 mb-6">
@@ -38,34 +49,81 @@
 	</div>
 
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-		<h1 class="font-bold text-black text-2xl mb-3">Leaderboard</h1>
+		<h1 class="font-bold text-black text-2xl">Leaderboard</h1>
 
-		<div class="flex flex-col space-y-3 mb-4">
+		<small class="text-xs mb-3 text-gray-400">Ordered by {orerByAttr}</small>
+
+		<div class="grid grid-cols-12 gap-3 mb-4">
+			<div class="hidden md:flex col-span-4" />
+			<button
+				on:click={orderBy('author')}
+				class="hidden md:flex col-span-1 items-center justify-center"
+			>
+				<img class="max-w-[30px]" src="/author.png" alt="Medal" />
+			</button>
+			<button
+				on:click={orderBy('gold')}
+				class="hidden md:flex col-span-1  items-center justify-center"
+			>
+				<img class="max-w-[30px]" src="/gold.png" alt="Medal" />
+			</button>
+			<button
+				on:click={orderBy('silver')}
+				class="hidden md:flex col-span-1  items-center justify-center"
+			>
+				<img class="max-w-[30px]" src="/silver.png" alt="Medal" />
+			</button>
+			<button
+				on:click={orderBy('bronze')}
+				class="hidden md:flex col-span-1  items-center justify-center"
+			>
+				<img class="max-w-[30px]" src="/bronze.png" alt="Medal" />
+			</button>
+			<div class="hidden md:block col-span-4" />
+
 			{#each leaderboard as record, index}
-				<div class="flex items-baseline justify-start space-x-3">
-					<div class="flex items-end justify-start">
-						<h3 class="leading-6 font-bold text-black text-author-500 text-2xl">{index + 1}.</h3>
-						<p class="leading-5 ml-2 font-bold text-lg">{Utils.getName(record.$id)}</p>
-						<p class="leading-4 ml-2 text-sm text-gray-500">{record.score} points</p>
-					</div>
-
-					<a href={'/user/' + record.$id}>
-						<button
-							class="transform translate-y-[2px] rounded-tl-lg rounded-br-lg text-white bg-author-600 p-[2px] font-bold"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-4 w-4"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="2"
+				<div class="col-span-12 md:col-span-4">
+					<div class="flex items-baseline justify-start space-x-3">
+						<div class="flex items-end justify-start">
+							<h3 class="leading-6 font-bold text-black text-author-500 text-2xl">{index + 1}.</h3>
+							<p class="leading-5 ml-2 font-bold text-lg">{Utils.getName(record.$id)}</p>
+							<button on:click={orderBy('points')} class="leading-4 ml-2 text-sm text-gray-500"
+								>{record.score} points</button
 							>
-								<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-							</svg>
-						</button>
-					</a>
+						</div>
+
+						<a href={'/user/' + record.$id}>
+							<button
+								class="transform translate-y-[2px] rounded-tl-lg rounded-br-lg text-white bg-author-600 p-[2px] font-bold"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+								</svg>
+							</button>
+						</a>
+					</div>
 				</div>
+				<div class="hidden md:flex col-span-1  items-center justify-center">
+					<p class="font-bold text-sm text-gray-600">{record.author}</p>
+				</div>
+				<div class="hidden md:flex col-span-1  items-center justify-center">
+					<p class="font-bold text-sm text-gray-600">{record.gold}</p>
+				</div>
+				<div class="hidden md:flex col-span-1  items-center justify-center">
+					<p class="font-bold text-sm text-gray-600">{record.silver}</p>
+				</div>
+				<div class="hidden md:flex col-span-1  items-center justify-center">
+					<p class="font-bold text-sm text-gray-600">{record.bronze}</p>
+				</div>
+
+				<div class="hidden md:block col-span-4" />
 			{/each}
 		</div>
 
@@ -78,7 +136,7 @@
 		<p class="mb-3">
 			Couldn't find player you are looking for? Here, look for his profile by his ID.
 		</p>
-		<div class="flex space-x-4">
+		<div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
 			<input
 				bind:value={userId}
 				class="focus:outline-none focus:ring ring-slate-300 border border-slate-300 w-full max-w-sm bg-slate-200 p-2 rounded-md"
