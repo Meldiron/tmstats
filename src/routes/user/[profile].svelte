@@ -332,7 +332,7 @@
 		<h1 class="font-bold text-black text-2xl mb-3">How to Read Data?</h1>
 
 		<div class="prose">
-			<p>Cells on website follow same color pallete as medals in TrackMania game.</p>
+			<p>Cells on website follow same color pallete as medals in Trackmania game.</p>
 			<ul>
 				<li class="text-author-500">Green is <b class="font-bold">Author Medal</b></li>
 				<li class="text-gold-500">Yellow is <b class="font-bold">Gold Medal</b></li>
