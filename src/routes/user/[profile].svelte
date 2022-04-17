@@ -287,7 +287,7 @@
 
 		<button
 			on:click={updateData}
-			class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-xl text-white bg-author-600 py-2 px-6 font-bold"
+			class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-white bg-author-600 py-2 px-6 font-bold"
 		>
 			{#if isLoading}
 				<svg
@@ -319,7 +319,7 @@
 	<div class="grid grid-cols-12 gap-6 mt-6">
 		{#each months as month}
 			<div
-				class="border border-gray-900 p-4 bg-gray-800 rounded-tl-3xl rounded-br-xl col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3"
+				class="border border-gray-900 p-4 bg-gray-800 rounded-tl-3xl rounded-br-3xl col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3"
 			>
 				<h3 class="mb-3 font-semibold text-lg text-gray-200">{month.name}</h3>
 
