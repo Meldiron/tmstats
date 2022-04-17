@@ -7,16 +7,11 @@
 	appwrite.setEndpoint('https://appwrite.matejbaco.eu/v1').setProject('trackmaniaDailyStats');
 
 	import { page } from '$app/stores';
-
-	const profiles = {
-		'06e99ad3-cded-4440-a19c-b3df4fda8004': 'Meldiron',
-		'5ca1fa3a-3413-4863-86d7-7a47982abc1b': 'Dejwfík',
-		'f6fe29aa-45dc-4fe9-9a95-d5e2c39f6b5f': 'Benko'
-	};
+	import { Utils } from '../../utils';
 
 	const profileId = $page.params.profile;
-	const profileName = profiles[profileId] ?? 'Unknown Name';
-	let lastUpdate = '...';
+	const profileName = Utils.getName(profileId);
+	let isLoading = false;
 
 	const monthNames = [
 		'January',
@@ -39,8 +34,11 @@
 	let bronze = 0;
 	let gold = 0;
 	let author = 0;
-
 	let totalPoints = 0;
+	let noMedalMaps = [];
+	let lastUpdate = '...';
+
+	let heatMaps = [];
 
 	for (let month = 0; month < 12; month++) {
 		months.push({
@@ -49,17 +47,33 @@
 		});
 	}
 
-	onMount(async () => {
+	const onMountFunction = async () => {
+		for (const heatMap of heatMaps) {
+			heatMap.$destroy();
+		}
+
+		finish = 0;
+		silver = 0;
+		bronze = 0;
+		gold = 0;
+		author = 0;
+		totalPoints = 0;
+		noMedalMaps = [];
+		lastUpdate = '...';
+		heatMaps = [];
+
 		const dbRes = await appwrite.database.getDocument<any>('profiles', profileId);
 		const dataSet = JSON.parse(dbRes.medals);
 
 		lastUpdate = moment(dbRes.lastUpdate).format('DD.MM.YYYY HH:mm');
 
-		Object.keys(dataSet).forEach((k) => {
+		for (const k in dataSet) {
 			const medal = dataSet[k];
 
 			if (medal === 0) {
 				finish++;
+
+				noMedalMaps = [...noMedalMaps, k];
 			} else if (medal === 1) {
 				bronze++;
 
@@ -77,7 +91,7 @@
 
 				totalPoints += 8;
 			}
-		});
+		}
 
 		const year = new Date().getFullYear();
 
@@ -97,7 +111,7 @@
 				});
 
 			const colors = [
-				'#374151', // Finish Only, same as empty
+				'#ff1493', // Finish Only, same as empty
 				'#cd7f32', // Bronze
 				'#ffffff', // Silver
 				'#ffd700', // Gold
@@ -168,10 +182,22 @@
 				},
 				target: document.querySelector('#heatmap-' + number)
 			});
+
+			heatMaps = [...heatMaps, map];
 		}
-	});
+
+		console.log(noMedalMaps);
+	};
+
+	onMount(onMountFunction);
 
 	async function updateData() {
+		if (isLoading) {
+			return;
+		}
+
+		isLoading = true;
+
 		try {
 			await appwrite.account.get();
 		} catch (err) {
@@ -192,6 +218,8 @@
 		} catch (err) {
 			alert(err.message);
 		}
+
+		isLoading = false;
 	}
 </script>
 
@@ -252,6 +280,42 @@
 		</div>
 	</div>
 
+	<div
+		class=" my-4 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
+	>
+		<p class="text-gray-400">Last update <b class="font-bold">{lastUpdate}</b></p>
+
+		<button
+			on:click={updateData}
+			class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-xl text-white bg-author-600 py-2 px-6 font-bold"
+		>
+			{#if isLoading}
+				<svg
+					class="w-5 h-5 animate-spin"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+				>
+					<circle
+						class="opacity-25"
+						cx="12"
+						cy="12"
+						r="10"
+						stroke="currentColor"
+						stroke-width="4"
+					/>
+					<path
+						class="opacity-75"
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					/>
+				</svg>
+			{:else}
+				<p class="m-0 p-0">Update Data</p>
+			{/if}
+		</button>
+	</div>
+
 	<div class="grid grid-cols-12 gap-6 mt-6">
 		{#each months as month}
 			<div
@@ -272,31 +336,31 @@
 			<ul>
 				<li class="text-author-500">Green is <b class="font-bold">Author Medal</b></li>
 				<li class="text-gold-500">Yellow is <b class="font-bold">Gold Medal</b></li>
-				<li class="text-silver-500">Dark Gray is <b class="font-bold">Silver Medal</b></li>
+				<li class="text-silver-500">White is <b class="font-bold">Silver Medal</b></li>
 				<li class="text-bronze-500">Orange is <b class="font-bold">Bronze Medal</b></li>
-				<li class="text-gray-200">Light Gray is <b class="font-bold">No Medal</b></li>
+				<li class="text-gray-200">Dark Gray is <b class="font-bold">No Medal</b></li>
 			</ul>
 			<p>
 				If you have finished a map but didn't get any medal, the cell has the same color as if you
-				would never play the map. Try harder, you can do this!
+				would never play the map. Try harder, you can do this! Here is a list of maps you tried but
+				didn't get medal on:
 			</p>
+			<ul>
+				{#each noMedalMaps as map}
+					<li>
+						{map}
+					</li>
+				{/each}
+
+				{#if noMedalMaps.length <= 0}
+					<li class="text-author-500">All maps are fine!</li>
+				{/if}
+			</ul>
 			<p>
-				New data is not fetched automatically. To request a data update, click button below. Keep in
-				mind this only schedules request into a queue. If there is a long queue, you might need to
-				wait minutes, or even hours for your profile update.
+				New data is not fetched automatically. To request a data update, use 'Update Data' button at
+				the top of the page. Keep in mind this only schedules request into a queue. If there is a
+				long queue, you might need to wait minutes, or even hours for your profile update.
 			</p>
-
-			<div
-				class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-start"
-			>
-				<button
-					on:click={updateData}
-					class="rounded-tl-3xl rounded-br-xl text-white bg-author-600 py-2 px-6 font-bold"
-					>Update Data</button
-				>
-
-				<p class="text-gray-400">Last update <b class="font-bold">{lastUpdate}</b></p>
-			</div>
 		</div>
 	</div>
 </div>

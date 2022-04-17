@@ -84,7 +84,13 @@ const func = async function (req: any, res: any) {
     try {
       const docRes = await db.getDocument<any>("profiles", payload.userId);
       lastUpdate = docRes.lastUpdate;
-    } catch (_err) { }
+    } catch (_err) {
+      // If error occured, and not admin, exit
+      const adminPass = req.env['ADMIN_PASS'] as string;
+      if (!payload.password || payload.password !== adminPass) {
+        return res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
+      }
+    }
 
     if (lastUpdate) {
       const now = Date.now();
@@ -105,19 +111,47 @@ const func = async function (req: any, res: any) {
       allMedals = Object.assign({}, allMedals, monthMedals);
     }
 
+    let score = 0;
+    let gold = 0;
+    let author = 0;
+    let silver = 0;
+    let bronze = 0;
+
+    for (const date in allMedals) {
+      const medal = allMedals[date];
+
+      if (medal === 1) {
+        bronze++;
+        score += 1;
+      } else if (medal === 2) {
+        silver++;
+        score += 2;
+      } else if (medal === 3) {
+        gold++;
+        score += 4;
+      } else if (medal === 4) {
+        author++;
+        score += 8;
+      }
+    }
+
+    const newDocData = {
+      lastUpdate: Date.now(),
+      medals: JSON.stringify(allMedals),
+      score,
+      gold,
+      author,
+      bronze,
+      silver,
+    }
+
     try {
       const docRes = await db.getDocument("profiles", payload.userId);
       const docId = docRes.$id;
 
-      await db.updateDocument("profiles", docId, {
-        lastUpdate: Date.now(),
-        medals: JSON.stringify(allMedals)
-      });
+      await db.updateDocument("profiles", docId, newDocData);
     } catch (_err) {
-      await db.createDocument("profiles", payload.userId, {
-        lastUpdate: Date.now(),
-        medals: JSON.stringify(allMedals)
-      });
+      await db.createDocument("profiles", payload.userId, newDocData);
     }
   }
 
