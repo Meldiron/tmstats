@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-
+	import { goto } from '$app/navigation';
 	import { Appwrite } from 'appwrite';
 	import { Utils } from '../utils';
 
@@ -9,6 +9,9 @@
 	appwrite.setEndpoint('https://appwrite.matejbaco.eu/v1').setProject('trackmaniaDailyStats');
 
 	let userId = '';
+	let userName = '';
+
+	let isLoading = false;
 
 	let leaderboard = [];
 
@@ -19,6 +22,32 @@
 			orerByAttr = sort;
 			onMountFunction();
 		};
+	}
+
+	function onVisitProfile() {
+		goto('/user/' + userId);
+	}
+
+	async function lookupProfile() {
+		try {
+			isLoading = true;
+
+			const res = await appwrite.functions.createExecution(
+				'nadeoAction',
+				JSON.stringify({
+					type: 'getUserId',
+					nick: userName
+				}),
+				false
+			);
+
+			const id = JSON.parse(res.stdout).id;
+
+			goto('/user/' + id);
+		} catch (_err) {
+		} finally {
+			isLoading = false;
+		}
 	}
 
 	const onMountFunction = async () => {
@@ -131,24 +160,82 @@
 	</div>
 
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-		<h1 class="font-bold text-black text-2xl mb-3">Profile Lookup</h1>
+		<h1 class="font-bold text-black text-2xl mb-3">Profile Lookup by ID</h1>
 
 		<p class="mb-3">
 			Couldn't find player you are looking for? Here, look for his profile by his ID.
 		</p>
-		<div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
+		<form
+			on:submit|preventDefault={onVisitProfile}
+			class="max-w-sm sm:max-w-none flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4"
+		>
 			<input
 				bind:value={userId}
-				class="focus:outline-none focus:ring ring-slate-300 border border-slate-300 w-full max-w-sm bg-slate-200 p-2 rounded-md"
+				class="focus:outline-none focus:ring ring-slate-300 border border-slate-300 w-full sm:max-w-sm bg-slate-200 p-2 rounded-md"
 				type="text"
 				placeholder="06e99ad3-cded-4440-a19c-b3df4fda8004"
 			/>
 
-			<a href={'/user/' + userId}>
-				<button class="rounded-tl-3xl rounded-br-3xl text-white bg-author-600 py-2 px-6 font-bold"
-					>Visit Profile</button
-				>
-			</a>
-		</div>
+			<button
+				type="submit"
+				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-600 py-2 px-6 font-bold"
+			>
+				<p class="m-0 p-0">Visit Profile</p>
+			</button>
+		</form>
+	</div>
+
+	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
+		<h1 class="font-bold text-black text-2xl mb-3">Profile Lookup by Nickname</h1>
+
+		<p class="mb-3">
+			Are you not sure what user ID is? Enter nickname here, and we will take care of finding ID.
+		</p>
+		<form
+			on:submit|preventDefault={lookupProfile}
+			class="max-w-sm sm:max-w-none flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4"
+		>
+			<input
+				bind:value={userName}
+				class="focus:outline-none sm:max-w-sm focus:ring ring-slate-300 border border-slate-300 w-full bg-slate-200 p-2 rounded-md"
+				type="text"
+				placeholder="MeldironSK"
+			/>
+
+			<button
+				type="submit"
+				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-600 py-2 px-6 font-bold"
+			>
+				{#if isLoading}
+					<svg
+						class="w-5 h-5 animate-spin"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+					>
+						<circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						/>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+						/>
+					</svg>
+				{:else}
+					<p class="m-0 p-0">Visit Profile</p>
+				{/if}
+			</button>
+		</form>
+		<small class="text-xs mb-3 text-gray-400"
+			>This action uses <a class="text-gray-600" target="_blank" href="https://trackmania.io/"
+				>trackmania.io</a
+			> services.</small
+		>
 	</div>
 </div>

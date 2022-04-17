@@ -8,7 +8,8 @@ const env = config();
 
 await Func({
     env,
-    payload: '{"type":"updateProfile","userId":"06e99ad3-cded-4440-a19c-b3df4fda8004"}'
+    // payload: '{"type":"updateProfile","userId":"06e99ad3-cded-4440-a19c-b3df4fda8004"}'
+    payload: '{"type":"getUserId","nick":"Meldiron"}'
 }, {
     json: (json: any, _code: any) => {
         console.log(json);

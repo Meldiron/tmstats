@@ -3,6 +3,7 @@
 import * as sdk from "https://deno.land/x/appwrite@3.0.0/mod.ts";
 import { Auth } from "./Auth.ts";
 import { Daily } from "./Daily.ts";
+import axiod from "https://deno.land/x/axiod/mod.ts";
 
 // https://players.trackmania.com/server/dedicated
 
@@ -70,11 +71,25 @@ const func = async function (req: any, res: any) {
       return res.json({ message: "This action requires 'nick'.", code: 500 });
     }
 
-    return res.json({ message: "This action is not supported yet.", code: 500 });
+    const tmRes = await axiod.get("https://trackmania.io/api/players/find?search=" + payload.nick, {
+      headers: {
+        'User-Agent': 'TM Daily Stats / 0.0.1 Private app'
+      }
+    });
+    const bodyJson = tmRes.data;
+
+    if (bodyJson.length <= 0) {
+      return res.json({ message: "User with this nickname not found.", code: 500 });
+    }
+
+    const userId = bodyJson[0].player.id;
+
+    return res.json({
+      id: userId
+    });
   }
 
   if (payload.type === 'updateProfile') {
-
     if (!payload.userId) {
       return res.json({ message: "This action requires 'userId'.", code: 500 });
     }
@@ -153,10 +168,14 @@ const func = async function (req: any, res: any) {
     } catch (_err) {
       await db.createDocument("profiles", payload.userId, newDocData);
     }
+
+    return res.json({
+      message: "Profile successfully updated!",
+    });
   }
 
   res.json({
-    message: "Profile successfully updated!",
+    action: "none",
   });
 };
 

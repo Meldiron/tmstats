@@ -2,6 +2,18 @@
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
 
+```
+{
+    "type": "updateProfile",
+    "userId": "5ca1fa3a-3413-4863-86d7-7a47982abc1b",
+    "password": "(uppercase k) ac minus 3numbers"
+}
+
+Meldiron: 06e99ad3-cded-4440-a19c-b3df4fda8004
+Dejwfík: 5ca1fa3a-3413-4863-86d7-7a47982abc1b
+Benko: f6fe29aa-45dc-4fe9-9a95-d5e2c39f6b5f
+```
+
 ## Creating a project
 
 If you're seeing this, you've probably already done this step. Congrats!!!
