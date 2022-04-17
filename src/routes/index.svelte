@@ -30,6 +30,12 @@
 
 	async function lookupProfile() {
 		try {
+			await appwrite.account.get();
+		} catch (err) {
+			await appwrite.account.createAnonymousSession();
+		}
+
+		try {
 			isLoading = true;
 
 			const res = await appwrite.functions.createExecution(
