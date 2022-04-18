@@ -38,18 +38,7 @@
 	}
 
 	const onMountFunction = async () => {
-		const docs = await appwrite.database.listDocuments(
-			'profiles',
-			[],
-			100,
-			undefined,
-			undefined,
-			undefined,
-			[orerByAttr === 'points' ? 'score' : orerByAttr],
-			['DESC']
-		);
-
-		leaderboard = docs.documents;
+		leaderboard = await AppwriteService.listProfiles(orerByAttr);
 	};
 
 	onMount(onMountFunction);

@@ -25,6 +25,25 @@ export class AppwriteService {
         };
     }
 
+
+    static async listProfiles(orerByAttr: string) {
+        await this.ensureAuth();
+
+
+        const docs = await appwrite.database.listDocuments(
+            'profiles',
+            [],
+            100,
+            undefined,
+            undefined,
+            undefined,
+            [orerByAttr === 'points' ? 'score' : orerByAttr],
+            ['DESC']
+        );
+
+        return docs.documents;
+    }
+
     static async nadeoAction(profileId: string): Promise<string> {
         await this.ensureAuth();
 
