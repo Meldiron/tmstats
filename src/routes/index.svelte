@@ -76,32 +76,6 @@
 	</div>
 
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-		<h1 class="font-bold text-black text-2xl mb-3">Profile Lookup by ID</h1>
-
-		<p class="mb-3">
-			Couldn't find player you are looking for? Here, look for his profile by his ID.
-		</p>
-		<form
-			on:submit|preventDefault={onVisitProfile}
-			class="max-w-sm sm:max-w-none flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4"
-		>
-			<input
-				bind:value={userId}
-				class="focus:outline-none focus:ring ring-slate-300 border border-slate-300 w-full sm:max-w-sm bg-slate-200 p-2 rounded-md"
-				type="text"
-				placeholder="06e99ad3-cded-4440-a19c-b3df4fda8004"
-			/>
-
-			<button
-				type="submit"
-				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-500 hover:bg-author-600 py-2 px-6 font-bold"
-			>
-				<p class="m-0 p-0">Visit Profile</p>
-			</button>
-		</form>
-	</div>
-
-	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
 		<h1 class="font-bold text-black text-2xl mb-3">Profile Lookup by Nickname</h1>
 
 		<p class="mb-3">
@@ -153,6 +127,32 @@
 				>trackmania.io</a
 			> services.</small
 		>
+	</div>
+
+	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
+		<h1 class="font-bold text-black text-2xl mb-3">Profile Lookup by ID</h1>
+
+		<p class="mb-3">
+			Couldn't find player you are looking for? Here, look for his profile by his ID.
+		</p>
+		<form
+			on:submit|preventDefault={onVisitProfile}
+			class="max-w-sm sm:max-w-none flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4"
+		>
+			<input
+				bind:value={userId}
+				class="focus:outline-none focus:ring ring-slate-300 border border-slate-300 w-full sm:max-w-sm bg-slate-200 p-2 rounded-md"
+				type="text"
+				placeholder="06e99ad3-cded-4440-a19c-b3df4fda8004"
+			/>
+
+			<button
+				type="submit"
+				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-500 hover:bg-author-600 py-2 px-6 font-bold"
+			>
+				<p class="m-0 p-0">Visit Profile</p>
+			</button>
+		</form>
 	</div>
 
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
