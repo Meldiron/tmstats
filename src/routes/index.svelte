@@ -49,7 +49,7 @@
 		<h1 class="font-bold text-black text-2xl mb-3">TMStats | Daily Medal Calendar</h1>
 
 		<div class="prose">
-			<p>Yearly view of your medals in daily maps. Share your daily maps medals with anyone!</p>
+			<p>Yearly view of your medals in a calendar. Share your daily maps medals with anyone!</p>
 		</div>
 	</div>
 
