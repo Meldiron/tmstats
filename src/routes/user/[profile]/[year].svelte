@@ -7,11 +7,18 @@
 	appwrite.setEndpoint('https://appwrite.matejbaco.eu/v1').setProject('trackmaniaDailyStats');
 
 	import { page } from '$app/stores';
-	import { Utils } from '../../utils';
+	import { Utils } from '../../../utils';
 
-	const profileId = $page.params.profile;
-	const profileName = Utils.getName(profileId);
+	let profileId;
+	let currentYear;
+	let profileName;
+
 	let isLoading = false;
+
+	const years = [];
+	for (let y = 2020; y <= new Date().getFullYear(); y++) {
+		years.push(y);
+	}
 
 	const monthNames = [
 		'January',
@@ -48,6 +55,8 @@
 	}
 
 	const onMountFunction = async () => {
+		console.log('INIT');
+
 		for (const heatMap of heatMaps) {
 			heatMap.$destroy();
 		}
@@ -93,7 +102,7 @@
 			}
 		}
 
-		const year = new Date().getFullYear();
+		const year = +currentYear;
 
 		for (const month of months) {
 			const number = month.month;
@@ -101,7 +110,8 @@
 			let data = Object.keys(dataSet)
 				.filter((d) => {
 					const m = d.split('-')[1];
-					return +m === number;
+					const y = d.split('-')[2];
+					return +m === number && +y === year;
 				})
 				.map((key) => {
 					return {
@@ -185,11 +195,27 @@
 
 			heatMaps = [...heatMaps, map];
 		}
-
-		console.log(noMedalMaps);
 	};
 
 	onMount(onMountFunction);
+
+	let lastFootprint = null;
+	page.subscribe(() => {
+		currentYear = $page.params.year;
+		profileId = $page.params.profile;
+		profileName = Utils.getName(profileId);
+
+		if (lastFootprint === null) {
+			lastFootprint = '{}';
+			return;
+		}
+
+		const footprint = JSON.stringify($page.params);
+		if (lastFootprint !== footprint) {
+			lastFootprint = footprint;
+			onMountFunction();
+		}
+	});
 
 	async function updateData() {
 		if (isLoading) {
@@ -214,7 +240,7 @@
 			);
 
 			throw new Error(
-				'Profile update scheduled. This usually takes around a minute, but can take more depending on queue length.'
+				'Profile update scheduled. Keep in mind this only works if last update was at least 1 hour ago. This action usually takes around a minute, but can take more depending on queue length.'
 			);
 		} catch (err) {
 			alert(err.message);
@@ -281,40 +307,55 @@
 		</div>
 	</div>
 
-	<div
-		class=" my-4 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
-	>
-		<p class="text-gray-400">Last update <b class="font-bold">{lastUpdate}</b></p>
-
-		<button
-			on:click={updateData}
-			class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-white bg-author-600 py-2 px-6 font-bold"
-		>
-			{#if isLoading}
-				<svg
-					class="w-5 h-5 animate-spin"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
+	<div class="flex items-center justify-between space-x-3">
+		<div class="flex items-center justify-start space-x-2">
+			{#each years as year}
+				<a href={'/user/' + profileId + '/' + year}>
+					<button
+						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-slate-600 bg-slate-200 py-2 px-6 font-bold hover:bg-slate-300"
+						class:yearselected={year === +currentYear}
+					>
+						<p class="m-0 p-0">{year}</p>
+					</button></a
 				>
-					<circle
-						class="opacity-25"
-						cx="12"
-						cy="12"
-						r="10"
-						stroke="currentColor"
-						stroke-width="4"
-					/>
-					<path
-						class="opacity-75"
-						fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-					/>
-				</svg>
-			{:else}
-				<p class="m-0 p-0">Update Data</p>
-			{/if}
-		</button>
+			{/each}
+		</div>
+
+		<div
+			class=" my-4 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
+		>
+			<p class="text-gray-400">Last update <b class="font-bold">{lastUpdate}</b></p>
+
+			<button
+				on:click={updateData}
+				class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-white bg-author-500 hover:bg-author-600 py-2 px-6 font-bold"
+			>
+				{#if isLoading}
+					<svg
+						class="w-5 h-5 animate-spin"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+					>
+						<circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						/>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+						/>
+					</svg>
+				{:else}
+					<p class="m-0 p-0">Update Data</p>
+				{/if}
+			</button>
+		</div>
 	</div>
 
 	<div class="grid grid-cols-12 gap-6 mt-6">

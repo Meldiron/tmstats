@@ -157,7 +157,7 @@
 			"runtime": "deno-1.14",
 			"path": "functions/convertId",
 			"entrypoint": "src/mod.ts",
-			"execute": [],
+			"execute": ["role:all"],
 			"events": [],
 			"schedule": "",
 			"timeout": 15

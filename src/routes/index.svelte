@@ -25,7 +25,7 @@
 	}
 
 	function onVisitProfile() {
-		goto('/user/' + userId);
+		goto('/user/' + userId + '/' + new Date().getFullYear());
 	}
 
 	async function lookupProfile() {
@@ -48,7 +48,7 @@
 
 			const id = JSON.parse(res.stdout).id;
 
-			goto('/user/' + id);
+			goto('/user/' + id + '/' + new Date().getFullYear());
 		} catch (_err) {
 		} finally {
 			isLoading = false;
@@ -126,9 +126,9 @@
 							>
 						</div>
 
-						<a href={'/user/' + record.$id}>
+						<a href={'/user/' + record.$id + '/' + new Date().getFullYear()}>
 							<button
-								class="transform translate-y-[2px] rounded-tl-lg rounded-br-lg text-white bg-author-600 p-[2px] font-bold"
+								class="transform translate-y-[2px] rounded-tl-lg rounded-br-lg text-white bg-author-500 hover:bg-author-600 p-[2px] font-bold"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -183,7 +183,7 @@
 
 			<button
 				type="submit"
-				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-600 py-2 px-6 font-bold"
+				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-500 hover:bg-author-600 py-2 px-6 font-bold"
 			>
 				<p class="m-0 p-0">Visit Profile</p>
 			</button>
@@ -209,7 +209,7 @@
 
 			<button
 				type="submit"
-				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-600 py-2 px-6 font-bold"
+				class="rounded-tl-3xl rounded-br-3xl text-white bg-author-500 hover:bg-author-600 py-2 px-6 font-bold"
 			>
 				{#if isLoading}
 					<svg

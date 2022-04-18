@@ -2,12 +2,14 @@
 
 import Func from "./mod.ts";
 
+/*
 import { config } from "https://deno.land/x/dotenv/mod.ts";
-
 const env = config();
+*/
 
 await Func({
-    env,
+    // env,
+    env: {},
     payload: '{"nick":"Meldiron"}'
 }, {
     json: (json: any, _code: any) => {

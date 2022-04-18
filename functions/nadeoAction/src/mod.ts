@@ -35,16 +35,6 @@ const func = async function (req: any, res: any) {
 
   const payload = JSON.parse(req.payload || '{}');
 
-  if (!payload.type) {
-    return res.json({ message: "Specify action type.", code: 500 });
-  }
-
-  const allowedTypes = ['getUserId', 'updateProfile'];
-
-  if (!allowedTypes.includes(payload.type)) {
-    return res.json({ message: "Action type not supported.", code: 500 });
-  }
-
   client = new sdk.Client();
   db = new sdk.Database(client);
 
