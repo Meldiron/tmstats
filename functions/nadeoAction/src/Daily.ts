@@ -4,12 +4,37 @@ import { Auth } from "./Auth.ts";
 import { getAxiod, sdk } from "./deps.ts";
 
 export class Daily {
+    static formatTMText(str: string): string {
+        let res, resStr;
+
+        // Iterate through the string and check if there are $t,
+
+        // First remplace all $T by $t and $Z by $z (for the regex)
+        resStr = str.replace(/\$T/g, '$t').replace(/\$Z/g, '$z');
+
+
+        // If there is a $t, it will be replaced by the text in uppercase until the $z or the end of the string
+        while ((res = resStr.match(/\$t(.)*(\$z)|\$t(.)*$/g)) !== null) {
+            for (let i = 0; i < res.length; i++) {
+                resStr = resStr.replace(res[i], res[i].toUpperCase());
+            }
+        }
+
+        // Check if there are two dollar signs in a row, returns one dollar sign
+        resStr = resStr.replace(/\$\$/gi, '$');
+
+        // Then remove all TM codes
+        return resStr.replace(/\$[<>wnoisgtz]|\$[hl]\[(.)+\]|\$[hl]|\$[0-9a-fA-F]{3}/gi, '');
+    }
+
     static getOffset(dateFrom = new Date(2020, 6, 1), dateTo = new Date()) {
         return dateTo.getMonth() - dateFrom.getMonth() +
             (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
     }
 
     static async getMissingMaps(db: sdk.Database): Promise<any[]> {
+        // TODO: If this starts failing, just fetch everything all the time.. and then do getDocument. If exists, dont do anything. If not, createDocument
+
         const downloadedMaps = [];
 
         let hasNext = true;
@@ -25,16 +50,15 @@ export class Daily {
         const missingKeys: string[] = [];
         const missingMonths: string[] = [];
 
-        const dateFrom = new Date(2020, 6, 1);
+        const dateFrom = new Date(2020, 6, 1, 10);
         for (let dayTime = dateFrom.getTime(); dayTime < Date.now(); dayTime += 86400000) {
             const d = new Date(dayTime);
-            const monthKey = `${d.getMonth() + 1}-${d.getFullYear()}`;
-            const dayKey = `${d.getDate()}-${monthKey}`;
+            const monthKey = `${d.getUTCMonth() + 1}-${d.getUTCFullYear()}`;
+            const dayKey = `${d.getUTCDate()}-${monthKey}`;
 
             const downloadedMap = downloadedMaps.find((map: any) => map.key === dayKey);
             if (!downloadedMap) {
                 if (!missingKeys.includes(dayKey)) {
-
                     missingKeys.push(dayKey);
                 }
 
@@ -90,9 +114,12 @@ export class Daily {
                 const month = dailyRes.data.monthList[0].month;
                 const year = dailyRes.data.monthList[0].year;
 
+                const normalName = this.formatTMText(map.name);
+
                 return {
                     mapid: map.mapId,
                     mapUid: map.mapUid,
+                    name: normalName,
                     day,
                     month,
                     year,
