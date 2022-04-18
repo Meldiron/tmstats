@@ -480,8 +480,8 @@
 			</ul>
 			<p>
 				New data is not fetched automatically. To request a data update, use 'Update Profile' button
-				at the top of the page. Keep in mind this only schedules request into a queue. If there is a
-				long queue, you might need to wait minutes, or even hours for your profile update.
+				at the top of the page. Keep in mind this there might be a waiting queue during heavy loads,
+				and update may take up to a few minutes.
 			</p>
 			<p>
 				Your score for year <strong>{currentYear}</strong> is
