@@ -94,6 +94,36 @@ export class Auth {
 
     private async newTokenAction() {
         console.warn("Getting new tokens for " + this.service);
+
+        // Client Token
+        const authRes = await (await getAxiod()).post("https://public-ubiservices.ubi.com/v3/profiles/sessions", {
+            audience: this.service
+        }, {
+            headers: {
+                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+                'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
+                'Authorization': 'Basic ' + this.nadeoAuth,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const loginRes = await (await getAxiod()).post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices", {
+            audience: this.service
+        }, {
+            headers: {
+                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+                'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
+                'Authorization': 'ubi_v1 t=' + authRes.data.ticket,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const auth = loginRes.data;
+        this.accessToken = auth.accessToken;
+        this.refreshToken = auth.refreshToken;
+
+        /*
+        // Server token:
         const loginRes = await (await getAxiod()).post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/basic", {
             audience: this.service
         }, {
@@ -109,6 +139,7 @@ export class Auth {
 
         this.accessToken = auth.accessToken;
         this.refreshToken = auth.refreshToken;
+        */
     }
 
     private async refreshTokenAction() {

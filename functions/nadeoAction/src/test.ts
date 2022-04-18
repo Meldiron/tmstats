@@ -9,7 +9,7 @@ const env = config();
 
 await Func({
     env,
-    payload: '{"userId":"f6fe29aa-45dc-4fe9-9a95-d5e2c39f6b5f","password":"dev"}'
+    payload: '{"userId":"5ca1fa3a-3413-4863-86d7-7a47982abc1b","password":"dev"}'
 }, {
     json: (json: any, _code: any) => {
         console.log(json);

@@ -1,12 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { Appwrite } from 'appwrite';
-	import { Utils } from '../utils';
-
-	const appwrite = new Appwrite();
-
-	appwrite.setEndpoint('https://appwrite.matejbaco.eu/v1').setProject('trackmaniaDailyStats');
+	import { AppwriteService } from '../appwrite';
 
 	let userId = '';
 	let userName = '';
@@ -30,26 +25,13 @@
 
 	async function lookupProfile() {
 		try {
-			await appwrite.account.get();
-		} catch (err) {
-			await appwrite.account.createAnonymousSession();
-		}
-
-		try {
 			isLoading = true;
 
-			const res = await appwrite.functions.createExecution(
-				'convertId',
-				JSON.stringify({
-					nick: userName
-				}),
-				false
-			);
-
-			const id = JSON.parse(res.stdout).id;
+			const id = await AppwriteService.getId(userName);
 
 			goto('/user/' + id + '/' + new Date().getFullYear());
-		} catch (_err) {
+		} catch (err) {
+			alert(err.message);
 		} finally {
 			isLoading = false;
 		}
@@ -120,7 +102,7 @@
 					<div class="flex items-baseline justify-start space-x-3">
 						<div class="flex items-end justify-start">
 							<h3 class="leading-6 font-bold text-black text-author-500 text-2xl">{index + 1}.</h3>
-							<p class="leading-5 ml-2 font-bold text-lg">{Utils.getName(record.$id)}</p>
+							<p class="leading-5 ml-2 font-bold text-lg">{record.nickname}</p>
 							<button on:click={orderBy('points')} class="leading-4 ml-2 text-sm text-gray-500"
 								>{record.score} points</button
 							>

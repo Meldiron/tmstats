@@ -68,7 +68,7 @@ const func = async function (req: any, res: any) {
     // If error occured, and not admin, exit
     const adminPass = req.env['ADMIN_PASS'] as string;
     if (!payload.password || payload.password !== adminPass) {
-      return res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
+      // return res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
     }
   }
 
@@ -83,6 +83,18 @@ const func = async function (req: any, res: any) {
       }
     }
   }
+
+  const accountRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/accounts/displayNames/?accountIdList=" + payload.userId, {
+    headers: {
+      'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+
+      'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const nickname = accountRes.data[0].displayName;
 
   const allMedals = await Daily.getMedals(payload.userId);
 
@@ -118,6 +130,7 @@ const func = async function (req: any, res: any) {
     author,
     bronze,
     silver,
+    nickname
   }
 
   try {
@@ -132,10 +145,17 @@ const func = async function (req: any, res: any) {
   return res.json({
     message: "Profile successfully updated!",
   });
-
-  res.json({
-    action: "none",
-  });
 };
 
-export default func;
+export default async function (req: any, res: any) {
+  try {
+    await func(req, res);
+  } catch (err) {
+    console.log(err);
+
+    if (!err.message) {
+      err.message = "Unexpected error.";
+    }
+    throw err;
+  }
+};

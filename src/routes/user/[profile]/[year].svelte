@@ -1,18 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Appwrite } from 'appwrite';
-
-	const appwrite = new Appwrite();
-
-	appwrite.setEndpoint('https://appwrite.matejbaco.eu/v1').setProject('trackmaniaDailyStats');
 
 	import { page } from '$app/stores';
-	import { Utils } from '../../../utils';
+	import { AppwriteService } from '../../../appwrite';
 
 	let profileId;
 	let currentYear;
-	let profileName;
+	let profileName = '...';
 	let currentYearScore = 0;
+	let didFail = null;
 
 	let isLoading = false;
 
@@ -72,9 +68,23 @@
 		lastUpdate = '...';
 		heatMaps = [];
 		currentYearScore = 0;
+		didFail = null;
 
-		const dbRes = await appwrite.database.getDocument<any>('profiles', profileId);
-		const dataSet = JSON.parse(dbRes.medals);
+		let dbRes;
+
+		try {
+			dbRes = await AppwriteService.getHeatmap(profileId);
+		} catch (err) {
+			didFail = true;
+		}
+
+		if (!dbRes) {
+			return;
+		}
+
+		const dataSet = dbRes.medals;
+
+		profileName = dbRes.nickname;
 
 		lastUpdate = moment(dbRes.lastUpdate).format('DD.MM.YYYY HH:mm');
 
@@ -217,10 +227,9 @@
 	onMount(onMountFunction);
 
 	let lastFootprint = null;
-	page.subscribe(() => {
+	page.subscribe(async () => {
 		currentYear = $page.params.year;
 		profileId = $page.params.profile;
-		profileName = Utils.getName(profileId);
 
 		if (lastFootprint === null) {
 			lastFootprint = '{}';
@@ -242,23 +251,9 @@
 		isLoading = true;
 
 		try {
-			await appwrite.account.get();
-		} catch (err) {
-			await appwrite.account.createAnonymousSession();
-		}
-
-		try {
-			const _res = await appwrite.functions.createExecution(
-				'nadeoAction',
-				JSON.stringify({
-					userId: profileId
-				}),
-				true
-			);
-
-			throw new Error(
-				'Profile update scheduled. Keep in mind this only works if last update was at least 1 hour ago. This action usually takes around a minute, but can take more depending on queue length.'
-			);
+			const msg = await AppwriteService.nadeoAction(profileId);
+			onMountFunction();
+			throw new Error(msg);
 		} catch (err) {
 			alert(err.message);
 		}
@@ -369,7 +364,7 @@
 						/>
 					</svg>
 				{:else}
-					<p class="m-0 p-0">Update Data</p>
+					<p class="m-0 p-0">Update Profile</p>
 				{/if}
 			</button>
 		</div>
@@ -387,6 +382,59 @@
 		{/each}
 	</div>
 
+	{#if didFail === false}
+		<div
+			class="mt-6 border border-blue-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-blue-500 p-4"
+		>
+			<div class="flex items-center justify-start space-x-3">
+				<div class="rounded-full bg-blue-700 text-white p-1">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+				</div>
+				<p>Profile update can take up to a few minutes.</p>
+			</div>
+		</div>
+	{:else if didFail === true}
+		<div
+			class="mt-6 border border-red-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-red-500 p-4"
+		>
+			<div class="flex items-center justify-start space-x-3">
+				<div class="rounded-full bg-red-700 text-white p-1">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+				</div>
+				<p>
+					We don't have this profile yet. Click 'Update Profile' to start fetching data. Be aware,
+					it can take a few minutes.
+				</p>
+			</div>
+		</div>
+	{/if}
+
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
 		<h1 class="font-bold text-black text-2xl mb-3">How to Read Data?</h1>
 
@@ -401,8 +449,8 @@
 			</ul>
 			<p>
 				If you have finished a map but didn't get any medal, the cell has the same color as if you
-				would never play the map. Try harder, you can do this! Here is a list of maps you tried but
-				didn't get medal on:
+				would never play the map. Try harder, you can do this! Here is a list of maps you finished
+				but didn't get medal on:
 			</p>
 			<ul>
 				{#each noMedalMaps as map}
@@ -416,8 +464,8 @@
 				{/if}
 			</ul>
 			<p>
-				New data is not fetched automatically. To request a data update, use 'Update Data' button at
-				the top of the page. Keep in mind this only schedules request into a queue. If there is a
+				New data is not fetched automatically. To request a data update, use 'Update Profile' button
+				at the top of the page. Keep in mind this only schedules request into a queue. If there is a
 				long queue, you might need to wait minutes, or even hours for your profile update.
 			</p>
 			<p>
