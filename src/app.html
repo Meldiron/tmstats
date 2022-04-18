@@ -141,7 +141,28 @@
 			data-cfasync="false"
 		></script>
 		<script>
+			var analyticsScript = function (didConsent) {
+				if (didConsent) {
+					var script = document.createElement('script');
+					script.src = 'https://analytics.objednajsidomov.sk/js/plausible.js';
+					script.defer = true;
+					script.dataset.domain = 'tmstats.eu';
+
+					document.head.appendChild(script);
+				}
+			};
+
 			window.cookieconsent.initialise({
+				onStatusChange: function () {
+					analyticsScript(this.hasConsented());
+				},
+				onInitialise: function () {
+					analyticsScript(this.hasConsented());
+				},
+				onRevokeChoice: function () {
+					analyticsScript(this.hasConsented());
+				},
+				type: 'opt-in',
 				palette: {
 					popup: {
 						background: '#ecfdf5',
@@ -155,7 +176,7 @@
 				theme: 'classic',
 				content: {
 					message:
-						'This website uses authentication cookies that are necessary for proper functionality. No analytics data is collected.'
+						'This website uses authentication and analytics cookies. Analytics data is not shared externally.'
 				}
 			});
 		</script>
