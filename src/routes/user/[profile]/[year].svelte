@@ -74,6 +74,7 @@
 
 		try {
 			dbRes = await AppwriteService.getHeatmap(profileId);
+			didFail = false;
 		} catch (err) {
 			didFail = true;
 		}
@@ -319,7 +320,7 @@
 		</div>
 	</div>
 
-	<div class="flex items-center justify-between space-x-3">
+	<div class="md:mt-0 mt-6 flex flex-col md:flex-row items-center justify-between space-x-3">
 		<div class="flex items-center justify-start space-x-2">
 			{#each years as year}
 				<a href={'/user/' + profileId + '/' + year}>
@@ -373,7 +374,7 @@
 	<div class="grid grid-cols-12 gap-6 mt-6">
 		{#each months as month}
 			<div
-				class="border border-gray-900 p-4 bg-gray-800 rounded-tl-3xl rounded-br-3xl col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3"
+				class="border border-gray-900 p-4 bg-gray-800 rounded-tl-3xl rounded-br-3xl col-span-6 sm:col-span-6 md:col-span-4 lg:col-span-3"
 			>
 				<h3 class="mb-3 font-semibold text-lg text-gray-200">{month.name}</h3>
 
