@@ -65,109 +65,83 @@ const func = async function (req: any, res: any) {
     await Auth.Game.load();
   }
 
-  if (payload.type === 'getUserId') {
-    if (!payload.nick) {
-      return res.json({ message: "This action requires 'nick'.", code: 500 });
-    }
-
-    const tmRes = await (await getAxiod()).get("https://trackmania.io/api/players/find?search=" + payload.nick, {
-      headers: {
-        'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com'
-      }
-    });
-    const bodyJson = tmRes.data;
-
-    if (bodyJson.length <= 0) {
-      return res.json({ message: "User with this nickname not found.", code: 500 });
-    }
-
-    const userId = bodyJson[0].player.id;
-
-    return res.json({
-      id: userId
-    });
+  if (!payload.userId) {
+    return res.json({ message: "This action requires 'userId'.", code: 500 });
   }
 
-  if (payload.type === 'updateProfile') {
-    if (!payload.userId) {
-      return res.json({ message: "This action requires 'userId'.", code: 500 });
+  let lastUpdate = null;
+
+  try {
+    const docRes = await db.getDocument<any>("profiles", payload.userId);
+    lastUpdate = docRes.lastUpdate;
+  } catch (_err) {
+    // If error occured, and not admin, exit
+    const adminPass = req.env['ADMIN_PASS'] as string;
+    if (!payload.password || payload.password !== adminPass) {
+      return res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
     }
+  }
 
-    let lastUpdate = null;
+  if (lastUpdate) {
+    const now = Date.now();
 
-    try {
-      const docRes = await db.getDocument<any>("profiles", payload.userId);
-      lastUpdate = docRes.lastUpdate;
-    } catch (_err) {
-      // If error occured, and not admin, exit
+    const h1 = 1000 * 60 * 60;
+    if (lastUpdate + h1 > now) {
       const adminPass = req.env['ADMIN_PASS'] as string;
       if (!payload.password || payload.password !== adminPass) {
-        return res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
+        return res.json({ message: "You can only refresh profile once every hour.", code: 500 });
       }
     }
-
-    if (lastUpdate) {
-      const now = Date.now();
-
-      const h1 = 1000 * 60 * 60;
-      if (lastUpdate + h1 > now) {
-        const adminPass = req.env['ADMIN_PASS'] as string;
-        if (!payload.password || payload.password !== adminPass) {
-          return res.json({ message: "You can only refresh profile once every hour.", code: 500 });
-        }
-      }
-    }
-
-    const allMedals = await Daily.getMedals(payload.userId);
-    console.log(allMedals);
-
-    let score = 0;
-    let gold = 0;
-    let author = 0;
-    let silver = 0;
-    let bronze = 0;
-
-    for (const date in allMedals) {
-      const medal = allMedals[date];
-
-      if (medal === 1) {
-        bronze++;
-        score += 1;
-      } else if (medal === 2) {
-        silver++;
-        score += 2;
-      } else if (medal === 3) {
-        gold++;
-        score += 4;
-      } else if (medal === 4) {
-        author++;
-        score += 8;
-      }
-    }
-
-    const newDocData = {
-      lastUpdate: Date.now(),
-      medals: JSON.stringify(allMedals),
-      score,
-      gold,
-      author,
-      bronze,
-      silver,
-    }
-
-    try {
-      const docRes = await db.getDocument("profiles", payload.userId);
-      const docId = docRes.$id;
-
-      await db.updateDocument("profiles", docId, newDocData);
-    } catch (_err) {
-      await db.createDocument("profiles", payload.userId, newDocData);
-    }
-
-    return res.json({
-      message: "Profile successfully updated!",
-    });
   }
+
+  const allMedals = await Daily.getMedals(payload.userId);
+
+  let score = 0;
+  let gold = 0;
+  let author = 0;
+  let silver = 0;
+  let bronze = 0;
+
+  for (const date in allMedals) {
+    const medal = allMedals[date];
+
+    if (medal === 1) {
+      bronze++;
+      score += 1;
+    } else if (medal === 2) {
+      silver++;
+      score += 2;
+    } else if (medal === 3) {
+      gold++;
+      score += 4;
+    } else if (medal === 4) {
+      author++;
+      score += 8;
+    }
+  }
+
+  const newDocData = {
+    lastUpdate: Date.now(),
+    medals: JSON.stringify(allMedals),
+    score,
+    gold,
+    author,
+    bronze,
+    silver,
+  }
+
+  try {
+    const docRes = await db.getDocument("profiles", payload.userId);
+    const docId = docRes.$id;
+
+    await db.updateDocument("profiles", docId, newDocData);
+  } catch (_err) {
+    await db.createDocument("profiles", payload.userId, newDocData);
+  }
+
+  return res.json({
+    message: "Profile successfully updated!",
+  });
 
   res.json({
     action: "none",

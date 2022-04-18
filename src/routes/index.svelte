@@ -39,9 +39,8 @@
 			isLoading = true;
 
 			const res = await appwrite.functions.createExecution(
-				'nadeoAction',
+				'convertId',
 				JSON.stringify({
-					type: 'getUserId',
 					nick: userName
 				}),
 				false

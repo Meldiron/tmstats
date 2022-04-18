@@ -150,6 +150,17 @@
 			"events": [],
 			"schedule": "",
 			"timeout": 300
+		},
+		{
+			"$id": "convertId",
+			"name": "convertId",
+			"runtime": "deno-1.14",
+			"path": "functions/convertId",
+			"entrypoint": "src/mod.ts",
+			"execute": [],
+			"events": [],
+			"schedule": "",
+			"timeout": 15
 		}
 	]
 }

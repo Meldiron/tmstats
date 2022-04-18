@@ -205,16 +205,17 @@
 		}
 
 		try {
-			const res = await appwrite.functions.createExecution(
+			const _res = await appwrite.functions.createExecution(
 				'nadeoAction',
 				JSON.stringify({
-					type: 'updateProfile',
 					userId: profileId
 				}),
-				false
+				true
 			);
 
-			throw new Error(res.stdout + ',' + res.stderr);
+			throw new Error(
+				'Profile update scheduled. This usually takes around a minute, but can take more depending on queue length.'
+			);
 		} catch (err) {
 			alert(err.message);
 		}
