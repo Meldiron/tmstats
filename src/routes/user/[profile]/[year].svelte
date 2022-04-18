@@ -12,6 +12,7 @@
 	let profileId;
 	let currentYear;
 	let profileName;
+	let currentYearScore = 0;
 
 	let isLoading = false;
 
@@ -70,6 +71,7 @@
 		noMedalMaps = [];
 		lastUpdate = '...';
 		heatMaps = [];
+		currentYearScore = 0;
 
 		const dbRes = await appwrite.database.getDocument<any>('profiles', profileId);
 		const dataSet = JSON.parse(dbRes.medals);
@@ -87,18 +89,31 @@
 				bronze++;
 
 				totalPoints += 1;
+				console.log(+k.split('-')[2]);
+				if (+k.split('-')[2] === +currentYear) {
+					currentYearScore += 1;
+				}
 			} else if (medal === 2) {
 				silver++;
 
 				totalPoints += 2;
+				if (+k.split('-')[2] === +currentYear) {
+					currentYearScore += 2;
+				}
 			} else if (medal === 3) {
 				gold++;
 
 				totalPoints += 4;
+				if (+k.split('-')[2] === +currentYear) {
+					currentYearScore += 4;
+				}
 			} else if (medal === 4) {
 				author++;
 
-				totalPoints += 8;
+				totalPoints += 12;
+				if (+k.split('-')[2] === +currentYear) {
+					currentYearScore += 12;
+				}
 			}
 		}
 
@@ -169,6 +184,8 @@
 					return d;
 				});
 			}
+
+			document.querySelector('#heatmap-' + number).innerHTML = '';
 
 			const map = new SvelteHeatmap({
 				props: {
@@ -402,6 +419,10 @@
 				New data is not fetched automatically. To request a data update, use 'Update Data' button at
 				the top of the page. Keep in mind this only schedules request into a queue. If there is a
 				long queue, you might need to wait minutes, or even hours for your profile update.
+			</p>
+			<p>
+				Your score for year <strong>{currentYear}</strong> is
+				<strong>{currentYearScore} points.</strong>
 			</p>
 		</div>
 	</div>

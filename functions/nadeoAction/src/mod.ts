@@ -106,7 +106,7 @@ const func = async function (req: any, res: any) {
       score += 4;
     } else if (medal === 4) {
       author++;
-      score += 8;
+      score += 12;
     }
   }
 
