@@ -263,7 +263,7 @@
 	}
 </script>
 
-<div class="max-w-5xl w-full mx-auto mt-6 mb-6">
+<div class="max-w-5xl w-full mx-auto mt-6">
 	<div
 		class="border border-gray-900  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl font-bold text-white text-2xl bg-gray-800 p-4"
 	>
@@ -320,7 +320,60 @@
 		</div>
 	</div>
 
-	<div class="md:mt-0 mt-6 flex flex-col md:flex-row items-center justify-between space-x-3">
+	{#if didFail === false}
+		<div
+			class="mt-6 border border-blue-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-blue-500 p-4"
+		>
+			<div class="flex items-center justify-start space-x-3">
+				<div class="rounded-full bg-blue-700 text-white p-1">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+				</div>
+				<p>Profile update can take up to a few minutes. Please be kind. Don't spam this.</p>
+			</div>
+		</div>
+	{:else if didFail === true}
+		<div
+			class="mt-6 border border-red-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-red-500 p-4"
+		>
+			<div class="flex items-center justify-start space-x-3">
+				<div class="rounded-full bg-red-700 text-white p-1">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+				</div>
+				<p>
+					We don't have this profile yet. Click 'Update Profile' to start fetching data. Be aware,
+					it can take a few minutes.
+				</p>
+			</div>
+		</div>
+	{/if}
+
+	<div class="mt-6 flex flex-col md:flex-row items-center justify-between space-x-3">
 		<div class="flex items-center justify-start space-x-2">
 			{#each years as year}
 				<a href={'/user/' + profileId + '/' + year}>
@@ -335,7 +388,7 @@
 		</div>
 
 		<div
-			class=" my-4 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
+			class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
 		>
 			<p class="text-gray-400">Last update <b class="font-bold">{lastUpdate}</b></p>
 
@@ -382,59 +435,6 @@
 			</div>
 		{/each}
 	</div>
-
-	{#if didFail === false}
-		<div
-			class="mt-6 border border-blue-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-blue-500 p-4"
-		>
-			<div class="flex items-center justify-start space-x-3">
-				<div class="rounded-full bg-blue-700 text-white p-1">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/>
-					</svg>
-				</div>
-				<p>Profile update can take up to a few minutes.</p>
-			</div>
-		</div>
-	{:else if didFail === true}
-		<div
-			class="mt-6 border border-red-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-red-500 p-4"
-		>
-			<div class="flex items-center justify-start space-x-3">
-				<div class="rounded-full bg-red-700 text-white p-1">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/>
-					</svg>
-				</div>
-				<p>
-					We don't have this profile yet. Click 'Update Profile' to start fetching data. Be aware,
-					it can take a few minutes.
-				</p>
-			</div>
-		</div>
-	{/if}
 
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
 		<h1 class="font-bold text-black text-2xl mb-3">How to Read Data?</h1>
