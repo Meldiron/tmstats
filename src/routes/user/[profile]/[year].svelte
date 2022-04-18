@@ -351,34 +351,7 @@
 		</div>
 	</div>
 
-	{#if didFail === false}
-		<div
-			class="mt-6 border border-blue-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-blue-500 p-4"
-		>
-			<div class="flex items-center justify-start space-x-3">
-				<div class="rounded-full bg-blue-700 text-white p-1">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						stroke-width="2"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						/>
-					</svg>
-				</div>
-				<p>
-					Profile update can take up to a few minutes. If your profile update takes more than 15
-					minutes, please retry it again.
-				</p>
-			</div>
-		</div>
-	{:else if didFail === true}
+	{#if didFail === true}
 		<div
 			class="mt-6 border border-red-700  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl text-white bg-red-500 p-4"
 		>

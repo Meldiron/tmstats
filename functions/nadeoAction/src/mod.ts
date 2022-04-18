@@ -100,7 +100,7 @@ const func = async function (req: any, res: any) {
   timeoutCache[appwriteUserId] = Date.now();
   setTimeout(() => {
     timeoutCache[appwriteUserId] = null;
-  }, 100);
+  }, 60000);
 
   const accountRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/accounts/displayNames/?accountIdList=" + payload.userId, {
     headers: {
