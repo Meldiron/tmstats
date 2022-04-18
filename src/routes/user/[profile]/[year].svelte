@@ -74,17 +74,13 @@
 		maxPoints = 0;
 		didFail = null;
 
-		let dbRes;
-
-		try {
-			dbRes = await AppwriteService.getHeatmap(profileId);
-			didFail = false;
-		} catch (err) {
-			didFail = true;
-		}
+		let dbRes = await AppwriteService.getHeatmap(profileId);
 
 		if (!dbRes) {
+			didFail = true;
 			return;
+		} else {
+			didFail = false;
 		}
 
 		const dataSet = dbRes.medals;
