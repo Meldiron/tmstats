@@ -19,6 +19,12 @@ import { getAxiod, sdk } from "./deps.ts";
   If an error is thrown, a response with code 500 will be returned.
 */
 
+let timeoutCache: any = {};
+
+setInterval(() => {
+  timeoutCache = {};
+}, 60000 * 5);
+
 export let client: sdk.Client = null as any;
 export let db: sdk.Database = null as any;
 
@@ -32,6 +38,18 @@ const func = async function (req: any, res: any) {
   ) {
     return res.json({ message: "Missing environment variables", code: 500 });
   }
+
+  const appwriteUserId = req.env['APPWRITE_FUNCTION_USER_ID'] as string;
+
+  if (timeoutCache[appwriteUserId]) {
+    return res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
+  }
+
+  timeoutCache[appwriteUserId] = Date.now();
+
+  setTimeout(() => {
+    timeoutCache[appwriteUserId] = null;
+  }, 60000);
 
   const payload = JSON.parse(req.payload || '{}');
 

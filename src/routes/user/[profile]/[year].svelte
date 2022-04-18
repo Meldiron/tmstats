@@ -8,6 +8,7 @@
 	let currentYear;
 	let profileName = '...';
 	let currentYearScore = 0;
+	let maxPoints = 0;
 	let didFail = null;
 
 	let isLoading = false;
@@ -52,7 +53,9 @@
 	}
 
 	const onMountFunction = async () => {
-		console.log('INIT');
+		if (!$page.url.pathname.startsWith('/user/')) {
+			return;
+		}
 
 		for (const heatMap of heatMaps) {
 			heatMap.$destroy();
@@ -68,6 +71,7 @@
 		lastUpdate = '...';
 		heatMaps = [];
 		currentYearScore = 0;
+		maxPoints = 0;
 		didFail = null;
 
 		let dbRes;
@@ -127,6 +131,8 @@
 				}
 			}
 		}
+
+		maxPoints = getMaxPoints(currentYear);
 
 		const year = +currentYear;
 
@@ -252,14 +258,43 @@
 		isLoading = true;
 
 		try {
-			const msg = await AppwriteService.nadeoAction(profileId);
-			onMountFunction();
-			throw new Error(msg);
-		} catch (err) {
-			alert(err.message);
-		}
+			const res = await AppwriteService.nadeoAction(profileId);
 
-		isLoading = false;
+			if (res) {
+				onMountFunction();
+			}
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	function getMaxPoints(y) {
+		y = +y;
+
+		if (y === 2020) {
+			return 184 * 12;
+		} else if (y === new Date().getFullYear()) {
+			let totalDays = 0;
+
+			for (let m = 1; m <= new Date().getMonth(); m++) {
+				const d = moment(m + '-' + y, 'MM-YYYY');
+				totalDays += d.daysInMonth();
+				console.log(m, d.daysInMonth());
+			}
+
+			totalDays += new Date().getDate() - 1;
+
+			return totalDays * 12;
+		} else {
+			let totalDays = 0;
+
+			for (let m = 1; m <= 12; m++) {
+				const d = moment(m + '-' + y, 'MM-YYYY');
+				totalDays += d.daysInMonth();
+			}
+
+			return totalDays * 12;
+		}
 	}
 </script>
 
@@ -341,7 +376,10 @@
 						/>
 					</svg>
 				</div>
-				<p>Profile update can take up to a few minutes. Please be kind. Don't spam this.</p>
+				<p>
+					Profile update can take up to a few minutes. If your profile update takes more than 15
+					minutes, please retry it again.
+				</p>
 			</div>
 		</div>
 	{:else if didFail === true}
@@ -390,7 +428,7 @@
 		<div
 			class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
 		>
-			<p class="text-gray-400">Last update <b class="font-bold">{lastUpdate}</b></p>
+			<p class="text-slate-500">Last update <b class="font-bold">{lastUpdate}</b></p>
 
 			<button
 				on:click={updateData}
@@ -442,11 +480,18 @@
 		<div class="prose">
 			<p>Cells on website follow same color pallete as medals in Trackmania game.</p>
 			<ul>
-				<li class="text-author-500">Green is <b class="font-bold">Author Medal</b></li>
-				<li class="text-gold-500">Yellow is <b class="font-bold">Gold Medal</b></li>
-				<li class="text-silver-500">White is <b class="font-bold">Silver Medal</b></li>
-				<li class="text-bronze-500">Orange is <b class="font-bold">Bronze Medal</b></li>
-				<li class="text-gray-200">Dark Gray is <b class="font-bold">No Medal</b></li>
+				<li class="text-author-500">
+					Green is <b class="font-bold">Author Medal</b> worth <b class="font-bold">12 points</b>
+				</li>
+				<li class="text-gold-600">
+					Yellow is <b class="font-bold">Gold Medal</b> worth <b class="font-bold">4 points</b>
+				</li>
+				<li class="text-silver-500">
+					White is <b class="font-bold">Silver Medal</b> worth <b class="font-bold">2 points</b>
+				</li>
+				<li class="text-bronze-500">
+					Orange is <b class="font-bold">Bronze Medal</b> worth <b class="font-bold">1 points</b>
+				</li>
 			</ul>
 			<p>
 				If you have finished a map but didn't get any medal, the cell has the same color as if you
@@ -471,7 +516,7 @@
 			</p>
 			<p>
 				Your score for year <strong>{currentYear}</strong> is
-				<strong>{currentYearScore} points.</strong>
+				<strong>{currentYearScore}/{maxPoints} points.</strong>
 			</p>
 		</div>
 	</div>

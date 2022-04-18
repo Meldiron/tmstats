@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { AppwriteService } from '../appwrite';
+	import { AppwriteService, toastConfig } from '../appwrite';
+	import Toastify from 'toastify-js';
 
 	let userId = '';
 	let userName = '';
@@ -19,7 +20,24 @@
 		};
 	}
 
+	function isAccountId(id: string): boolean {
+		const regexp = new RegExp(
+			'^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$'
+		);
+		return regexp.test(id);
+	}
+
 	function onVisitProfile() {
+		if (!isAccountId(userId)) {
+			Toastify({
+				...toastConfig,
+				text: 'This is not a valid ID.',
+				style: {
+					background: '#f97316'
+				}
+			}).showToast();
+			return;
+		}
 		goto('/user/' + userId + '/' + new Date().getFullYear());
 	}
 
@@ -28,10 +46,9 @@
 			isLoading = true;
 
 			const id = await AppwriteService.getId(userName);
-
-			goto('/user/' + id + '/' + new Date().getFullYear());
-		} catch (err) {
-			alert(err.message);
+			if (id) {
+				goto('/user/' + id + '/' + new Date().getFullYear());
+			}
 		} finally {
 			isLoading = false;
 		}
@@ -39,6 +56,9 @@
 
 	const onMountFunction = async () => {
 		leaderboard = await AppwriteService.listProfiles(orerByAttr);
+		if (!leaderboard) {
+			leaderboard = [];
+		}
 	};
 
 	onMount(onMountFunction);
@@ -46,17 +66,24 @@
 
 <div class="max-w-5xl w-full mx-auto mt-6 mb-6">
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-		<h1 class="font-bold text-black text-2xl mb-3">TMStats | Daily Medal Calendar</h1>
+		<h1 class="font-bold text-black text-2xl mb-3">TMStats | TOTD Medal Calendar</h1>
 
 		<div class="prose">
-			<p>Yearly view of your medals in a calendar. Share your daily maps medals with anyone!</p>
+			<p>
+				Yearly view of your TOTD medals in a calendar. Share your daily maps medals with anyone!
+			</p>
 		</div>
 	</div>
 
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
 		<h1 class="font-bold text-black text-2xl">Leaderboard</h1>
 
-		<small class="text-xs mb-3 text-gray-400">Ordered by {orerByAttr}</small>
+		<p class="mb-2 mt-2">
+			<span class="text-red-500">This is not a global leaderboard!</span> This only shows players in
+			our database, not everyone.
+		</p>
+
+		<small class="text-xs mb-3 text-gray-400">Ordered by {orerByAttr}. </small>
 
 		<div class="grid grid-cols-12 gap-3 mb-4">
 			<div class="hidden md:flex col-span-4" />
