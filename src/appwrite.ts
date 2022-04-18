@@ -4,7 +4,6 @@ const appwrite = new Appwrite();
 
 appwrite.setEndpoint('https://appwrite.tmstats.eu/v1').setProject('trackmaniaDailyStats');
 
-
 export class AppwriteService {
     static async ensureAuth(): Promise<void> {
         try {
@@ -82,3 +81,5 @@ export class AppwriteService {
         return id;
     }
 }
+
+AppwriteService.ensureAuth();
