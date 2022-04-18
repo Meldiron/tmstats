@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { getAxiod } from "./deps.ts";
-import { db } from "./mod.ts";
 import { decode } from "https://deno.land/std@0.74.0/encoding/base64url.ts";
+import { sdk } from "./deps.ts";
 
 export class Auth {
     public static Game: Auth = null as any;
@@ -11,7 +11,7 @@ export class Auth {
     private accessToken: string | null = null;
     private refreshToken: string | null = null;
 
-    constructor(private service: 'NadeoLiveServices' | 'NadeoServices', private nadeoAuth: string) {
+    constructor(private db: sdk.Database, private service: 'NadeoLiveServices' | 'NadeoServices', private nadeoAuth: string) {
     }
 
     async getToken() {
@@ -26,10 +26,10 @@ export class Auth {
         let doc: any = null;
 
         try {
-            const cacheRes = await db.getDocument("nadeoCache", "auth");
+            const cacheRes = await this.db.getDocument("nadeoCache", "auth");
             doc = cacheRes;
         } catch (_err) {
-            const cacheRes = await db.createDocument("nadeoCache", "auth", {
+            const cacheRes = await this.db.createDocument("nadeoCache", "auth", {
                 value: '{}'
             });
             doc = cacheRes;
@@ -48,10 +48,10 @@ export class Auth {
         let doc: any = null;
 
         try {
-            const cacheRes = await db.getDocument("nadeoCache", "auth");
+            const cacheRes = await this.db.getDocument("nadeoCache", "auth");
             doc = cacheRes;
         } catch (_err) {
-            const cacheRes = await db.createDocument("nadeoCache", "auth", {
+            const cacheRes = await this.db.createDocument("nadeoCache", "auth", {
                 value: '{}'
             });
             doc = cacheRes;
@@ -66,7 +66,7 @@ export class Auth {
         doc[this.service]['accessToken'] = this.accessToken;
         doc[this.service]['refreshToken'] = this.refreshToken;
 
-        await db.updateDocument("nadeoCache", "auth", {
+        await this.db.updateDocument("nadeoCache", "auth", {
             value: JSON.stringify(doc)
         });
     }

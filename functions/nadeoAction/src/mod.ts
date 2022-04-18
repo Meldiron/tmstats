@@ -2,7 +2,7 @@
 
 import { Auth } from "./Auth.ts";
 import { Daily } from "./Daily.ts";
-import { getAxiod, sdk } from "./deps.ts";
+import { getAxiod, sdk, RateLimiter } from "./deps.ts";
 
 // https://players.trackmania.com/server/dedicated
 
@@ -19,14 +19,16 @@ import { getAxiod, sdk } from "./deps.ts";
   If an error is thrown, a response with code 500 will be returned.
 */
 
+RateLimiter.Limiter = new RateLimiter();
+
 let timeoutCache: any = {};
 
 setInterval(() => {
   timeoutCache = {};
 }, 60000 * 5);
 
-export let client: sdk.Client = null as any;
-export let db: sdk.Database = null as any;
+let client: sdk.Client = null as any;
+let db: sdk.Database = null as any;
 
 const func = async function (req: any, res: any) {
   if (
@@ -41,16 +43,6 @@ const func = async function (req: any, res: any) {
 
   const appwriteUserId = req.env['APPWRITE_FUNCTION_USER_ID'] as string;
 
-  if (timeoutCache[appwriteUserId]) {
-    return res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
-  }
-
-  timeoutCache[appwriteUserId] = Date.now();
-
-  setTimeout(() => {
-    timeoutCache[appwriteUserId] = null;
-  }, 60000);
-
   const payload = JSON.parse(req.payload || '{}');
 
   client = new sdk.Client();
@@ -64,12 +56,12 @@ const func = async function (req: any, res: any) {
   const nadeoAuth = req.env['NADE_AUTH'] as string;
 
   if (!Auth.Live) {
-    Auth.Live = new Auth("NadeoLiveServices", nadeoAuth);
+    Auth.Live = new Auth(db, "NadeoLiveServices", nadeoAuth);
     await Auth.Live.load();
   }
 
   if (!Auth.Game) {
-    Auth.Game = new Auth("NadeoServices", nadeoAuth);
+    Auth.Game = new Auth(db, "NadeoServices", nadeoAuth);
     await Auth.Game.load();
   }
 
@@ -102,6 +94,14 @@ const func = async function (req: any, res: any) {
     }
   }
 
+  if (timeoutCache[appwriteUserId]) {
+    return res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
+  }
+  timeoutCache[appwriteUserId] = Date.now();
+  setTimeout(() => {
+    timeoutCache[appwriteUserId] = null;
+  }, 100);
+
   const accountRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/accounts/displayNames/?accountIdList=" + payload.userId, {
     headers: {
       'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
@@ -114,7 +114,7 @@ const func = async function (req: any, res: any) {
 
   const nickname = accountRes.data[0].displayName;
 
-  const allMedals = await Daily.getMedals(payload.userId);
+  const allMedals = await Daily.getMedals(payload.userId, db);
 
   let score = 0;
   let gold = 0;

@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-import Func from "./mod.ts";
+import Func from "./mod_daily_cron.ts";
 
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 
@@ -8,7 +8,7 @@ const env = config();
 
 await Func({
     env,
-    payload: '{"userId":"5ca1fa3a-3413-4863-86d7-7a47982abc1b","password":"dev"}'
+    payload: '{}'
 }, {
     json: (json: any, _code: any) => {
         console.log(json);

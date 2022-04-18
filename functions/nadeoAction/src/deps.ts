@@ -1,7 +1,11 @@
 export * as sdk from "https://deno.land/x/appwrite@3.0.0/mod.ts";
 
+// https://players.trackmania.com/server/dedicated
+
 import { axiod as _axiod } from "https://deno.land/x/axiod/mod.ts";
-class RateLimiter {
+export class RateLimiter {
+    public static Limiter: any;
+
     bucket: number;
 
     constructor(private refill: number = 2, private interval: number = 1000) {
@@ -31,9 +35,8 @@ class RateLimiter {
         return true;
     }
 }
-const rateLimiter = new RateLimiter();
 
 export const getAxiod = async () => {
-    await rateLimiter.take();
+    await RateLimiter.Limiter.take();
     return _axiod;
 }
