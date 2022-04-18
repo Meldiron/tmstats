@@ -1,9 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 
-import * as sdk from "https://deno.land/x/appwrite@3.0.0/mod.ts";
 import { Auth } from "./Auth.ts";
 import { Daily } from "./Daily.ts";
-import axiod from "https://deno.land/x/axiod/mod.ts";
+import { getAxiod, sdk } from "./deps.ts";
 
 // https://players.trackmania.com/server/dedicated
 
@@ -71,9 +70,9 @@ const func = async function (req: any, res: any) {
       return res.json({ message: "This action requires 'nick'.", code: 500 });
     }
 
-    const tmRes = await axiod.get("https://trackmania.io/api/players/find?search=" + payload.nick, {
+    const tmRes = await (await getAxiod()).get("https://trackmania.io/api/players/find?search=" + payload.nick, {
       headers: {
-        'User-Agent': 'TM Daily Stats / 0.0.1 Private app'
+        'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com'
       }
     });
     const bodyJson = tmRes.data;
@@ -119,12 +118,8 @@ const func = async function (req: any, res: any) {
       }
     }
 
-    let allMedals: any = {};
-    const currentMonth = new Date().getMonth() + 1;
-    for (let month = currentMonth; month > 0; month--) {
-      const monthMedals = await Daily.getMedals(payload.userId, month);
-      allMedals = Object.assign({}, allMedals, monthMedals);
-    }
+    const allMedals = await Daily.getMedals(payload.userId);
+    console.log(allMedals);
 
     let score = 0;
     let gold = 0;

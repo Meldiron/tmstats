@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-import axiod from "https://deno.land/x/axiod/mod.ts";
+import { getAxiod } from "./deps.ts";
 import { db } from "./mod.ts";
 import { decode } from "https://deno.land/std@0.74.0/encoding/base64url.ts";
 
@@ -94,10 +94,12 @@ export class Auth {
 
     private async newTokenAction() {
         console.warn("Getting new tokens for " + this.service);
-        const loginRes = await axiod.post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/basic", {
+        const loginRes = await (await getAxiod()).post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/basic", {
             audience: this.service
         }, {
             headers: {
+                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+
                 'Authorization': 'Basic ' + this.nadeoAuth,
                 'Content-Type': 'application/json',
             }
@@ -111,8 +113,10 @@ export class Auth {
 
     private async refreshTokenAction() {
         console.warn("Refreshing tokens for " + this.service);
-        const refreshRes = await axiod.post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh", {}, {
+        const refreshRes = await (await getAxiod()).post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh", {}, {
             headers: {
+                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+
                 'Content-Type': 'application/json',
                 'Authorization': 'nadeo_v1 t=' + this.refreshToken
             }

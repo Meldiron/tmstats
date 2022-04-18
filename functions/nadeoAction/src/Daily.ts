@@ -1,15 +1,19 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { Auth } from "./Auth.ts";
-import axiod from "https://deno.land/x/axiod/mod.ts";
+import { getAxiod } from "./deps.ts";
 
 export class Daily {
-    static async getMedals(userId: string, month: number) {
-        const currentMonth = new Date().getMonth() + 1;
-        const offset = Math.abs(currentMonth - month);
+    static getOffset(dateFrom = new Date(2020, 6, 1), dateTo = new Date()) {
+        return dateTo.getMonth() - dateFrom.getMonth() +
+            (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
+    }
 
-        const dailyRes = await axiod.get("https://live-services.trackmania.nadeo.live/api/token/campaign/month?offset=" + offset + "&length=1", {
+    static async getMedals(userId: string, offset = 0, outData = {}): Promise<any> {
+        const dailyRes = await (await getAxiod()).get("https://live-services.trackmania.nadeo.live/api/token/campaign/month?offset=" + offset + "&length=1", {
             headers: {
+                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+
                 'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -18,8 +22,10 @@ export class Daily {
 
         const mapUIdList = dailyRes.data.monthList[0].days.map((d: any) => d.mapUid).filter((id: string) => id !== "");
 
-        const mapIdsRes = await axiod.get("https://prod.trackmania.core.nadeo.online/maps/?mapUidList=" + mapUIdList.join(","), {
+        const mapIdsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/maps/?mapUidList=" + mapUIdList.join(","), {
             headers: {
+                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+
                 'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -43,8 +49,10 @@ export class Daily {
             mapData[id] = `${day}-${month}-${year}`;
         });
 
-        const medalsRes = await axiod.get("https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=" + userId + "&mapIdList=" + mapIdList.join(","), {
+        const medalsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=" + userId + "&mapIdList=" + mapIdList.join(","), {
             headers: {
+                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+
                 'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -60,6 +68,15 @@ export class Daily {
             responseData[mapInfo] = medalData.medal;
         });
 
-        return responseData;
+        outData = Object.assign({}, outData, responseData);
+
+        const maxOffset = this.getOffset();
+
+        if (offset >= maxOffset) {
+            return outData;
+        } else {
+            return await this.getMedals(userId, offset + 1, outData);
+        }
+
     }
 }

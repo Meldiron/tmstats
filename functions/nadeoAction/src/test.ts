@@ -1,6 +1,9 @@
 // deno-lint-ignore-file no-explicit-any
 
+console.log("Start");
+
 import Func from "./mod.ts";
+import { Daily } from "./Daily.ts";
 
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 
@@ -8,8 +11,8 @@ const env = config();
 
 await Func({
     env,
-    // payload: '{"type":"updateProfile","userId":"06e99ad3-cded-4440-a19c-b3df4fda8004"}'
-    payload: '{"type":"getUserId","nick":"Meldiron"}'
+    payload: '{"type":"updateProfile","userId":"f6fe29aa-45dc-4fe9-9a95-d5e2c39f6b5f","password":"dev"}'
+    // payload: '{"type":"getUserId","nick":"Meldiron"}'
 }, {
     json: (json: any, _code: any) => {
         console.log(json);
