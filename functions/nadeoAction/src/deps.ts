@@ -4,12 +4,12 @@ import { axiod as _axiod } from "https://deno.land/x/axiod/mod.ts";
 class RateLimiter {
     bucket: number;
 
-    constructor(private refill: number = 1, private interval: number = 1000) {
-        this.bucket = refill;
+    constructor(private refill: number = 2, private interval: number = 1000) {
+        this.bucket = this.refill;
 
         setInterval(() => {
-            this.bucket = refill;
-        }, interval);
+            this.bucket = this.refill;
+        }, this.interval);
     }
 
     public async take() {
