@@ -11,6 +11,13 @@
 	let maxPoints = 0;
 	let didFail = null;
 
+	const cursor = {
+		visible: false,
+		left: 0,
+		top: 0,
+		data: {}
+	};
+
 	let isLoading = false;
 
 	const years = [];
@@ -144,7 +151,10 @@
 				.map((key) => {
 					return {
 						date: moment(key, 'D-M-YYYY').toDate(),
-						value: dataSet[key]
+						value: dataSet[key],
+						data: {
+							id: key
+						}
 					};
 				});
 
@@ -197,6 +207,24 @@
 					return d;
 				});
 			}
+
+			data = data.map((d) => {
+				return {
+					...d,
+					mouseEnter: (event) => {
+						cursor.visible = true;
+						cursor.left = event.pos.x + event.pos.width/2;
+						cursor.top = event.pos.y;
+						cursor.data = {
+							id: event.id,
+							medal: dataSet[event.id]
+						}
+					},
+					mouseLeave: (event) => {
+						cursor.visible = false;
+					}
+				};
+			});
 
 			document.querySelector('#heatmap-' + number).innerHTML = '';
 
@@ -294,6 +322,11 @@
 	}
 </script>
 
+{#if cursor.visible}
+<div style={'left: ' + cursor.left + 'px; top: ' + (cursor.top-10) + 'px'} class="absolute left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none">
+Map name coming soon</div>
+{/if}
+
 <div class="max-w-5xl w-full mx-auto mt-6">
 	<div
 		class="border border-gray-900  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl font-bold text-white text-2xl bg-gray-800 p-4"
@@ -313,6 +346,30 @@
 					/>
 				</svg>
 			</a>
+
+			{#if didFail === null}
+				<svg
+					class="w-5 h-5 animate-spin"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+				>
+					<circle
+						class="opacity-25"
+						cx="12"
+						cy="12"
+						r="10"
+						stroke="currentColor"
+						stroke-width="4"
+					/>
+					<path
+						class="opacity-75"
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					/>
+				</svg>
+			{/if}
+
 			<h1>
 				{profileName}
 				<span class="text-sm uppercase font-normal text-gray-400">{totalPoints} points</span>
