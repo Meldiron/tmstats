@@ -72,6 +72,7 @@
 			<p>
 				Yearly view of your TOTD medals in a calendar. Share your daily maps medals with anyone!
 			</p>
+			<p class="text-sm text-gray-400">This website introduces private leaderboard that only consists of players whose profile has been loaded before. If you are looking for worldwide stats, you can visit <a href="https://www.author-tracker.com/" target="_blank">TM Author Tracker</a>.</p>
 		</div>
 	</div>
 
