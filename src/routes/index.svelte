@@ -66,11 +66,11 @@
 
 <div class="max-w-5xl w-full mx-auto mt-6">
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-		<h1 class="font-bold text-black text-2xl mb-3">TMStats | TOTD Medal Calendar</h1>
+		<h1 class="font-bold text-black text-2xl mb-3">TMStats | Medal Calendar</h1>
 
 		<div class="prose">
 			<p>
-				Yearly view of your TOTD medals in a calendar. Share your daily maps medals with anyone!
+				Overview of all Trackmania medals you achieved. Share your campaign or daily maps medals with anyone!
 			</p>
 			<p class="text-sm text-gray-400">This website introduces private leaderboard that only consists of players whose profile has been loaded before. If you are looking for worldwide stats, you can visit <a href="https://www.author-tracker.com/" target="_blank">TM Author Tracker</a>.</p>
 		</div>
@@ -134,7 +134,7 @@
 		<h1 class="font-bold text-black text-2xl mb-3">Profile Lookup by ID</h1>
 
 		<p class="mb-3">
-			Couldn't find player you are looking for? Here, look for his profile by his ID.
+			Do you know what your ID is? Here, find a profile by Trackmania ID.
 		</p>
 		<form
 			on:submit|preventDefault={onVisitProfile}

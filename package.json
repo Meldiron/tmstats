@@ -1,5 +1,5 @@
 {
-  "name": "tm-daily-heatmap",
+  "name": "tmstats",
   "version": "0.0.1",
   "scripts": {
     "dev": "svelte-kit dev",

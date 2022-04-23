@@ -4,23 +4,24 @@ Welcome to the documentation of this function 👋 We strongly recommend keeping
 
 ## 🤖 Documentation
 
-Simple function similar to typical "hello world" example, but instead, we return a simple JSON that tells everyone how awesome developers are.
+Function to send username to [Trackmania.io](https://trackmania.io/) APIs, getting user ID as response. Finally, responds with fetched user ID.
 
-<!-- Update with your description, for example 'Create Stripe payment and return payment URL' -->
+This method respects API limit of 2 requests per second.
 
 _Example input:_
 
-This function expects no input
+```json
+{
+    "nick": "MeldironSK"
+}
+```
 
-<!-- If input is expected, add example -->
 
 _Example output:_
 
-<!-- Update with your expected output -->
-
 ```json
 {
- "areDevelopersAwesome": true
+    "id": "06e99ad3-cded-4440-a19c-b3df4fda8004"
 }
 ```
 
@@ -28,9 +29,7 @@ _Example output:_
 
 List of environment variables used by this cloud function:
 
-- **APPWRITE_FUNCTION_ENDPOINT** - Endpoint of Appwrite project
-- **APPWRITE_FUNCTION_API_KEY** - Appwrite API Key
-<!-- Add your custom environment variables -->
+No variables needed.
 
 ## 🚀 Deployment
 
