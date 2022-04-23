@@ -4,7 +4,7 @@
 
 ## 👋 Introduction
 
-TMStats is a medal calendar that shows overview of all Trackmania medals you achieved. The website allows user to share campaign or daily maps medals with anyone.
+TMStats is a medal calendar that shows overview of all Trackmania medals an user achieved. The website allows user to share campaign or daily maps medals with anyone.
 
 Project focuses on multiple aspects and features:
 
