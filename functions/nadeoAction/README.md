@@ -1,6 +1,6 @@
 # nadeoAction & nadeoCron
 
-Welcome to the documentation of this function 👋  We strongly recommend keeping this file in sync with your function's logic to make sure anyone can easily understand your function in the future. If you don't need documentation, you can remove this file.
+Welcome to the documentation of this function 👋 We strongly recommend keeping this file in sync with your function's logic to make sure anyone can easily understand your function in the future. If you don't need documentation, you can remove this file.
 
 ## 🤖 Documentation
 
@@ -15,14 +15,14 @@ This function has 2 endpoints. One for user-faced update method `mod.ts`, one fo
 
 ## 1. Endpoint 'mod.ts'
 
-The function respects maximum API limit of 2 request per second to all Nadeo services.
+The function respects maximum API limit of 1 request per second to all Nadeo services.
 
 _Example input:_
 
 ```json
 {
-    "userId": "06e99ad3-cded-4440-a19c-b3df4fda8004",
-    "password": "My-Secret123"
+	"userId": "06e99ad3-cded-4440-a19c-b3df4fda8004",
+	"password": "My-Secret123"
 }
 ```
 
@@ -32,7 +32,7 @@ _Example output:_
 
 ```json
 {
-    "message": "Profile successfully updated!"
+	"message": "Profile successfully updated!"
 }
 ```
 
@@ -57,7 +57,7 @@ _Example output:_
 
 ```json
 {
-    "message": "Map information updated! Dowloaded 2 maps: id1234,id5678",
+	"message": "Map information updated! Dowloaded 2 maps: id1234,id5678"
 }
 ```
 

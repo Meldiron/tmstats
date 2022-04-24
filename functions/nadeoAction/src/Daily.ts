@@ -131,9 +131,6 @@ export class Daily {
             const monthKey = `${d.getUTCMonth() + 1}-${d.getUTCFullYear()}`;
             const dayKey = `${d.getUTCDate()}-${monthKey}`;
 
-            missingKeys.push(dayKey);
-            continue;
-
             const downloadedMap = downloadedMaps.find((map: any) => map.key === dayKey);
             if (!downloadedMap) {
                 if (!missingKeys.includes(dayKey)) {
@@ -146,7 +143,7 @@ export class Daily {
 
         for (const missingKey of missingKeys) {
             const map = await this.fetchMap(missingKey, storage);
-            if (map !== null) {
+            if (map !== null && map.key) {
                 mapsData.push(map.key);
 
                 try {
@@ -203,7 +200,10 @@ export class Daily {
                 const mapId = medalData.mapId;
                 const mapInfo = mapData[mapId];
 
-                responseData[mapInfo] = medalData.medal;
+                responseData[mapInfo] = {
+                    medal: medalData.medal,
+                    time: medalData.recordScore.time
+                };
             });
         }
 

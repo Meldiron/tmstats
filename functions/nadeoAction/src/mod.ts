@@ -82,12 +82,13 @@ const func = async function (req: any, res: any) {
     }
   }
 
+  const adminPass = req.env['ADMIN_PASS'] as string;
+
   if (lastUpdate) {
     const now = Date.now();
 
     const h1 = 1000 * 60 * 60;
     if (lastUpdate + h1 > now) {
-      const adminPass = req.env['ADMIN_PASS'] as string;
       if (!payload.password || payload.password !== adminPass) {
         return res.json({ message: "You can only refresh profile once every hour.", code: 500 });
       }
@@ -95,7 +96,9 @@ const func = async function (req: any, res: any) {
   }
 
   if (timeoutCache[appwriteUserId]) {
-    return res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
+    if (!payload.password || payload.password !== adminPass) {
+      return res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
+    }
   }
   timeoutCache[appwriteUserId] = Date.now();
   setTimeout(() => {
@@ -123,7 +126,7 @@ const func = async function (req: any, res: any) {
   let bronze = 0;
 
   for (const date in allMedals) {
-    const medal = allMedals[date];
+    const medal = allMedals[date].medal;
 
     if (medal === 1) {
       bronze++;

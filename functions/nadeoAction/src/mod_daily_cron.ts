@@ -54,19 +54,10 @@ const func = async function (req: any, res: any) {
     await Auth.Game.load();
   }
 
-  const missingMaps = await Daily.fetchMissingMaps(db, storage);
-
-  for (const map of missingMaps) {
-    try {
-      await db.getDocument('dailyMaps', map.key);
-      await db.updateDocument('dailyMaps', map.key, map);
-    } catch (_err) {
-      await db.createDocument('dailyMaps', map.key, map);
-    }
-  }
+  const ids = await Daily.fetchMissingMaps(db, storage);
 
   return res.json({
-    message: "Map information updated! Dowloaded " + missingMaps.length + " maps: " + missingMaps.map((m: any) => m.key).join(","),
+    message: "Map information updated! Dowloaded " + ids.length + " maps: " + ids.map((m: any) => m.key).join(","),
   });
 };
 

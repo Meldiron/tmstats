@@ -10,7 +10,7 @@ export class RateLimiter {
 
     bucket: number;
 
-    constructor(private refill: number = 2, private interval: number = 1000) {
+    constructor(private refill: number = 1, private interval: number = 1000) {
         this.bucket = this.refill;
 
         setInterval(() => {
