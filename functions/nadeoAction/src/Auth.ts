@@ -100,7 +100,7 @@ export class Auth {
             audience: this.service
         }, {
             headers: {
-                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
                 'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
                 'Authorization': 'Basic ' + this.nadeoAuth,
                 'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export class Auth {
             audience: this.service
         }, {
             headers: {
-                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
                 'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
                 'Authorization': 'ubi_v1 t=' + authRes.data.ticket,
                 'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ export class Auth {
             audience: this.service
         }, {
             headers: {
-                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
 
                 'Authorization': 'Basic ' + this.nadeoAuth,
                 'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ export class Auth {
         console.warn("Refreshing tokens for " + this.service);
         const refreshRes = await (await getAxiod()).post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh", {}, {
             headers: {
-                'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
 
                 'Content-Type': 'application/json',
                 'Authorization': 'nadeo_v1 t=' + this.refreshToken

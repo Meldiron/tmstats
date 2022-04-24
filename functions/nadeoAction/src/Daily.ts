@@ -1,6 +1,9 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { Auth } from "./Auth.ts";
+import { download } from "https://deno.land/x/download/mod.ts";
+import * as path from "https://deno.land/std/path/mod.ts";
+
 import { getAxiod, sdk } from "./deps.ts";
 
 export class Daily {
@@ -32,9 +35,82 @@ export class Daily {
             (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
     }
 
-    static async getMissingMaps(db: sdk.Database): Promise<any[]> {
-        // TODO: If this starts failing, just fetch everything all the time.. and then do getDocument. If exists, dont do anything. If not, createDocument
+    static async fetchMap(dateKey: string, storage: sdk.Storage) {
+        console.log("Fetching ", dateKey);
 
+        const date = new Date(+dateKey.split("-")[2], (+dateKey.split("-")[1]) - 1, +dateKey.split("-")[0]);
+        const offset = this.getOffset(date);
+
+        const dailyRes = await (await getAxiod()).get("https://live-services.trackmania.nadeo.live/api/token/campaign/month?offset=" + offset + "&length=1", {
+            headers: {
+                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
+
+                'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const map = dailyRes.data.monthList[0].days.find((mapDay: any) => {
+            const day = mapDay.monthDay;
+            const month = dailyRes.data.monthList[0].month;
+            const year = dailyRes.data.monthList[0].year;
+            const localDateKey = `${day}-${month}-${year}`;
+
+            return localDateKey === dateKey;
+        });
+
+        const mapUId = map.mapUid;
+
+        if (mapUId === "") {
+            console.log("Map not live yet");
+            return null;
+        }
+
+        const mapIdsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/maps/?mapUidList=" + mapUId, {
+            headers: {
+                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
+
+                'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const mapIdData = mapIdsRes.data[0];
+
+        const day = map.monthDay;
+        const month = dailyRes.data.monthList[0].month;
+        const year = dailyRes.data.monthList[0].year;
+
+        await download(mapIdData.thumbnailUrl, {
+            file: 'thumbnail.jpg',
+            dir: './'
+        });
+
+        const __dirname = new URL('.', import.meta.url).pathname;
+        const filePath = path.join(__dirname, "../thumbnail.jpg");
+        const fileAppwrite = await storage.createFile('mapImages', 'unique()', filePath);
+
+        return {
+            mapid: mapIdData.mapId,
+            mapUid: mapIdData.mapUid,
+            name: this.formatTMText(mapIdData.name),
+            day,
+            month,
+            year,
+            key: `${day}-${month}-${year}`,
+            seasonUid: map.seasonUid,
+            bronzeScore: mapIdData.bronzeScore,
+            silverScore: mapIdData.silverScore,
+            goldScore: mapIdData.goldScore,
+            authorScore: mapIdData.authorScore,
+            collectionName: this.formatTMText(mapIdData.collectionName),
+            thumbnailFileId: fileAppwrite.$id,
+        }
+    }
+
+    static async fetchMissingMaps(db: sdk.Database, storage: sdk.Storage): Promise<any[]> {
         const downloadedMaps = [];
 
         let hasNext = true;
@@ -48,7 +124,6 @@ export class Daily {
         } while (hasNext === true);
 
         const missingKeys: string[] = [];
-        const missingMonths: string[] = [];
 
         const dateFrom = new Date(2020, 6, 1, 10);
         for (let dayTime = dateFrom.getTime(); dayTime < Date.now(); dayTime += 86400000) {
@@ -56,79 +131,30 @@ export class Daily {
             const monthKey = `${d.getUTCMonth() + 1}-${d.getUTCFullYear()}`;
             const dayKey = `${d.getUTCDate()}-${monthKey}`;
 
+            missingKeys.push(dayKey);
+            continue;
+
             const downloadedMap = downloadedMaps.find((map: any) => map.key === dayKey);
             if (!downloadedMap) {
                 if (!missingKeys.includes(dayKey)) {
                     missingKeys.push(dayKey);
-                }
-
-                if (!missingMonths.includes(monthKey)) {
-                    missingMonths.push(monthKey);
                 }
             }
         }
 
         const mapsData: any[] = [];
 
-        const missingOffsets = missingMonths.map((monthKey) => {
-            const date = new Date(+monthKey.split("-")[1], (+monthKey.split("-")[0]) - 1, 1);
-            return this.getOffset(date);
-        });
+        for (const missingKey of missingKeys) {
+            const map = await this.fetchMap(missingKey, storage);
+            if (map !== null) {
+                mapsData.push(map.key);
 
-        for (const offset of missingOffsets) {
-            const dailyRes = await (await getAxiod()).get("https://live-services.trackmania.nadeo.live/api/token/campaign/month?offset=" + offset + "&length=1", {
-                headers: {
-                    'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
-
-                    'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                try {
+                    await db.getDocument('dailyMaps', map.key);
+                    await db.updateDocument('dailyMaps', map.key, map);
+                } catch (_err) {
+                    await db.createDocument('dailyMaps', map.key, map);
                 }
-            });
-
-            dailyRes.data.monthList[0].days = dailyRes.data.monthList[0].days.filter((mapDay: any) => {
-                const day = mapDay.monthDay;
-                const month = dailyRes.data.monthList[0].month;
-                const year = dailyRes.data.monthList[0].year;
-                const dateKey = `${day}-${month}-${year}`;
-
-                return missingKeys.includes(dateKey);
-            });
-
-            const mapUIdList = dailyRes.data.monthList[0].days.map((d: any) => d.mapUid).filter((id: string) => id !== "");
-
-            const mapIdsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/maps/?mapUidList=" + mapUIdList.join(","), {
-                headers: {
-                    'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
-
-                    'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const maps: any[] = mapIdsRes.data.map((map: any) => {
-                const mapDay = dailyRes.data.monthList[0].days.find((d: any) => d.mapUid === map.mapUid);
-
-                const day = mapDay.monthDay;
-                const month = dailyRes.data.monthList[0].month;
-                const year = dailyRes.data.monthList[0].year;
-
-                const normalName = this.formatTMText(map.name);
-
-                return {
-                    mapid: map.mapId,
-                    mapUid: map.mapUid,
-                    name: normalName,
-                    day,
-                    month,
-                    year,
-                    key: `${day}-${month}-${year}`,
-                }
-            });
-
-            for (const map of maps) {
-                mapsData.push(map);
             }
         }
 
@@ -165,7 +191,7 @@ export class Daily {
 
             const medalsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=" + userId + "&mapIdList=" + chunkOfIds.join(","), {
                 headers: {
-                    'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+                    'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
 
                     'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                     'Accept': 'application/json',

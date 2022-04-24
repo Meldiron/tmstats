@@ -43,6 +43,10 @@ TMStats uses multiple frontend and backend technologies with focus of simplifyin
 
 2. Sign up into your Appwrite instance and create project with both name and ID set to `trackmaniaDailyStats`
 3. Install [Appwrite CLI](https://appwrite.io/docs/command-line) locally, and login: `appwrite login`
+4. Deploy collections: `appwrite deploy collection`
+5. Deploy functions: `appwrite deploy functions`
+6. Manually create bucked with ID and name both `mapImages`. Set permission to stoarge-level and set it to `role:all`. Disable Encryption and Anti Virus. Set Allowed File Extensions to 
+`jpg`.
 
 To prepare your changes from your Appwrite instance database to production one:
 

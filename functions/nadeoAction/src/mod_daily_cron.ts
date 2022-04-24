@@ -2,7 +2,7 @@
 
 import { Auth } from "./Auth.ts";
 import { Daily } from "./Daily.ts";
-import { getAxiod, sdk, RateLimiter } from "./deps.ts";
+import { sdk, RateLimiter } from "./deps.ts";
 
 /*
   'req' variable has:
@@ -21,6 +21,7 @@ RateLimiter.Limiter = new RateLimiter(1, 5000);
 
 let client: sdk.Client = null as any;
 let db: sdk.Database = null as any;
+let storage: sdk.Storage = null as any;
 
 const func = async function (req: any, res: any) {
   if (
@@ -34,6 +35,7 @@ const func = async function (req: any, res: any) {
 
   client = new sdk.Client();
   db = new sdk.Database(client);
+  storage = new sdk.Storage(client);
 
   client
     .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)
@@ -52,10 +54,15 @@ const func = async function (req: any, res: any) {
     await Auth.Game.load();
   }
 
-  const missingMaps = await Daily.getMissingMaps(db);
+  const missingMaps = await Daily.fetchMissingMaps(db, storage);
 
   for (const map of missingMaps) {
-    await db.createDocument('dailyMaps', map.key, map);
+    try {
+      await db.getDocument('dailyMaps', map.key);
+      await db.updateDocument('dailyMaps', map.key, map);
+    } catch (_err) {
+      await db.createDocument('dailyMaps', map.key, map);
+    }
   }
 
   return res.json({
@@ -74,4 +81,4 @@ export default async function (req: any, res: any) {
     }
     throw err;
   }
-};
+}

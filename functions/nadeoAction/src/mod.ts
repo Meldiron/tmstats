@@ -104,7 +104,7 @@ const func = async function (req: any, res: any) {
 
   const accountRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/accounts/displayNames/?accountIdList=" + payload.userId, {
     headers: {
-      'User-Agent': 'tm.matejbaco.eu / 0.0.1 matejbaco2000@gmail.com',
+      'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
 
       'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
       'Accept': 'application/json',
@@ -176,4 +176,4 @@ export default async function (req: any, res: any) {
     }
     throw err;
   }
-};
+}
