@@ -233,7 +233,7 @@
 				props: {
 					allowOverflow: true,
 					cellGap: 4,
-					cellRadius: 4,
+					cellRadius: 2,
 					monthLabelHeight: 0,
 					dayLabelWidth: 0,
 					colors,
