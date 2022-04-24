@@ -56,7 +56,7 @@ export class AppwriteService {
         }
     }
 
-    static async listProfiles(orerByAttr: string) {
+    static async listProfiles(orerByAttr: string, limit = 100, offset = 0) {
         try {
             await this.ensureAuth();
 
@@ -64,8 +64,8 @@ export class AppwriteService {
             const docs = await appwrite.database.listDocuments(
                 'profiles',
                 [],
-                100,
-                undefined,
+                limit,
+                offset,
                 undefined,
                 undefined,
                 [orerByAttr === 'points' ? 'score' : orerByAttr],
@@ -176,5 +176,3 @@ export class AppwriteService {
         return null;
     }
 }
-
-AppwriteService.ensureAuth();

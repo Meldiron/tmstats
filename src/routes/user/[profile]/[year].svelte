@@ -97,7 +97,7 @@
 		lastUpdate = moment(dbRes.lastUpdate).format('DD.MM.YYYY HH:mm');
 
 		for (const k in dataSet) {
-			const medal = dataSet[k];
+			const medal = dataSet[k].medal;
 
 			if (medal === 0) {
 				finish++;
@@ -107,7 +107,7 @@
 				bronze++;
 
 				totalPoints += 1;
-				console.log(+k.split('-')[2]);
+
 				if (+k.split('-')[2] === +currentYear) {
 					currentYearScore += 1;
 				}
@@ -151,9 +151,10 @@
 				.map((key) => {
 					return {
 						date: moment(key, 'D-M-YYYY').toDate(),
-						value: dataSet[key],
+						value: dataSet[key].medal,
 						data: {
-							id: key
+							id: key,
+							raw: dataSet[key]
 						}
 					};
 				});
@@ -217,7 +218,7 @@
 						cursor.top = event.pos.y;
 						cursor.data = {
 							id: event.id,
-							medal: dataSet[event.id]
+							medal: dataSet[event.id].medal
 						}
 					},
 					mouseLeave: (event) => {
@@ -232,7 +233,7 @@
 				props: {
 					allowOverflow: true,
 					cellGap: 4,
-					cellRadius: 2,
+					cellRadius: 4,
 					monthLabelHeight: 0,
 					dayLabelWidth: 0,
 					colors,
@@ -303,7 +304,6 @@
 			for (let m = 1; m <= new Date().getMonth(); m++) {
 				const d = moment(m + '-' + y, 'MM-YYYY');
 				totalDays += d.daysInMonth();
-				console.log(m, d.daysInMonth());
 			}
 
 			totalDays += new Date().getDate() - 1;
@@ -323,7 +323,7 @@
 </script>
 
 {#if cursor.visible}
-<div style={'left: ' + cursor.left + 'px; top: ' + (cursor.top-10) + 'px'} class="absolute left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none">
+<div style={'left: ' + cursor.left + 'px; top: ' + (cursor.top-10) + 'px'} class="fixed left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none">
 Map name coming soon</div>
 {/if}
 
