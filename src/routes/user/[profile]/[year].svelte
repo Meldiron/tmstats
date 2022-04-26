@@ -3,6 +3,7 @@
 
 	import { page } from '$app/stores';
 	import { AppwriteService } from '../../../appwrite';
+	import { dataset_dev } from 'svelte/internal';
 
 	let profileId;
 	let currentYear;
@@ -154,7 +155,8 @@
 						value: dataSet[key].medal,
 						data: {
 							id: key,
-							raw: dataSet[key]
+							raw: dataSet[key],
+							hover: true
 						}
 					};
 				});
@@ -213,13 +215,18 @@
 				return {
 					...d,
 					mouseEnter: (event) => {
+						const idSplit = event.id.split('-');
+						const date = new Date(idSplit[2], idSplit[1] - 1, idSplit[0]);
+						const dayName = date.toLocaleDateString(undefined, { weekday: 'long' });
+
 						cursor.visible = true;
-						cursor.left = event.pos.x + event.pos.width/2;
+						cursor.left = event.pos.x + event.pos.width / 2;
 						cursor.top = event.pos.y;
 						cursor.data = {
 							id: event.id,
-							medal: dataSet[event.id].medal
-						}
+							medal: dataSet[event.id].medal,
+							text: dayName + ' ' + event.id.split('-').join('.')
+						};
 					},
 					mouseLeave: (event) => {
 						cursor.visible = false;
@@ -323,8 +330,12 @@
 </script>
 
 {#if cursor.visible}
-<div style={'left: ' + cursor.left + 'px; top: ' + (cursor.top-10) + 'px'} class="fixed left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none">
-Map name coming soon</div>
+	<div
+		style={'left: ' + cursor.left + 'px; top: ' + (cursor.top - 10) + 'px'}
+		class="fixed left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none"
+	>
+		{cursor.data.text}
+	</div>
 {/if}
 
 <div class="max-w-5xl w-full mx-auto mt-6">
