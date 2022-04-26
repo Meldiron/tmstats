@@ -91,6 +91,7 @@ export class Daily {
         const __dirname = new URL('.', import.meta.url).pathname;
         const filePath = path.join(__dirname, "../thumbnail.jpg");
         const fileAppwrite = await storage.createFile('mapImages', 'unique()', filePath);
+        await Deno.remove(filePath);
 
         return {
             mapid: mapIdData.mapId,

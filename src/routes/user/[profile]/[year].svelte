@@ -3,7 +3,6 @@
 
 	import { page } from '$app/stores';
 	import { AppwriteService } from '../../../appwrite';
-	import { dataset_dev } from 'svelte/internal';
 
 	let profileId;
 	let currentYear;
