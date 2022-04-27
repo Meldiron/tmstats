@@ -83,13 +83,15 @@ export class Daily {
         const month = dailyRes.data.monthList[0].month;
         const year = dailyRes.data.monthList[0].year;
 
-        await download(mapIdData.thumbnailUrl, {
-            file: 'thumbnail.jpg',
-            dir: './'
-        });
-
         const __dirname = new URL('.', import.meta.url).pathname;
         const filePath = path.join(__dirname, "../thumbnail.jpg");
+        const fileFolderPath = path.join(__dirname, "../");
+
+        await download(mapIdData.thumbnailUrl, {
+            file: 'thumbnail.jpg',
+            dir: fileFolderPath
+        });
+
         const fileAppwrite = await storage.createFile('mapImages', 'unique()', filePath);
         await Deno.remove(filePath);
 
