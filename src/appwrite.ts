@@ -1,4 +1,4 @@
-import { Appwrite } from 'appwrite';
+import { Appwrite, Query } from 'appwrite';
 import Toastify from 'toastify-js'
 import "toastify-js/src/toastify.css"
 
@@ -52,6 +52,34 @@ export class AppwriteService {
             Toastify({
                 ...toastConfig,
                 text: "Could not load profile: " + err.message,
+            }).showToast();
+        }
+    }
+
+    static async getMapsDetails(mapsId: string[]) {
+        try {
+            await this.ensureAuth();
+
+            const allDocuments = [];
+
+            const chunkSize = 100;
+            for (let i = 0; i < mapsId.length; i += chunkSize) {
+                const chunk = mapsId.slice(i, i + chunkSize);
+
+                const dbRes = await appwrite.database.listDocuments<any>('dailyMaps', [
+                    Query.equal("$id", chunk)
+                ], 100);
+
+                allDocuments.push(...dbRes.documents);
+            }
+
+            return allDocuments;
+        } catch (err) {
+            console.error(err);
+
+            Toastify({
+                ...toastConfig,
+                text: "Could not load map info: " + err.message,
             }).showToast();
         }
     }

@@ -171,7 +171,9 @@
         },
         {
             "$id": "dailyMaps",
-            "$read": [],
+            "$read": [
+                "role:all"
+            ],
             "$write": [],
             "name": "dailyMaps",
             "enabled": true,
@@ -302,7 +304,7 @@
                     "default": null
                 },
                 {
-                    "key": "thumbnailUrl",
+                    "key": "thumbnailFileId",
                     "type": "string",
                     "status": "available",
                     "required": false,

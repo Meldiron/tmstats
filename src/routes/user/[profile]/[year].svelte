@@ -15,7 +15,7 @@
 		visible: false,
 		left: 0,
 		top: 0,
-		data: {}
+		data: {} as any
 	};
 
 	let isLoading = false;
@@ -47,7 +47,7 @@
 	let gold = 0;
 	let author = 0;
 	let totalPoints = 0;
-	let noMedalMaps = [];
+	let noMedalMaps = null;
 	let lastUpdate = '...';
 
 	let heatMaps = [];
@@ -74,7 +74,7 @@
 		gold = 0;
 		author = 0;
 		totalPoints = 0;
-		noMedalMaps = [];
+		noMedalMaps = null;
 		lastUpdate = '...';
 		heatMaps = [];
 		currentYearScore = 0;
@@ -96,13 +96,15 @@
 
 		lastUpdate = moment(dbRes.lastUpdate).format('DD.MM.YYYY HH:mm');
 
+		let localNoMedals = [];
+
 		for (const k in dataSet) {
 			const medal = dataSet[k].medal;
 
 			if (medal === 0) {
 				finish++;
 
-				noMedalMaps = [...noMedalMaps, k];
+				localNoMedals = [...localNoMedals, k];
 			} else if (medal === 1) {
 				bronze++;
 
@@ -135,6 +137,12 @@
 			}
 		}
 
+		const medalMapDocuments = await AppwriteService.getMapsDetails(Object.keys(dataSet));
+
+		if (medalMapDocuments) {
+			noMedalMaps = medalMapDocuments.filter((d) => localNoMedals.includes(d.$id));
+		}
+
 		maxPoints = getMaxPoints(currentYear);
 
 		const year = +currentYear;
@@ -155,7 +163,8 @@
 						data: {
 							id: key,
 							raw: dataSet[key],
-							hover: true
+							hover: true,
+							mapData: medalMapDocuments.find((d) => d.$id === key)
 						}
 					};
 				});
@@ -229,6 +238,14 @@
 					},
 					mouseLeave: (event) => {
 						cursor.visible = false;
+					},
+					mouseDown: (event) => {
+						window
+							.open(
+								`https://trackmania.io/#/totd/leaderboard/${event.mapData.seasonUid}/${event.mapData.mapUid}`,
+								'_blank'
+							)
+							.focus();
 					}
 				};
 			});
@@ -331,7 +348,7 @@
 {#if cursor.visible}
 	<div
 		style={'left: ' + cursor.left + 'px; top: ' + (cursor.top - 10) + 'px'}
-		class="fixed left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none"
+		class="fixed text-center left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none"
 	>
 		{cursor.data.text}
 	</div>
@@ -450,7 +467,7 @@
 	<div class="mt-6 flex flex-col md:flex-row items-center justify-between space-x-3">
 		<div class="flex items-center justify-start space-x-2">
 			{#each years as year}
-				<a href={'/user/' + profileId + '/' + year}>
+				<a target="_blank" href={'/user/' + profileId + '/' + year}>
 					<button
 						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-slate-600 bg-slate-200 py-2 px-6 font-bold hover:bg-slate-300"
 						class:yearselected={year === +currentYear}
@@ -529,22 +546,36 @@
 					Orange is <b class="font-bold">Bronze Medal</b> worth <b class="font-bold">1 points</b>
 				</li>
 			</ul>
-			<p>
-				If you have finished a map but didn't get any medal, the cell has the same color as if you
-				would never play the map. Try harder, you can do this! Here is a list of maps you finished
-				but didn't get medal on:
-			</p>
-			<ul>
-				{#each noMedalMaps as map}
-					<li>
-						{map}
-					</li>
-				{/each}
 
-				{#if noMedalMaps.length <= 0}
-					<li class="text-author-500">All maps are fine!</li>
-				{/if}
-			</ul>
+			{#if noMedalMaps !== null}
+				<p>
+					If you have finished a map but didn't get any medal, the cell has the same color as if you
+					would never play the map. Try harder, you can do this! Here is a list of maps you finished
+					but didn't get medal on:
+				</p>
+				<ul>
+					{#each noMedalMaps as map}
+						<li>
+							<p>
+								<a
+									href={'https://trackmania.io/#/totd/leaderboard/' +
+										map.seasonUid +
+										'/' +
+										map.mapUid}
+									class="font-bold text-blue-500 underline">{map.name}</a
+								>
+
+								<span class="ml-2 text-gray-400"> {map.$id} </span>
+							</p>
+						</li>
+					{/each}
+
+					{#if noMedalMaps.length <= 0}
+						<li class="text-author-500">All maps are fine!</li>
+					{/if}
+				</ul>
+			{/if}
+
 			<p>
 				New data is not fetched automatically. To request a data update, use 'Update Profile' button
 				at the top of the page. Keep in mind this there might be a waiting queue during heavy loads,
