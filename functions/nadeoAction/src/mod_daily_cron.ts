@@ -17,7 +17,7 @@ import { sdk, RateLimiter } from "./deps.ts";
   If an error is thrown, a response with code 500 will be returned.
 */
 
-RateLimiter.Limiter = new RateLimiter(1, 5000);
+RateLimiter.Limiter = new RateLimiter(1, 2000);
 
 let client: sdk.Client = null as any;
 let db: sdk.Database = null as any;

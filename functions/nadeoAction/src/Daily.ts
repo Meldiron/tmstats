@@ -35,6 +35,22 @@ export class Daily {
             (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
     }
 
+    static async getFinishers(mapUid: string, time: number) {
+        const timeRes = await (await getAxiod()).get(`https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/Personal_Best/map/${mapUid}/surround/0/0?score=${time}&onlyWorld=true`, {
+            headers: {
+                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
+
+                'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const position = timeRes.data.tops[0].top[0].position;
+
+        return position;
+    }
+
     static async fetchMap(dateKey: string, storage: sdk.Storage) {
         console.log("Fetching ", dateKey);
 
@@ -79,6 +95,12 @@ export class Daily {
 
         const mapIdData = mapIdsRes.data[0];
 
+        const authorTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.authorScore);
+        const goldTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.goldScore);
+        const silverTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.silverScore);
+        const bronzeTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.bronzeScore);
+        const emptyTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.bronzeScore * 3);
+
         const day = map.monthDay;
         const month = dailyRes.data.monthList[0].month;
         const year = dailyRes.data.monthList[0].year;
@@ -104,10 +126,21 @@ export class Daily {
             year,
             key: `${day}-${month}-${year}`,
             seasonUid: map.seasonUid,
+
             bronzeScore: mapIdData.bronzeScore,
+            bronzeScorePosition: bronzeTimePlayersAmount,
+
             silverScore: mapIdData.silverScore,
+            silverScorePosition: silverTimePlayersAmount,
+
             goldScore: mapIdData.goldScore,
+            goldScorePosition: goldTimePlayersAmount,
+
             authorScore: mapIdData.authorScore,
+            authorScorePosition: authorTimePlayersAmount,
+
+            totalScorePositions: emptyTimePlayersAmount,
+
             collectionName: this.formatTMText(mapIdData.collectionName),
             thumbnailFileId: fileAppwrite.$id,
         }
@@ -119,7 +152,7 @@ export class Daily {
         let hasNext = true;
         let offset = 0;
         do {
-            const maps = await db.listDocuments("dailyMaps", [], 100, offset);
+            const maps = await db.listDocuments<any>("dailyMaps", [], 100, offset);
             downloadedMaps.push(...maps.documents);
 
             hasNext = maps.documents.length > 0;
@@ -138,6 +171,12 @@ export class Daily {
             if (!downloadedMap) {
                 if (!missingKeys.includes(dayKey)) {
                     missingKeys.push(dayKey);
+                }
+            } else {
+                if (downloadedMap.totalScorePositions === 0) {
+                    if (!missingKeys.includes(dayKey)) {
+                        missingKeys.push(dayKey);
+                    }
                 }
             }
         }
