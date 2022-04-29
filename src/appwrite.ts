@@ -18,6 +18,10 @@ export const toastConfig = {
     // onClick: function(){}
 };
 export class AppwriteService {
+    static getImg(id: string) {
+        return appwrite.storage.getFilePreview("mapImages", id, 640)
+    }
+
     static async ensureAuth(): Promise<void> {
         try {
             await appwrite.account.get();

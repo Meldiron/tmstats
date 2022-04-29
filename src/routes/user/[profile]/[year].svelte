@@ -3,6 +3,7 @@
 
 	import { page } from '$app/stores';
 	import { AppwriteService } from '../../../appwrite';
+	import Badge from '$lib/badge.svelte';
 
 	let profileId;
 	let currentYear;
@@ -10,6 +11,7 @@
 	let currentYearScore = 0;
 	let maxPoints = 0;
 	let didFail = null;
+	let dataSet = null;
 
 	const cursor = {
 		visible: false,
@@ -50,6 +52,8 @@
 	let noMedalMaps = null;
 	let lastUpdate = '...';
 
+	let modalData = null;
+
 	let heatMaps = [];
 
 	for (let month = 0; month < 12; month++) {
@@ -57,6 +61,17 @@
 			month: month + 1,
 			name: monthNames[month]
 		});
+	}
+
+	function formatTime(ms: number) {
+		const mins = Math.floor(ms / 1000 / 60);
+		ms -= mins * 1000 * 60;
+		const secs = Math.floor(ms / 1000);
+		ms -= secs * 1000;
+
+		return `${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}.${
+			ms > 99 ? ms : '0' + ms
+		}`;
 	}
 
 	const onMountFunction = async () => {
@@ -80,6 +95,7 @@
 		currentYearScore = 0;
 		maxPoints = 0;
 		didFail = null;
+		dataSet = null;
 
 		let dbRes = await AppwriteService.getHeatmap(profileId);
 
@@ -90,7 +106,7 @@
 			didFail = false;
 		}
 
-		const dataSet = dbRes.medals;
+		dataSet = dbRes.medals;
 
 		profileName = dbRes.nickname;
 
@@ -240,12 +256,7 @@
 						cursor.visible = false;
 					},
 					mouseDown: (event) => {
-						window
-							.open(
-								`https://trackmania.io/#/totd/leaderboard/${event.mapData.seasonUid}/${event.mapData.mapUid}`,
-								'_blank'
-							)
-							.focus();
+						modalData = event.mapData;
 					}
 				};
 			});
@@ -354,6 +365,217 @@
 	</div>
 {/if}
 
+{#if modalData !== null}
+	<div
+		on:click={() => (modalData = null)}
+		class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full inset-0 md:h-full justify-center bg-slate-900 bg-opacity-75"
+	>
+		<div class="relative w-full max-w-2xl sm:pt-4">
+			<div
+				class="relative bg-white rounded-lg shadow"
+				on:click={(event) => event.stopPropagation()}
+			>
+				<div class="flex justify-between items-start p-4 rounded-t">
+					<h3 class="text-xl font-semibold text-gray-900">{modalData.name}</h3>
+					<button
+						on:click={() => (modalData = null)}
+						type="button"
+						class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+						data-modal-toggle="defaultModal"
+					>
+						<svg
+							class="w-5 h-5"
+							fill="currentColor"
+							viewBox="0 0 20 20"
+							xmlns="http://www.w3.org/2000/svg"
+							><path
+								fill-rule="evenodd"
+								d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+								clip-rule="evenodd"
+							/></svg
+						>
+					</button>
+				</div>
+
+				<div class="p-6 pt-0">
+					<div class="bg-gray-200 shadow-inner aspect-video w-full overflow-hidden rounded-lg">
+						<img
+							src={AppwriteService.getImg(modalData.thumbnailFileId).toString()}
+							class="w-full h-full object-cover object-center"
+							alt=""
+						/>
+					</div>
+				</div>
+
+				<div class="pt-0 p-6 space-y-6">
+					<div class="block">
+						<Badge score={modalData.difficulty} long={true} />
+
+						<span
+							class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+								<path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+							</svg>
+							<span>{modalData.totalScorePositions.toLocaleString()} finishes</span>
+						</span>
+
+						<span
+							class="bg-gray-800 text-gray-200 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+							><svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							<span>{modalData.$id.split('-').join('.')}</span>
+						</span>
+					</div>
+
+					<div>
+						<h1 class="font-bold text-xl mb-2">Medal Times</h1>
+
+						<div class="flex flex-col space-y-4">
+							<div class="flex items-center space-x-3">
+								<img src="/author.png" class="w-7" alt="" />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.authorScore)}</p>
+								<Badge score={modalData.authorDifficulty} long={false} />
+
+								<span
+									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+										<path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+									</svg>
+									<span>{modalData.authorScorePosition.toLocaleString()} finishes</span>
+								</span>
+							</div>
+							<div class="flex items-center space-x-3">
+								<img src="/gold.png" class="w-7" alt="" />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.goldScore)}</p>
+								<Badge score={modalData.goldDifficulty} long={false} />
+
+								<span
+									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+										<path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+									</svg>
+									<span>{modalData.goldScorePosition.toLocaleString()} finishes</span>
+								</span>
+							</div>
+							<div class="flex items-center space-x-3">
+								<img src="/silver.png" class="w-7" alt="" />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.silverScore)}</p>
+								<Badge score={modalData.silverDifficulty} long={false} />
+
+								<span
+									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+										<path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+									</svg>
+									<span>{modalData.silverScorePosition.toLocaleString()} finishes</span>
+								</span>
+							</div>
+							<div class="flex items-center space-x-3">
+								<img src="/bronze.png" class="w-7" alt="" />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.bronzeScore)}</p>
+								<Badge score={modalData.bronzeDifficulty} long={false} />
+
+								<span
+									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+										<path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+									</svg>
+									<span>{modalData.bronzeScorePosition.toLocaleString()} finishes</span>
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<h1 class="font-bold text-xl mb-2">Your Time</h1>
+
+						{#if dataSet[modalData.$id].medal !== 0}
+							<div class="flex items-center space-x-3">
+								{#if dataSet[modalData.$id].medal === 4}
+									<img src="/author.png" class="w-7" alt="" />
+								{:else if dataSet[modalData.$id].medal === 3}
+									<img src="/gold.png" class="w-7" alt="" />
+								{:else if dataSet[modalData.$id].medal === 2}
+									<img src="/silver.png" class="w-7" alt="" />
+								{:else if dataSet[modalData.$id].medal === 1}
+									<img src="/bronze.png" class="w-7" alt="" />
+								{/if}
+
+								<p class="text-lg min-w-[100px]">{formatTime(dataSet[modalData.$id].time)}</p>
+							</div>
+						{:else}
+							<p class="text-lg min-w-[100px]">
+								<span class="text-red-500 font-bold">NO MEDAL</span>
+								<span>{formatTime(dataSet[modalData.$id].time)}</span>
+							</p>
+						{/if}
+					</div>
+				</div>
+
+				<div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200">
+					<a
+						target="_blank"
+						href={`https://trackmania.io/#/totd/leaderboard/${modalData.seasonUid}/${modalData.mapUid}`}
+					>
+						<button
+							data-modal-toggle="defaultModal"
+							type="button"
+							class="flex items-center space-x-2 text-white bg-author-600 hover:bg-author-700 focus:ring-4 focus:outline-none focus:ring-author-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+						>
+							<p>Visit on Trackmania.io</p>
+						</button>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
 <div class="max-w-5xl w-full mx-auto mt-6">
 	<div
 		class="border border-gray-900  flex flex-col space-y-4 sm:flex-row  sm:space-y-0 items-center justify-between rounded-tl-3xl rounded-br-3xl font-bold text-white text-2xl bg-gray-800 p-4"
@@ -457,8 +679,8 @@
 					</svg>
 				</div>
 				<p>
-					We don't have this profile yet. Click 'Update Profile' to start fetching data. Be aware,
-					it can take a few minutes.
+					We don't have this profile yet. Click 'Update Profile' to start fetching data. This
+					usually takes only a few seconds.
 				</p>
 			</div>
 		</div>
@@ -467,7 +689,7 @@
 	<div class="mt-6 flex flex-col md:flex-row items-center justify-between space-x-3">
 		<div class="flex items-center justify-start space-x-2">
 			{#each years as year}
-				<a target="_blank" href={'/user/' + profileId + '/' + year}>
+				<a href={'/user/' + profileId + '/' + year}>
 					<button
 						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-slate-600 bg-slate-200 py-2 px-6 font-bold hover:bg-slate-300"
 						class:yearselected={year === +currentYear}
@@ -557,12 +779,8 @@
 					{#each noMedalMaps as map}
 						<li>
 							<p>
-								<a
-									href={'https://trackmania.io/#/totd/leaderboard/' +
-										map.seasonUid +
-										'/' +
-										map.mapUid}
-									class="font-bold text-blue-500 underline">{map.name}</a
+								<button on:click={() => (modalData = map)} class="font-bold text-blue-500 underline"
+									>{map.name}</button
 								>
 
 								<span class="ml-2 text-gray-400"> {map.$id} </span>
@@ -578,8 +796,7 @@
 
 			<p>
 				New data is not fetched automatically. To request a data update, use 'Update Profile' button
-				at the top of the page. Keep in mind this there might be a waiting queue during heavy loads,
-				and update may take up to a few minutes.
+				at the top of the page. This usually takes only a few seconds.
 			</p>
 			<p>
 				Your score for year <strong>{currentYear}</strong> is

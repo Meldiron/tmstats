@@ -4,6 +4,8 @@ Welcome to the documentation of this function 👋 We strongly recommend keeping
 
 ## 🤖 Documentation
 
+TODO: Write docs, and run CRON every day
+
 Simple function similar to typical "hello world" example, but instead, we return a simple JSON that tells everyone how awesome developers are.
 
 <!-- Update with your description, for example 'Create Stripe payment and return payment URL' -->
@@ -20,7 +22,7 @@ _Example output:_
 
 ```json
 {
- "areDevelopersAwesome": true
+	"areDevelopersAwesome": true
 }
 ```
 
