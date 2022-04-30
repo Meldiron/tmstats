@@ -57,7 +57,7 @@ const func = async function (req: any, res: any) {
   const ids = await Daily.fetchMissingMaps(db, storage);
 
   return res.json({
-    message: "Map information updated! Dowloaded " + ids.length + " maps: " + ids.map((m: any) => m.key).join(","),
+    message: "Map information updated! Dowloaded " + ids.length + " maps: " + ids
   });
 };
 

@@ -100,6 +100,7 @@ export class Daily {
         const silverTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.silverScore);
         const bronzeTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.bronzeScore);
         const emptyTimePlayersAmount = await Daily.getFinishers(mapUId, mapIdData.bronzeScore * 3);
+        const emptyTime2PlayersAmount = await Daily.getFinishers(mapUId, 86400000);
 
         const day = map.monthDay;
         const month = dailyRes.data.monthList[0].month;
@@ -139,7 +140,7 @@ export class Daily {
             authorScore: mapIdData.authorScore,
             authorScorePosition: authorTimePlayersAmount,
 
-            totalScorePositions: emptyTimePlayersAmount,
+            totalScorePositions: Math.max(emptyTimePlayersAmount, emptyTime2PlayersAmount),
 
             collectionName: this.formatTMText(mapIdData.collectionName),
             thumbnailFileId: fileAppwrite.$id,
@@ -159,6 +160,19 @@ export class Daily {
             offset += 100;
         } while (hasNext === true);
 
+        /*
+        // DEPRECATED MIGRATION TO FILL createdAt ATTRIBUTES
+        for (const downloadedMap of downloadedMaps) {
+            const d = new Date(+downloadedMap.year, +downloadedMap.month - 1, +downloadedMap.day);
+
+            if (!downloadedMap.createdAt) {
+                downloadedMap.createdAt = d.getTime();
+            }
+
+            await db.updateDocument("dailyMaps", downloadedMap.$id, downloadedMap);
+        }
+        */
+
         const missingKeys: string[] = [];
 
         const dateFrom = new Date(2020, 6, 1, 10);
@@ -173,7 +187,7 @@ export class Daily {
                     missingKeys.push(dayKey);
                 }
             } else {
-                if (downloadedMap.totalScorePositions === 0) {
+                if (downloadedMap.totalScorePositions === 0 || Date.now() < downloadedMap.createdAt + 604800000) {
                     if (!missingKeys.includes(dayKey)) {
                         missingKeys.push(dayKey);
                     }
