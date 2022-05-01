@@ -64,22 +64,31 @@ export class AppwriteService {
         }
     }
 
-    static async getMapsDetails(mapsId: string[]) {
+    static async getMapsDetails(year: number) {
         try {
             await this.ensureAuth();
 
             const allDocuments = [];
+            let cursor: string | undefined = undefined;
+            do {
+                try {
+                    const dbRes = await appwrite.database.listDocuments<any>('dailyMaps', [
+                        Query.equal("year", year)
+                    ], 100, undefined, cursor);
 
-            const chunkSize = 100;
-            for (let i = 0; i < mapsId.length; i += chunkSize) {
-                const chunk = mapsId.slice(i, i + chunkSize);
+                    if (dbRes.documents.length <= 0) {
+                        cursor = "-1";
+                        break;
+                    }
 
-                const dbRes = await appwrite.database.listDocuments<any>('dailyMaps', [
-                    Query.equal("$id", chunk)
-                ], 100);
+                    allDocuments.push(...dbRes.documents);
+                    cursor = dbRes.documents[dbRes.documents.length - 1].$id;
 
-                allDocuments.push(...dbRes.documents);
-            }
+                } catch (err) {
+                    console.error(err);
+                    cursor = "-1"
+                }
+            } while (cursor !== "-1");
 
             return allDocuments;
         } catch (err) {

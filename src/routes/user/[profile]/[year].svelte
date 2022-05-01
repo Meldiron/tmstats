@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 	import { AppwriteService } from '../../../appwrite';
 	import Badge from '$lib/badge.svelte';
+	import { raf } from 'svelte/internal';
 
 	let profileId;
 	let currentYear;
@@ -64,6 +65,8 @@
 	}
 
 	function formatTime(ms: number) {
+		console.log(ms);
+
 		const mins = Math.floor(ms / 1000 / 60);
 		ms -= mins * 1000 * 60;
 		const secs = Math.floor(ms / 1000);
@@ -153,15 +156,24 @@
 			}
 		}
 
-		const medalMapDocuments = await AppwriteService.getMapsDetails(Object.keys(dataSet));
+		const year = +currentYear;
+
+		const medalMapDocuments = await AppwriteService.getMapsDetails(year);
 
 		if (medalMapDocuments) {
-			noMedalMaps = medalMapDocuments.filter((d) => localNoMedals.includes(d.$id));
+			noMedalMaps = medalMapDocuments
+				.filter((d) => localNoMedals.includes(d.$id))
+				.map((m) => {
+					return {
+						raw: dataSet[m.$id],
+						id: m.$id,
+						hover: true,
+						mapData: m
+					};
+				});
 		}
 
 		maxPoints = getMaxPoints(currentYear);
-
-		const year = +currentYear;
 
 		for (const month of months) {
 			const number = month.month;
@@ -177,13 +189,41 @@
 						date: moment(key, 'D-M-YYYY').toDate(),
 						value: dataSet[key].medal,
 						data: {
-							id: key,
 							raw: dataSet[key],
+							id: key,
 							hover: true,
 							mapData: medalMapDocuments.find((d) => d.$id === key)
 						}
 					};
 				});
+
+			const startDate = moment('1-' + number + '-' + year, 'D-M-YYYY')
+				.startOf('month')
+				.toDate()
+				.getTime();
+			const endDate = moment('1-' + number + '-' + year, 'D-M-YYYY')
+				.endOf('month')
+				.toDate()
+				.getTime();
+
+			for (let t = startDate; t <= endDate; t += 86400000) {
+				const d = new Date(t);
+				const k = `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+
+				const existingData = data.find((d) => d.data.id === k);
+				if (!existingData) {
+					data.push({
+						date: d,
+						value: 0,
+						data: {
+							id: k,
+							raw: null,
+							hover: true,
+							mapData: medalMapDocuments.find((d) => d.$id === k)
+						}
+					});
+				}
+			}
 
 			const colors = [
 				'#ff1493', // Finish Only, same as empty
@@ -248,7 +288,7 @@
 						cursor.top = event.pos.y;
 						cursor.data = {
 							id: event.id,
-							medal: dataSet[event.id].medal,
+							medal: dataSet[event.id] ? dataSet[event.id].medal : 0,
 							text: dayName + ' ' + event.id.split('-').join('.')
 						};
 					},
@@ -256,7 +296,8 @@
 						cursor.visible = false;
 					},
 					mouseDown: (event) => {
-						modalData = event.mapData;
+						modalData = event;
+						console.log(modalData);
 					}
 				};
 			});
@@ -359,7 +400,7 @@
 {#if cursor.visible}
 	<div
 		style={'left: ' + cursor.left + 'px; top: ' + (cursor.top - 10) + 'px'}
-		class="fixed text-center left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none"
+		class="fixed z-20 text-center left-40 top-40 bg-slate-900  border border-slate-600 rounded-tl-xl rounded-br-xl px-3 py-1 text-white transform -translate-x-1/2 -translate-y-full pointer-events-none"
 	>
 		{cursor.data.text}
 	</div>
@@ -376,7 +417,7 @@
 				on:click={(event) => event.stopPropagation()}
 			>
 				<div class="flex justify-between items-start p-4 rounded-t">
-					<h3 class="text-xl font-semibold text-gray-900">{modalData.name}</h3>
+					<h3 class="text-xl font-semibold text-gray-900">{modalData.mapData.name}</h3>
 					<button
 						on:click={() => (modalData = null)}
 						type="button"
@@ -400,7 +441,7 @@
 				<div class="p-6 pt-0">
 					<div class="bg-gray-200 shadow-inner aspect-video w-full overflow-hidden rounded-lg">
 						<img
-							src={AppwriteService.getImg(modalData.thumbnailFileId).toString()}
+							src={AppwriteService.getImg(modalData.mapData.thumbnailFileId).toString()}
 							class="w-full h-full object-cover object-center"
 							alt=""
 						/>
@@ -409,7 +450,7 @@
 
 				<div class="pt-0 p-6 space-y-6">
 					<div class="block">
-						<Badge score={modalData.difficulty} long={true} />
+						<Badge score={modalData.mapData.difficulty} long={true} />
 
 						<span
 							class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
@@ -430,7 +471,7 @@
 									/>
 								</g>
 							</svg>
-							<span>{modalData.totalScorePositions.toLocaleString()} finishes</span>
+							<span>{modalData.mapData.totalScorePositions.toLocaleString()} finishes</span>
 						</span>
 
 						<span
@@ -447,7 +488,7 @@
 									clip-rule="evenodd"
 								/>
 							</svg>
-							<span>{modalData.$id}</span>
+							<span>{modalData.mapData.$id}</span>
 						</span>
 					</div>
 
@@ -457,8 +498,8 @@
 						<div class="flex flex-col space-y-4">
 							<div class="flex items-center space-x-3">
 								<img src="/author.png" class="w-7" alt="" />
-								<p class="text-lg min-w-[100px]">{formatTime(modalData.authorScore)}</p>
-								<Badge score={modalData.authorDifficulty} long={false} />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.authorScore)}</p>
+								<Badge score={modalData.mapData.authorDifficulty} long={false} />
 
 								<span
 									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
@@ -479,13 +520,13 @@
 											/>
 										</g>
 									</svg>
-									<span>{modalData.authorScorePosition.toLocaleString()} finishes</span>
+									<span>{modalData.mapData.authorScorePosition.toLocaleString()} finishes</span>
 								</span>
 							</div>
 							<div class="flex items-center space-x-3">
 								<img src="/gold.png" class="w-7" alt="" />
-								<p class="text-lg min-w-[100px]">{formatTime(modalData.goldScore)}</p>
-								<Badge score={modalData.goldDifficulty} long={false} />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.goldScore)}</p>
+								<Badge score={modalData.mapData.goldDifficulty} long={false} />
 
 								<span
 									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
@@ -506,13 +547,13 @@
 											/>
 										</g>
 									</svg>
-									<span>{modalData.goldScorePosition.toLocaleString()} finishes</span>
+									<span>{modalData.mapData.goldScorePosition.toLocaleString()} finishes</span>
 								</span>
 							</div>
 							<div class="flex items-center space-x-3">
 								<img src="/silver.png" class="w-7" alt="" />
-								<p class="text-lg min-w-[100px]">{formatTime(modalData.silverScore)}</p>
-								<Badge score={modalData.silverDifficulty} long={false} />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.silverScore)}</p>
+								<Badge score={modalData.mapData.silverDifficulty} long={false} />
 
 								<span
 									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
@@ -533,13 +574,13 @@
 											/>
 										</g>
 									</svg>
-									<span>{modalData.silverScorePosition.toLocaleString()} finishes</span>
+									<span>{modalData.mapData.silverScorePosition.toLocaleString()} finishes</span>
 								</span>
 							</div>
 							<div class="flex items-center space-x-3">
 								<img src="/bronze.png" class="w-7" alt="" />
-								<p class="text-lg min-w-[100px]">{formatTime(modalData.bronzeScore)}</p>
-								<Badge score={modalData.bronzeDifficulty} long={false} />
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.bronzeScore)}</p>
+								<Badge score={modalData.mapData.bronzeDifficulty} long={false} />
 
 								<span
 									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
@@ -560,7 +601,7 @@
 											/>
 										</g>
 									</svg>
-									<span>{modalData.bronzeScorePosition.toLocaleString()} finishes</span>
+									<span>{modalData.mapData.bronzeScorePosition.toLocaleString()} finishes</span>
 								</span>
 							</div>
 						</div>
@@ -569,24 +610,27 @@
 					<div>
 						<h1 class="font-bold text-xl mb-2">Your Time</h1>
 
-						{#if dataSet[modalData.$id].medal !== 0}
+						{#if modalData.raw && modalData.raw.medal !== 0}
 							<div class="flex items-center space-x-3">
-								{#if dataSet[modalData.$id].medal === 4}
+								{#if modalData.raw.medal === 4}
 									<img src="/author.png" class="w-7" alt="" />
-								{:else if dataSet[modalData.$id].medal === 3}
+								{:else if modalData.raw.medal === 3}
 									<img src="/gold.png" class="w-7" alt="" />
-								{:else if dataSet[modalData.$id].medal === 2}
+								{:else if modalData.raw.medal === 2}
 									<img src="/silver.png" class="w-7" alt="" />
-								{:else if dataSet[modalData.$id].medal === 1}
+								{:else if modalData.raw.medal === 1}
 									<img src="/bronze.png" class="w-7" alt="" />
 								{/if}
 
-								<p class="text-lg min-w-[100px]">{formatTime(dataSet[modalData.$id].time)}</p>
+								<p class="text-lg min-w-[100px]">{formatTime(modalData.raw.time)}</p>
 							</div>
 						{:else}
 							<p class="text-lg min-w-[100px]">
 								<span class="text-red-500 font-bold">NO MEDAL</span>
-								<span>{formatTime(dataSet[modalData.$id].time)}</span>
+
+								{#if modalData.raw}
+									<span>{formatTime(modalData.raw.time)}</span>
+								{/if}
 							</p>
 						{/if}
 					</div>
@@ -595,7 +639,7 @@
 				<div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200">
 					<a
 						target="_blank"
-						href={`https://trackmania.io/#/totd/leaderboard/${modalData.seasonUid}/${modalData.mapUid}`}
+						href={`https://trackmania.io/#/totd/leaderboard/${modalData.mapData.seasonUid}/${modalData.mapData.mapUid}`}
 					>
 						<button
 							data-modal-toggle="defaultModal"
@@ -724,7 +768,7 @@
 	<div class="mt-6 flex flex-col md:flex-row items-center justify-between space-x-3">
 		<div class="flex items-center justify-start space-x-2">
 			{#each years as year}
-				<a href={'/user/' + profileId + '/' + year}>
+				<a rel="external" href={'/user/' + profileId + '/' + year}>
 					<button
 						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-slate-600 bg-slate-200 py-2 px-6 font-bold hover:bg-slate-300"
 						class:yearselected={year === +currentYear}
@@ -775,8 +819,16 @@
 	<div class="grid grid-cols-12 gap-6 mt-6">
 		{#each months as month}
 			<div
-				class="border border-gray-900 p-4 bg-gray-800 rounded-tl-3xl rounded-br-3xl col-span-6 sm:col-span-6 md:col-span-4 lg:col-span-3"
+				class="relative border border-gray-900 p-4 bg-gray-800 rounded-tl-3xl rounded-br-3xl col-span-6 sm:col-span-6 md:col-span-4 lg:col-span-3"
 			>
+				{#if +currentYear === 2020 && +month.month <= 6}
+					<div
+						class="absolute inset-0 flex items-center justify-center p-4 font-bold text-white text-2xl bg-black opacity-90 rounded-tl-3xl rounded-br-3xl"
+					>
+						Event Closed
+					</div>
+				{/if}
+
 				<h3 class="mb-3 font-semibold text-lg text-gray-200">{month.name}</h3>
 
 				<div id={'heatmap-' + month.month} />
@@ -806,19 +858,19 @@
 
 			{#if noMedalMaps !== null}
 				<p>
-					If you have finished a map but didn't get any medal, the cell has the same color as if you
-					would never play the map. Try harder, you can do this! Here is a list of maps you finished
-					but didn't get medal on:
+					If you have finished a map but didn't get any medal in this year, the cell has the same
+					color as if you would never play the map. Try harder, you can do this! Here is a list of
+					maps you finished but didn't get medal on:
 				</p>
 				<ul>
 					{#each noMedalMaps as map}
 						<li>
 							<p>
 								<button on:click={() => (modalData = map)} class="font-bold text-blue-500 underline"
-									>{map.name}</button
+									>{map.mapData.name}</button
 								>
 
-								<span class="ml-2 text-gray-400"> {map.$id} </span>
+								<span class="ml-2 text-gray-400"> {map.mapData.$id} </span>
 							</p>
 						</li>
 					{/each}
