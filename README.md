@@ -1,6 +1,6 @@
 # 🥇 TMStats
 
-![Cover](static/cover_tmstats.png)
+![Cover](/static/cover_tmstats.png)
 
 ## 👋 Introduction
 
@@ -9,8 +9,9 @@ TMStats is a medal tracker that shows overview of all Trackmania medals an user 
 Project focuses on multiple aspects and features:
 
 - [x] Track of the day (TOTD) medals in yearly view
-- [ ] Campaign medals in decare view
-- [ ] Gamified achievement system
+- [ ] Campaign medals in season view
+- [ ] Custom map medals in list view
+- [ ] Gamified achievement & quests system
 
 As of right now, project has no business model and is fully free and open-sourced. Project generates expenses, and business model might be added in the future.
 
@@ -45,8 +46,8 @@ TMStats uses multiple frontend and backend technologies with focus of simplifyin
 3. Install [Appwrite CLI](https://appwrite.io/docs/command-line) locally, and login: `appwrite login`
 4. Deploy collections: `appwrite deploy collection`
 5. Deploy functions: `appwrite deploy functions`
-6. Manually create bucked with ID and name both `mapImages`. Set permission to stoarge-level and set it to `role:all`. Disable Encryption and Anti Virus. Set Allowed File Extensions to 
-`jpg`.
+6. Manually create bucked with ID and name both `mapImages`. Set permission to stoarge-level and set it to `role:all`. Disable Encryption and Anti Virus. Set Allowed File Extensions to
+   `jpg`.
 
 To prepare your changes from your Appwrite instance database to production one:
 
