@@ -22,6 +22,10 @@ export class AppwriteService {
         return appwrite.storage.getFilePreview("mapImages", id, 640)
     }
 
+    static getAppwrite() {
+        return appwrite;
+    }
+
     static async ensureAuth(): Promise<void> {
         try {
             await appwrite.account.get();
