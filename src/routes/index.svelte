@@ -28,10 +28,7 @@
 
 			const newPage = await AppwriteService.listProfiles(orerByAttr, limit, offset);
 			if (newPage) {
-				leaderboard = [
-					...leaderboard,
-					...newPage
-				];
+				leaderboard = [...leaderboard, ...newPage];
 
 				if (newPage.length < limit) {
 					hasNextPage = false;
@@ -92,7 +89,7 @@
 			leaderboard = [];
 		}
 
-		if(leaderboard.length < limit) {
+		if (leaderboard.length < limit) {
 			hasNextPage = false;
 		}
 	};
@@ -102,13 +99,24 @@
 
 <div class="max-w-5xl w-full mx-auto mt-6">
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-		<h1 class="font-bold text-black text-2xl mb-3">TMStats | Medal Tracker</h1>
+		<div
+			class="flex flex-col md:flex-row md:space-x-4 flex space-x-0 space-y-4 md:space-y-4 md:items-center"
+		>
+			<img class="w-24" src="/logo.svg" alt="" />
 
-		<div class="prose">
-			<p>
-				Overview of all Trackmania medals you achieved. Share your campaign or daily maps medals
-				with anyone!
-			</p>
+			<div>
+				<h1 class="font-bold text-black text-2xl mb-3">TMStats | Medal Tracker</h1>
+
+				<div class="prose">
+					<p>
+						Overview of all Trackmania medals you achieved. Share your campaign or daily maps medals
+						with anyone!
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="prose mt-4">
 			<p class="text-sm text-gray-400">
 				This website introduces private leaderboard that only consists of players whose profile has
 				been loaded before. If you are looking for worldwide stats, you can visit <a
