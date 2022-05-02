@@ -1,6 +1,6 @@
 # 🥇 TMStats
 
-![Cover](/static/cover_tmstats.png)
+![Cover](https://raw.githubusercontent.com/Meldiron/tmstats/master/static/cover_tmstats.png)
 
 ## 👋 Introduction
 
