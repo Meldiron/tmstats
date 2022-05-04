@@ -144,6 +144,7 @@ export class Daily {
 
             collectionName: this.formatTMText(mapIdData.collectionName),
             thumbnailFileId: fileAppwrite.$id,
+            createdAt: Date.now()
         }
     }
 
@@ -187,7 +188,7 @@ export class Daily {
                     missingKeys.push(dayKey);
                 }
             } else {
-                if (downloadedMap.totalScorePositions === 0 || Date.now() < downloadedMap.createdAt + 604800000) {
+                if (downloadedMap.totalScorePositions === 0 || downloadedMap.createdAt === 0 || Date.now() < downloadedMap.createdAt + 604800000) {
                     if (!missingKeys.includes(dayKey)) {
                         missingKeys.push(dayKey);
                     }

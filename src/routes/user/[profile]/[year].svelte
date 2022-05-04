@@ -65,8 +65,6 @@
 	}
 
 	function formatTime(ms: number) {
-		console.log(ms);
-
 		const mins = Math.floor(ms / 1000 / 60);
 		ms -= mins * 1000 * 60;
 		const secs = Math.floor(ms / 1000);
@@ -296,8 +294,9 @@
 						cursor.visible = false;
 					},
 					mouseDown: (event) => {
-						modalData = event;
-						console.log(modalData);
+						if (event.mapData) {
+							modalData = event;
+						}
 					}
 				};
 			});
