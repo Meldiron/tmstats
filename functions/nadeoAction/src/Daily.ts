@@ -38,7 +38,7 @@ export class Daily {
     static async getFinishers(mapUid: string, time: number) {
         const timeRes = await (await getAxiod()).get(`https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/Personal_Best/map/${mapUid}/surround/0/0?score=${time}&onlyWorld=true`, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
 
                 'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
                 'Accept': 'application/json',
@@ -51,7 +51,7 @@ export class Daily {
         return position;
     }
 
-    static async fetchMap(dateKey: string, storage: sdk.Storage) {
+    static async fetchMap(dateKey: string, storage: sdk.Storage, existingDocument: any) {
         console.log("Fetching ", dateKey);
 
         const date = new Date(+dateKey.split("-")[2], (+dateKey.split("-")[1]) - 1, +dateKey.split("-")[0]);
@@ -59,7 +59,7 @@ export class Daily {
 
         const dailyRes = await (await getAxiod()).get("https://live-services.trackmania.nadeo.live/api/token/campaign/month?offset=" + offset + "&length=1", {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
 
                 'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
                 'Accept': 'application/json',
@@ -85,7 +85,7 @@ export class Daily {
 
         const mapIdsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/maps/?mapUidList=" + mapUId, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
 
                 'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                 'Accept': 'application/json',
@@ -106,17 +106,27 @@ export class Daily {
         const month = dailyRes.data.monthList[0].month;
         const year = dailyRes.data.monthList[0].year;
 
-        const __dirname = new URL('.', import.meta.url).pathname;
-        const filePath = path.join(__dirname, "../thumbnail.jpg");
-        const fileFolderPath = path.join(__dirname, "../");
+        let fileId;
 
-        await download(mapIdData.thumbnailUrl, {
-            file: 'thumbnail.jpg',
-            dir: fileFolderPath
-        });
+        if (existingDocument) {
+            fileId = existingDocument.thumbnailFileId;
+        }
 
-        const fileAppwrite = await storage.createFile('mapImages', 'unique()', filePath);
-        await Deno.remove(filePath);
+        if (!fileId) {
+            const __dirname = new URL('.', import.meta.url).pathname;
+            const filePath = path.join(__dirname, "../thumbnail.jpg");
+            const fileFolderPath = path.join(__dirname, "../");
+
+            await download(mapIdData.thumbnailUrl, {
+                file: 'thumbnail.jpg',
+                dir: fileFolderPath
+            });
+
+            const fileAppwrite = await storage.createFile('mapImages2', 'unique()', filePath);
+            await Deno.remove(filePath);
+
+            fileId = fileAppwrite.$id
+        }
 
         return {
             mapid: mapIdData.mapId,
@@ -143,7 +153,7 @@ export class Daily {
             totalScorePositions: Math.max(emptyTimePlayersAmount, emptyTime2PlayersAmount),
 
             collectionName: this.formatTMText(mapIdData.collectionName),
-            thumbnailFileId: fileAppwrite.$id,
+            thumbnailFileId: fileId,
             createdAt: Date.now()
         }
     }
@@ -183,12 +193,15 @@ export class Daily {
             const dayKey = `${d.getUTCDate()}-${monthKey}`;
 
             const downloadedMap = downloadedMaps.find((map: any) => map.key === dayKey);
-            if (!downloadedMap) {
+            if (!downloadedMap || !downloadedMap.thumbnailFileId) {
                 if (!missingKeys.includes(dayKey)) {
                     missingKeys.push(dayKey);
                 }
             } else {
-                if (downloadedMap.totalScorePositions === 0 || downloadedMap.createdAt === 0 || Date.now() < downloadedMap.createdAt + 604800000) {
+                const now = Date.now();
+                const ago7Days = now - (1000 * 60 * 60 * 24 * 7);
+
+                if (downloadedMap.totalScorePositions === 0 || downloadedMap.createdAt === 0 || dayTime >= ago7Days) {
                     if (!missingKeys.includes(dayKey)) {
                         missingKeys.push(dayKey);
                     }
@@ -196,10 +209,19 @@ export class Daily {
             }
         }
 
+        console.log(missingKeys);
+
         const mapsData: any[] = [];
 
         for (const missingKey of missingKeys) {
-            const map = await this.fetchMap(missingKey, storage);
+            let existingDocument = null;
+            try {
+                existingDocument = await db.getDocument('dailyMaps', missingKey);
+            } catch (err) {
+
+            }
+
+            const map = await this.fetchMap(missingKey, storage, existingDocument);
             if (map !== null && map.key) {
                 mapsData.push(map.key);
 
@@ -245,7 +267,7 @@ export class Daily {
 
             const medalsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=" + userId + "&mapIdList=" + chunkOfIds.join(","), {
                 headers: {
-                    'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com',
+                    'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
 
                     'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                     'Accept': 'application/json',
