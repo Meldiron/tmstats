@@ -19,7 +19,7 @@ export const toastConfig = {
 };
 export class AppwriteService {
     static getImg(id: string) {
-        return appwrite.storage.getFilePreview("mapImages", id, 640)
+        return appwrite.storage.getFilePreview("mapImages2", id, 640)
     }
 
     static getAppwrite() {
