@@ -1,10 +1,15 @@
-import { Appwrite, Query } from 'appwrite';
+import { Client, Storage, Databases, Query, Account, Functions } from 'appwrite';
 import Toastify from 'toastify-js'
 import "toastify-js/src/toastify.css"
 
-const appwrite = new Appwrite();
+const client = new Client();
 
-appwrite.setEndpoint('https://appwrite.tmstats.eu/v1').setProject('trackmaniaDailyStats');
+client.setEndpoint('https://appwrite.tmstats.eu/v1').setProject('trackmaniaDailyStats');
+
+const storage = new Storage(client);
+const account = new Account(client);
+const functions = new Functions(client);
+const database = new Databases(client, "default");
 
 export const toastConfig = {
     duration: 5000,
@@ -19,19 +24,15 @@ export const toastConfig = {
 };
 export class AppwriteService {
     static getImg(id: string) {
-        return appwrite.storage.getFilePreview("mapImages2", id, 640)
-    }
-
-    static getAppwrite() {
-        return appwrite;
+        return storage.getFilePreview("mapImages2", id, 640)
     }
 
     static async ensureAuth(): Promise<void> {
         try {
-            await appwrite.account.get();
+            await account.get();
         } catch (err0) {
             try {
-                await appwrite.account.createAnonymousSession();
+                await account.createAnonymousSession();
             } catch (err) {
                 console.error(err0);
                 console.error(err);
@@ -48,7 +49,7 @@ export class AppwriteService {
         try {
             await this.ensureAuth();
 
-            const dbRes = await appwrite.database.getDocument<any>('profiles', profileId);
+            const dbRes = await database.getDocument<any>('profiles', profileId);
             const dataSet = JSON.parse(dbRes.medals);
             return {
                 ...dbRes,
@@ -72,7 +73,7 @@ export class AppwriteService {
             let cursor: string | undefined = undefined;
             do {
                 try {
-                    const dbRes = await appwrite.database.listDocuments<any>('dailyMaps', [
+                    const dbRes = await database.listDocuments<any>('dailyMaps', [
                         Query.equal("year", year)
                     ], 100, undefined, cursor);
 
@@ -106,7 +107,7 @@ export class AppwriteService {
             await this.ensureAuth();
 
 
-            const docs = await appwrite.database.listDocuments(
+            const docs = await database.listDocuments(
                 'profiles',
                 [],
                 limit,
@@ -146,7 +147,7 @@ export class AppwriteService {
 
             await this.ensureAuth();
 
-            const res = await appwrite.functions.createExecution(
+            const res = await functions.createExecution(
                 'nadeoAction',
                 JSON.stringify({
                     userId: profileId
@@ -162,7 +163,7 @@ export class AppwriteService {
                 throw new Error(res.stderr);
             }
 
-            const json = JSON.parse(res.stdout);
+            const json = JSON.parse(res.response);
             Toastify({
                 ...toastConfig,
                 text: json.message,
@@ -191,7 +192,7 @@ export class AppwriteService {
         try {
             await this.ensureAuth();
 
-            const res = await appwrite.functions.createExecution(
+            const res = await functions.createExecution(
                 'convertId',
                 JSON.stringify({
                     nick
@@ -203,7 +204,7 @@ export class AppwriteService {
                 throw new Error(res.stderr);
             }
 
-            const id: string = JSON.parse(res.stdout).id;
+            const id: string = JSON.parse(res.response).id;
             return id;
 
         } catch (err) {
