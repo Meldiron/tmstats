@@ -122,7 +122,7 @@ export class Daily {
                 dir: fileFolderPath
             });
 
-            const fileAppwrite = await storage.createFile('mapImages2', 'unique()', filePath);
+            const fileAppwrite = await storage.createFile('mapImages2', 'unique()', sdk.InputFile.fromPath(filePath, "map.jpg"));
             await Deno.remove(filePath);
 
             fileId = fileAppwrite.$id
@@ -158,7 +158,7 @@ export class Daily {
         }
     }
 
-    static async fetchMissingMaps(db: sdk.Database, storage: sdk.Storage): Promise<any[]> {
+    static async fetchMissingMaps(db: sdk.Databases, storage: sdk.Storage): Promise<any[]> {
         const downloadedMaps = [];
 
         let hasNext = true;
@@ -237,7 +237,7 @@ export class Daily {
         return mapsData;
     }
 
-    static async getMedals(userId: string, db: sdk.Database): Promise<any> {
+    static async getMedals(userId: string, db: sdk.Databases): Promise<any> {
         const downloadedMaps: any[] = [];
 
         let hasNext = true;

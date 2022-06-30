@@ -28,7 +28,7 @@ setInterval(() => {
 }, 60000 * 5);
 
 let client: sdk.Client = null as any;
-let db: sdk.Database = null as any;
+let db: sdk.Databases = null as any;
 
 const func = async function (req: any, res: any) {
   if (
@@ -46,7 +46,7 @@ const func = async function (req: any, res: any) {
   const payload = JSON.parse(req.payload || '{}');
 
   client = new sdk.Client();
-  db = new sdk.Database(client);
+  db = new sdk.Databases(client, "default");
 
   client
     .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)

@@ -20,7 +20,7 @@ import { sdk, RateLimiter } from "./deps.ts";
 RateLimiter.Limiter = new RateLimiter(1, 2000);
 
 let client: sdk.Client = null as any;
-let db: sdk.Database = null as any;
+let db: sdk.Databases = null as any;
 let storage: sdk.Storage = null as any;
 
 const func = async function (req: any, res: any) {
@@ -34,7 +34,7 @@ const func = async function (req: any, res: any) {
   }
 
   client = new sdk.Client();
-  db = new sdk.Database(client);
+  db = new sdk.Databases(client, "default");
   storage = new sdk.Storage(client);
 
   client

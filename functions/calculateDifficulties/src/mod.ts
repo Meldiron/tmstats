@@ -52,7 +52,7 @@ const getDifficulty = (perc: number) => {
 export default async function (req: any, res: any) {
   const client = new sdk.Client();
 
-  let db = new sdk.Database(client);
+  let db = new sdk.Databases(client, "default");
 
   client
     .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)

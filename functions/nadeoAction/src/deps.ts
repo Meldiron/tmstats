@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-export * as sdk from "https://deno.land/x/appwrite@3.0.0/mod.ts";
+export * as sdk from "https://deno.land/x/appwrite@5.0.1/mod.ts";
 
 // https://players.trackmania.com/server/dedicated
 

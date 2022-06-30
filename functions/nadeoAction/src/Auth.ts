@@ -11,7 +11,7 @@ export class Auth {
     private accessToken: string | null = null;
     private refreshToken: string | null = null;
 
-    constructor(private db: sdk.Database, private service: 'NadeoLiveServices' | 'NadeoServices', private nadeoAuth: string) {
+    constructor(private db: sdk.Databases, private service: 'NadeoLiveServices' | 'NadeoServices', private nadeoAuth: string) {
     }
 
     async getToken() {
