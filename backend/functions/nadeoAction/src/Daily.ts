@@ -122,7 +122,7 @@ export class Daily {
                 dir: fileFolderPath
             });
 
-            const fileAppwrite = await storage.createFile('mapImages2', 'unique()', sdk.InputFile.fromPath(filePath, "map.jpg"));
+            const fileAppwrite = await storage.createFile('mapImages', 'unique()', sdk.InputFile.fromPath(filePath, "map.jpg"));
             await Deno.remove(filePath);
 
             fileId = fileAppwrite.$id

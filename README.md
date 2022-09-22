@@ -42,11 +42,12 @@ TMStats uses multiple frontend and backend technologies with focus of simplifyin
 
 > Make soure your `.env` file `_APP_FUNCTIONS_RUNTIMES` variable includes `deno-1.14` runtime. This runtime is used by all functions in this project. Changes to `.env` are applied using command `docker-compose up -d`.
 
-2. Sign up into your Appwrite instance and create project with both name and ID set to `trackmaniaDailyStats`
+2. Sign up into your Appwrite instance and create project with both name and ID set to `tmStats`
 3. Install [Appwrite CLI](https://appwrite.io/docs/command-line) locally, and login: `appwrite login`
-4. Deploy collections: `appwrite deploy collection`
-5. Deploy functions: `appwrite deploy functions`
-6. Manually create bucked with ID and name both `mapImages2`. Set permission to stoarge-level and set it to `role:all`. Disable Encryption and Anti Virus. Set Allowed File Extensions to
+4. Enter `cd backend`
+5. Deploy collections: `appwrite deploy collection`
+6. Deploy functions: `appwrite deploy functions`
+7. Manually create bucked with ID and name both `mapImages`. Add `read('any')` permission. Disable Encryption and Anti Virus. Set Allowed File Extensions to
    `jpg`.
 
 To prepare your changes from your Appwrite instance database to production one:

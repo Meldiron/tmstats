@@ -1,15 +1,14 @@
-import { Client, Storage, Databases, Query, Account, Functions } from 'appwrite';
+import { Client, Storage, Databases, Query, Functions } from 'appwrite';
 import Toastify from 'toastify-js'
 import "toastify-js/src/toastify.css"
 
 const client = new Client();
 
-client.setEndpoint('https://appwrite.tmstats.eu/v1').setProject('trackmaniaDailyStats');
+client.setEndpoint('https://demo.appwrite.io/v1').setProject('tmStats');
 
 const storage = new Storage(client);
-const account = new Account(client);
 const functions = new Functions(client);
-const database = new Databases(client, "default");
+const database = new Databases(client);
 
 export const toastConfig = {
     duration: 5000,
@@ -24,32 +23,12 @@ export const toastConfig = {
 };
 export class AppwriteService {
     static getImg(id: string) {
-        return storage.getFilePreview("mapImages2", id, 640)
-    }
-
-    static async ensureAuth(): Promise<void> {
-        try {
-            await account.get();
-        } catch (err0) {
-            try {
-                await account.createAnonymousSession();
-            } catch (err) {
-                console.error(err0);
-                console.error(err);
-
-                Toastify({
-                    ...toastConfig,
-                    text: "Account count not be created, website might not work properly: " + err,
-                }).showToast();
-            }
-        }
+        return storage.getFilePreview("mapImages", id, 640)
     }
 
     static async getHeatmap(profileId: string) {
         try {
-            await this.ensureAuth();
-
-            const dbRes = await database.getDocument<any>('profiles', profileId);
+            const dbRes = await database.getDocument<any>('default', 'profiles', profileId);
             const dataSet = JSON.parse(dbRes.medals);
             return {
                 ...dbRes,
@@ -67,15 +46,15 @@ export class AppwriteService {
 
     static async getMapsDetails(year: number) {
         try {
-            await this.ensureAuth();
-
             const allDocuments = [];
             let cursor: string | undefined = undefined;
             do {
                 try {
-                    const dbRes = await database.listDocuments<any>('dailyMaps', [
-                        Query.equal("year", year)
-                    ], 100, undefined, cursor);
+                    const dbRes = await database.listDocuments<any>('default', 'dailyMaps', [
+                        Query.equal("year", year),
+                        Query.limit(100),
+                        Query.cursorAfter(cursor)
+                    ]);
 
                     if (dbRes.documents.length <= 0) {
                         cursor = "-1";
@@ -104,18 +83,14 @@ export class AppwriteService {
 
     static async listProfiles(orerByAttr: string, limit = 100, offset = 0) {
         try {
-            await this.ensureAuth();
-
-
             const docs = await database.listDocuments(
+                'default',
                 'profiles',
-                [],
-                limit,
-                offset,
-                undefined,
-                undefined,
-                [orerByAttr === 'points' ? 'score' : orerByAttr],
-                ['DESC']
+                [
+                    Query.limit(limit),
+                    Query.offset(offset),
+                    Query.orderDesc(orerByAttr === 'points' ? 'score' : orerByAttr)
+                ]
             );
 
             return docs.documents;
@@ -144,8 +119,6 @@ export class AppwriteService {
                     text: "Your profile update is still being processed ...",
                 }).showToast();
             }, 5000);
-
-            await this.ensureAuth();
 
             const res = await functions.createExecution(
                 'nadeoAction',
@@ -190,8 +163,6 @@ export class AppwriteService {
 
     static async getId(nick: string): Promise<string> {
         try {
-            await this.ensureAuth();
-
             const res = await functions.createExecution(
                 'convertId',
                 JSON.stringify({

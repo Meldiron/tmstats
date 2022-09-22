@@ -31,7 +31,7 @@
   "type": "module",
   "dependencies": {
     "@sveltejs/adapter-static": "^1.0.0-next.29",
-    "appwrite": "^9.0.1",
+    "appwrite": "^10.1.0",
     "toastify-js": "^1.11.2"
   },
   "description": "Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).",

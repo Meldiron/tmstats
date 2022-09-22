@@ -1,14 +1,15 @@
 {
-	"projectId": "trackmaniaDailyStats",
-	"projectName": "trackmaniaDailyStats",
+	"projectId": "tmStats",
+	"projectName": "TMStats V1",
 	"collections": [
 		{
 			"$id": "profiles",
-			"$read": ["role:all"],
-			"$write": [],
+			"$permissions": [
+                "read(\"any\")"
+            ],
 			"name": "profiles",
 			"enabled": true,
-			"permission": "collection",
+			"documentSecurity": false,
 			"attributes": [
 				{
 					"key": "lastUpdate",
@@ -129,11 +130,10 @@
 		},
 		{
 			"$id": "nadeoCache",
-			"$read": [],
-			"$write": [],
+			"$permissions": [],
 			"name": "nadeoCache",
 			"enabled": true,
-			"permission": "collection",
+			"documentSecurity": false,
 			"attributes": [
 				{
 					"key": "value",
@@ -149,11 +149,12 @@
 		},
 		{
 			"$id": "dailyMaps",
-			"$read": ["role:all"],
-			"$write": [],
+			"$permissions": [
+                "read(\"any\")"
+            ],
 			"name": "dailyMaps",
 			"enabled": true,
-			"permission": "collection",
+			"documentSecurity": false,
 			"attributes": [
 				{
 					"key": "mapid",
@@ -349,7 +350,11 @@
 			"runtime": "deno-1.14",
 			"path": "functions/nadeoAction",
 			"entrypoint": "src/mod.ts",
-			"execute": ["role:all"],
+			"execute": ["any"],
+			"ignore": [
+                "node_modules",
+                ".npm"
+            ],
 			"events": [],
 			"schedule": "",
 			"timeout": 900
@@ -361,6 +366,10 @@
 			"path": "functions/nadeoAction",
 			"entrypoint": "src/mod_daily_cron.ts",
 			"execute": [],
+			"ignore": [
+                "node_modules",
+                ".npm"
+            ],
 			"events": [],
 			"schedule": "3 * * * *",
 			"timeout": 900
@@ -371,7 +380,11 @@
 			"runtime": "deno-1.14",
 			"path": "functions/convertId",
 			"entrypoint": "src/mod.ts",
-			"execute": ["role:all"],
+			"execute": ["any"],
+			"ignore": [
+                "node_modules",
+                ".npm"
+            ],
 			"events": [],
 			"schedule": "",
 			"timeout": 15
@@ -383,6 +396,10 @@
 			"path": "functions/calculateDifficulties",
 			"entrypoint": "src/mod.ts",
 			"execute": [],
+			"ignore": [
+                "node_modules",
+                ".npm"
+            ],
 			"events": [],
 			"schedule": "6 * * * *",
 			"timeout": 900
