@@ -8,8 +8,8 @@ const env = config();
 */
 
 await Func({
-    // env,
-    env: {},
+    // variables: env,
+    variables: {},
     payload: '{"nick":"Meldiron"}'
 }, {
     json: (json: any, _code: any) => {

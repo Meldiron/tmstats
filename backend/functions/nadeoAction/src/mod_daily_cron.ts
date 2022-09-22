@@ -86,7 +86,7 @@ export default async function (req: any, res: any) {
     if (!err.message) {
       err.message = "Unexpected error.";
     }
-    
+
     res.json({
       message: err.message
     });

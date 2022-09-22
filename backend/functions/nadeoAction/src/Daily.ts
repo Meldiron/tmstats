@@ -141,7 +141,7 @@ export class Daily {
         let hasNext = true;
         let offset = 0;
         do {
-            const maps = await db.listDocuments<any>("default", "dailyMaps", [ sdk.Query.limit(100) ], offset);
+            const maps = await db.listDocuments<any>("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.offset(offset) ]);
             downloadedMaps.push(...maps.documents);
 
             hasNext = maps.documents.length > 0;
