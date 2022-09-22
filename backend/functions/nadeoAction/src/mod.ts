@@ -10,7 +10,7 @@ import { getAxiod, sdk, RateLimiter } from "./deps.ts";
   'req' variable has:
     'headers' - object with request headers
     'payload' - object with request body data
-    'env' - object with environment variables
+    'variables' - object with function variables
 
   'res' variable has:
     'send(text, status)' - function to return text response. Status code defaults to 200
@@ -32,16 +32,16 @@ let db: sdk.Databases = null as any;
 
 const func = async function (req: any, res: any) {
   if (
-    !req.env['APPWRITE_FUNCTION_ENDPOINT'] ||
-    !req.env['APPWRITE_FUNCTION_PROJECT_ID'] ||
-    !req.env['APPWRITE_FUNCTION_API_KEY'] ||
-    !req.env['NADE_AUTH'] ||
-    !req.env['ADMIN_PASS']
+    !req.variables['APPWRITE_FUNCTION_ENDPOINT'] ||
+    !req.variables['APPWRITE_FUNCTION_PROJECT_ID'] ||
+    !req.variables['APPWRITE_FUNCTION_API_KEY'] ||
+    !req.variables['NADE_AUTH'] ||
+    !req.variables['ADMIN_PASS']
   ) {
     return res.json({ message: "Missing environment variables", code: 500 });
   }
 
-  const appwriteUserId = req.env['APPWRITE_FUNCTION_USER_ID'] as string;
+  const appwriteUserId = req.variables['APPWRITE_FUNCTION_USER_ID'] as string;
 
   const payload = JSON.parse(req.payload || '{}');
 
@@ -49,11 +49,11 @@ const func = async function (req: any, res: any) {
   db = new sdk.Databases(client);
 
   client
-    .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)
-    .setProject(req.env['APPWRITE_FUNCTION_PROJECT_ID'] as string)
-    .setKey(req.env['APPWRITE_FUNCTION_API_KEY'] as string);
+    .setEndpoint(req.variables['APPWRITE_FUNCTION_ENDPOINT'] as string)
+    .setProject(req.variables['APPWRITE_FUNCTION_PROJECT_ID'] as string)
+    .setKey(req.variables['APPWRITE_FUNCTION_API_KEY'] as string);
 
-  const nadeoAuth = req.env['NADE_AUTH'] as string;
+  const nadeoAuth = req.variables['NADE_AUTH'] as string;
 
   if (!Auth.Live) {
     Auth.Live = new Auth(db, "NadeoLiveServices", nadeoAuth);
@@ -76,13 +76,13 @@ const func = async function (req: any, res: any) {
     lastUpdate = docRes.lastUpdate;
   } catch (_err) {
     // If error occured, and not admin, exit
-    const adminPass = req.env['ADMIN_PASS'] as string;
+    const adminPass = req.variables['ADMIN_PASS'] as string;
     if (!payload.password || payload.password !== adminPass) {
       // return res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
     }
   }
 
-  const adminPass = req.env['ADMIN_PASS'] as string;
+  const adminPass = req.variables['ADMIN_PASS'] as string;
 
   if (lastUpdate) {
     const now = Date.now();
@@ -177,6 +177,9 @@ export default async function (req: any, res: any) {
     if (!err.message) {
       err.message = "Unexpected error.";
     }
-    throw err;
+
+    res.json({
+      message: err.message
+    });
   }
 }

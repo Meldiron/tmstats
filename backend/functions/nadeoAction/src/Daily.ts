@@ -51,7 +51,7 @@ export class Daily {
         return position;
     }
 
-    static async fetchMap(dateKey: string, existingDocument: any) {
+    static async fetchMap(dateKey: string) {
         console.log("Fetching ", dateKey);
 
         const date = new Date(+dateKey.split("-")[2], (+dateKey.split("-")[1]) - 1, +dateKey.split("-")[0]);
@@ -106,16 +106,6 @@ export class Daily {
         const month = dailyRes.data.monthList[0].month;
         const year = dailyRes.data.monthList[0].year;
 
-        let fileId;
-
-        if (existingDocument) {
-            fileId = existingDocument.thumbnailFileId;
-        }
-
-        if (!fileId) {
-            fileId = mapIdData.thumbnailUrl
-        }
-
         return {
             mapid: mapIdData.mapId,
             mapUid: mapIdData.mapUid,
@@ -141,8 +131,7 @@ export class Daily {
             totalScorePositions: Math.max(emptyTimePlayersAmount, emptyTime2PlayersAmount),
 
             collectionName: this.formatTMText(mapIdData.collectionName),
-            thumbnailFileId: fileId,
-            createdAt: Date.now()
+            thumbnailUrl: mapIdData.thumbnailUrl
         }
     }
 
@@ -181,7 +170,7 @@ export class Daily {
             const dayKey = `${d.getUTCDate()}-${monthKey}`;
 
             const downloadedMap = downloadedMaps.find((map: any) => map.key === dayKey);
-            if (!downloadedMap || !downloadedMap.thumbnailFileId) {
+            if (!downloadedMap) {
                 if (!missingKeys.includes(dayKey)) {
                     missingKeys.push(dayKey);
                 }
@@ -189,7 +178,7 @@ export class Daily {
                 const now = Date.now();
                 const ago7Days = now - (1000 * 60 * 60 * 24 * 7);
 
-                if (downloadedMap.totalScorePositions === 0 || downloadedMap.createdAt === 0 || dayTime >= ago7Days) {
+                if (downloadedMap.totalScorePositions === 0 || dayTime >= ago7Days) {
                     if (!missingKeys.includes(dayKey)) {
                         missingKeys.push(dayKey);
                     }
@@ -202,14 +191,7 @@ export class Daily {
         const mapsData: any[] = [];
 
         for (const missingKey of missingKeys) {
-            let existingDocument = null;
-            try {
-                existingDocument = await db.getDocument("default", 'dailyMaps', missingKey);
-            } catch (err) {
-
-            }
-
-            const map = await this.fetchMap(missingKey, existingDocument);
+            const map = await this.fetchMap(missingKey);
             if (map !== null && map.key) {
                 mapsData.push(map.key);
 

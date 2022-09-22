@@ -22,10 +22,6 @@ export const toastConfig = {
     // onClick: function(){}
 };
 export class AppwriteService {
-    static getImg(id: string) {
-        return storage.getFilePreview("mapImages", id, 640)
-    }
-
     static async getHeatmap(profileId: string) {
         try {
             const dbRes = await database.getDocument<any>('default', 'profiles', profileId);

@@ -40,7 +40,7 @@ const getDifficulty = (perc: number) => {
   'req' variable has:
     'headers' - object with request headers
     'payload' - object with request body data
-    'env' - object with environment variables
+    'variables' - object with function variables
 
   'res' variable has:
     'send(text, status)' - function to return text response. Status code defaults to 200
@@ -49,15 +49,15 @@ const getDifficulty = (perc: number) => {
   If an error is thrown, a response with code 500 will be returned.
 */
 
-export default async function (req: any, res: any) {
+const func = async function (req: any, res: any) {
   const client = new sdk.Client();
 
   let db = new sdk.Databases(client);
 
   client
-    .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)
-    .setProject(req.env['APPWRITE_FUNCTION_PROJECT_ID'] as string)
-    .setKey(req.env['APPWRITE_FUNCTION_API_KEY'] as string);
+    .setEndpoint(req.variables['APPWRITE_FUNCTION_ENDPOINT'] as string)
+    .setProject(req.variables['APPWRITE_FUNCTION_PROJECT_ID'] as string)
+    .setKey(req.variables['APPWRITE_FUNCTION_API_KEY'] as string);
 
   let didFail = false;
   let cursor: string | undefined = undefined;
@@ -127,4 +127,20 @@ export default async function (req: any, res: any) {
   res.json({
     success: true,
   });
+}
+
+export default async function (req: any, res: any) {
+  try {
+    await func(req, res);
+  } catch (err) {
+    console.log(err);
+
+    if (!err.message) {
+      err.message = "Unexpected error.";
+    }
+
+    res.json({
+      message: err.message
+    });
+  }
 }

@@ -47,8 +47,6 @@ TMStats uses multiple frontend and backend technologies with focus of simplifyin
 4. Enter `cd backend`
 5. Deploy collections: `appwrite deploy collection`
 6. Deploy functions: `appwrite deploy functions`
-7. Manually create bucked with ID and name both `mapImages`. Add `read('any')` permission. Disable Encryption and Anti Virus. Set Allowed File Extensions to
-   `jpg`.
 
 To prepare your changes from your Appwrite instance database to production one:
 

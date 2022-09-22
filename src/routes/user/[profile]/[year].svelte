@@ -440,7 +440,7 @@
 				<div class="p-6 pt-0">
 					<div class="bg-gray-200 shadow-inner aspect-video w-full overflow-hidden rounded-lg">
 						<img
-							src={AppwriteService.getImg(modalData.mapData.thumbnailFileId).toString()}
+							src={modalData.mapData.thumbnailUrl}
 							class="w-full h-full object-cover object-center"
 							alt=""
 						/>
