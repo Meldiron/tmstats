@@ -21,7 +21,6 @@ RateLimiter.Limiter = new RateLimiter(1, 2000);
 
 let client: sdk.Client = null as any;
 let db: sdk.Databases = null as any;
-let storage: sdk.Storage = null as any;
 
 const func = async function (req: any, res: any) {
   if (
@@ -34,8 +33,7 @@ const func = async function (req: any, res: any) {
   }
 
   client = new sdk.Client();
-  db = new sdk.Databases(client, "default");
-  storage = new sdk.Storage(client);
+  db = new sdk.Databases(client);
 
   client
     .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)
@@ -59,20 +57,20 @@ const func = async function (req: any, res: any) {
   const allDocs = [];
   let cursor: any = undefined;
   do {
-    const docs = await db.listDocuments("dailyMaps", undefined, 100, undefined, cursor, "after");
+    const docs = await db.listDocuments("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.cursorAfter(cursor) ]);
     allDocs.push(...docs.documents);
     cursor = docs.documents[docs.documents.length - 1]?.$id;
   } while (cursor);
 
   for (const doc of allDocs) {
-    await db.updateDocument("dailyMaps", doc.$id, {
+    await db.updateDocument("default", "dailyMaps", doc.$id, {
       ...doc,
       thumbnailFileId: ''
     })
   }
   */
 
-  const ids = await Daily.fetchMissingMaps(db, storage);
+  const ids = await Daily.fetchMissingMaps(db);
 
   return res.json({
     message: "Map information updated! Dowloaded " + ids.length + " maps: " + ids

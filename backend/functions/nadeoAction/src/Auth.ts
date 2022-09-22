@@ -26,10 +26,10 @@ export class Auth {
         let doc: any = null;
 
         try {
-            const cacheRes = await this.db.getDocument("nadeoCache", "auth");
+            const cacheRes = await this.db.getDocument("default", "nadeoCache", "auth");
             doc = cacheRes;
         } catch (_err) {
-            const cacheRes = await this.db.createDocument("nadeoCache", "auth", {
+            const cacheRes = await this.db.createDocument("default", "nadeoCache", "auth", {
                 value: '{}'
             });
             doc = cacheRes;
@@ -48,10 +48,10 @@ export class Auth {
         let doc: any = null;
 
         try {
-            const cacheRes = await this.db.getDocument("nadeoCache", "auth");
+            const cacheRes = await this.db.getDocument("default", "nadeoCache", "auth");
             doc = cacheRes;
         } catch (_err) {
-            const cacheRes = await this.db.createDocument("nadeoCache", "auth", {
+            const cacheRes = await this.db.createDocument("default", "nadeoCache", "auth", {
                 value: '{}'
             });
             doc = cacheRes;
@@ -66,7 +66,7 @@ export class Auth {
         doc[this.service]['accessToken'] = this.accessToken;
         doc[this.service]['refreshToken'] = this.refreshToken;
 
-        await this.db.updateDocument("nadeoCache", "auth", {
+        await this.db.updateDocument("default", "nadeoCache", "auth", {
             value: JSON.stringify(doc)
         });
     }

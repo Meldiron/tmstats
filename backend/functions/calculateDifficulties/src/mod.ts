@@ -52,7 +52,7 @@ const getDifficulty = (perc: number) => {
 export default async function (req: any, res: any) {
   const client = new sdk.Client();
 
-  let db = new sdk.Databases(client, "default");
+  let db = new sdk.Databases(client);
 
   client
     .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)
@@ -66,7 +66,7 @@ export default async function (req: any, res: any) {
 
   do {
     try {
-      const mapsResponse: sdk.Models.DocumentList<sdk.Models.Document> = await db.listDocuments("dailyMaps", [], 100, undefined, cursor);
+      const mapsResponse: sdk.Models.DocumentList<sdk.Models.Document> = await db.listDocuments("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.cursorAfter(cursor) ]);
 
       mapsArray.push(...mapsResponse.documents);
 
@@ -121,7 +121,7 @@ export default async function (req: any, res: any) {
   });
 
   for (const map of mapsArray) {
-    await db.updateDocument("dailyMaps", map.$id, map);
+    await db.updateDocument("default", "dailyMaps", map.$id, map);
   }
 
   res.json({

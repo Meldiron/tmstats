@@ -46,7 +46,7 @@ const func = async function (req: any, res: any) {
   const payload = JSON.parse(req.payload || '{}');
 
   client = new sdk.Client();
-  db = new sdk.Databases(client, "default");
+  db = new sdk.Databases(client);
 
   client
     .setEndpoint(req.env['APPWRITE_FUNCTION_ENDPOINT'] as string)
@@ -72,7 +72,7 @@ const func = async function (req: any, res: any) {
   let lastUpdate = null;
 
   try {
-    const docRes = await db.getDocument<any>("profiles", payload.userId);
+    const docRes = await db.getDocument<any>("default", "profiles", payload.userId);
     lastUpdate = docRes.lastUpdate;
   } catch (_err) {
     // If error occured, and not admin, exit
@@ -155,12 +155,12 @@ const func = async function (req: any, res: any) {
   }
 
   try {
-    const docRes = await db.getDocument("profiles", payload.userId);
+    const docRes = await db.getDocument("default", "profiles", payload.userId);
     const docId = docRes.$id;
 
-    await db.updateDocument("profiles", docId, newDocData);
+    await db.updateDocument("default", "profiles", docId, newDocData);
   } catch (_err) {
-    await db.createDocument("profiles", payload.userId, newDocData);
+    await db.createDocument("default", "profiles", payload.userId, newDocData);
   }
 
   return res.json({

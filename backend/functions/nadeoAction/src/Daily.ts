@@ -51,7 +51,7 @@ export class Daily {
         return position;
     }
 
-    static async fetchMap(dateKey: string, storage: sdk.Storage, existingDocument: any) {
+    static async fetchMap(dateKey: string, existingDocument: any) {
         console.log("Fetching ", dateKey);
 
         const date = new Date(+dateKey.split("-")[2], (+dateKey.split("-")[1]) - 1, +dateKey.split("-")[0]);
@@ -113,19 +113,7 @@ export class Daily {
         }
 
         if (!fileId) {
-            const __dirname = new URL('.', import.meta.url).pathname;
-            const filePath = path.join(__dirname, "../thumbnail.jpg");
-            const fileFolderPath = path.join(__dirname, "../");
-
-            await download(mapIdData.thumbnailUrl, {
-                file: 'thumbnail.jpg',
-                dir: fileFolderPath
-            });
-
-            const fileAppwrite = await storage.createFile('mapImages', 'unique()', sdk.InputFile.fromPath(filePath, "map.jpg"));
-            await Deno.remove(filePath);
-
-            fileId = fileAppwrite.$id
+            fileId = mapIdData.thumbnailUrl
         }
 
         return {
@@ -158,13 +146,13 @@ export class Daily {
         }
     }
 
-    static async fetchMissingMaps(db: sdk.Databases, storage: sdk.Storage): Promise<any[]> {
+    static async fetchMissingMaps(db: sdk.Databases): Promise<any[]> {
         const downloadedMaps = [];
 
         let hasNext = true;
         let offset = 0;
         do {
-            const maps = await db.listDocuments<any>("dailyMaps", [], 100, offset);
+            const maps = await db.listDocuments<any>("default", "dailyMaps", [ sdk.Query.limit(100) ], offset);
             downloadedMaps.push(...maps.documents);
 
             hasNext = maps.documents.length > 0;
@@ -180,7 +168,7 @@ export class Daily {
                 downloadedMap.createdAt = d.getTime();
             }
 
-            await db.updateDocument("dailyMaps", downloadedMap.$id, downloadedMap);
+            await db.updateDocument("default", "dailyMaps", downloadedMap.$id, downloadedMap);
         }
         */
 
@@ -216,20 +204,20 @@ export class Daily {
         for (const missingKey of missingKeys) {
             let existingDocument = null;
             try {
-                existingDocument = await db.getDocument('dailyMaps', missingKey);
+                existingDocument = await db.getDocument("default", 'dailyMaps', missingKey);
             } catch (err) {
 
             }
 
-            const map = await this.fetchMap(missingKey, storage, existingDocument);
+            const map = await this.fetchMap(missingKey, existingDocument);
             if (map !== null && map.key) {
                 mapsData.push(map.key);
 
                 try {
-                    await db.getDocument('dailyMaps', map.key);
-                    await db.updateDocument('dailyMaps', map.key, map);
+                    await db.getDocument("default", 'dailyMaps', map.key);
+                    await db.updateDocument("default", 'dailyMaps', map.key, map);
                 } catch (_err) {
-                    await db.createDocument('dailyMaps', map.key, map);
+                    await db.createDocument("default", 'dailyMaps', map.key, map);
                 }
             }
         }
@@ -243,7 +231,7 @@ export class Daily {
         let hasNext = true;
         let offset = 0;
         do {
-            const maps = await db.listDocuments("dailyMaps", [], 100, offset);
+            const maps = await db.listDocuments("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.offset(offset) ]);
             downloadedMaps.push(...maps.documents);
 
             hasNext = maps.documents.length > 0;
