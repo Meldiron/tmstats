@@ -127,7 +127,15 @@ const func = async function (req: any, res: any) {
   });
 
   for (const map of mapsArray) {
-    await db.updateDocument("default", "dailyMaps", map.$id, map);
+    const mapUpdate = {
+      difficulty: map.difficulty,
+      bronzeDifficulty: map.bronzeDifficulty,
+      silverDifficulty: map.silverDifficulty,
+      goldDifficulty: map.goldDifficulty,
+      authorDifficulty: map.authorDifficulty
+    };
+
+    await db.updateDocument("default", "dailyMaps", map.$id, mapUpdate);
   }
 
   res.json({
