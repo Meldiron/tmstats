@@ -52,24 +52,6 @@ const func = async function (req: any, res: any) {
     await Auth.Game.load();
   }
 
-  /*
-  // SCRIPT TO REMOVE ALL THUMBNAILS. NOT NEEDED ANYMORE
-  const allDocs = [];
-  let cursor: any = undefined;
-  do {
-    const docs = await db.listDocuments("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.cursorAfter(cursor) ]);
-    allDocs.push(...docs.documents);
-    cursor = docs.documents[docs.documents.length - 1]?.$id;
-  } while (cursor);
-
-  for (const doc of allDocs) {
-    await db.updateDocument("default", "dailyMaps", doc.$id, {
-      ...doc,
-      thumbnailUrl: ''
-    })
-  }
-  */
-
   const ids = await Daily.fetchMissingMaps(db);
 
   return res.json({

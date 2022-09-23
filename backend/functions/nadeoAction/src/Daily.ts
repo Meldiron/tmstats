@@ -148,19 +148,6 @@ export class Daily {
             offset += 100;
         } while (hasNext === true);
 
-        /*
-        // DEPRECATED MIGRATION TO FILL createdAt ATTRIBUTES
-        for (const downloadedMap of downloadedMaps) {
-            const d = new Date(+downloadedMap.year, +downloadedMap.month - 1, +downloadedMap.day);
-
-            if (!downloadedMap.createdAt) {
-                downloadedMap.createdAt = d.getTime();
-            }
-
-            await db.updateDocument("default", "dailyMaps", downloadedMap.$id, downloadedMap);
-        }
-        */
-
         const missingKeys: string[] = [];
 
         const dateFrom = new Date(2020, 6, 1, 10);

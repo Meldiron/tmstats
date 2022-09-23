@@ -46,11 +46,16 @@ export class AppwriteService {
             let cursor: string | undefined = undefined;
             do {
                 try {
-                    const dbRes = await database.listDocuments<any>('default', 'dailyMaps', [
+                    const queries = [
                         Query.equal("year", year),
                         Query.limit(100),
-                        Query.cursorAfter(cursor)
-                    ]);
+                    ];
+
+                    if(cursor) {
+                        queries.push(Query.cursorAfter(cursor));
+                    }
+
+                    const dbRes = await database.listDocuments<any>('default', 'dailyMaps', queries);
 
                     if (dbRes.documents.length <= 0) {
                         cursor = "-1";

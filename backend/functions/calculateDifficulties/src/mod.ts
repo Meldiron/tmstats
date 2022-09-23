@@ -66,7 +66,13 @@ const func = async function (req: any, res: any) {
 
   do {
     try {
-      const mapsResponse: sdk.Models.DocumentList<sdk.Models.Document> = await db.listDocuments("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.cursorAfter(cursor) ]);
+      const queries = [ sdk.Query.limit(100) ];
+
+      if(cursor) {
+        queries.push(sdk.Query.cursorAfter(cursor));
+      }
+
+      const mapsResponse: sdk.Models.DocumentList<sdk.Models.Document> = await db.listDocuments("default", "dailyMaps", queries);
 
       mapsArray.push(...mapsResponse.documents);
 
