@@ -438,7 +438,7 @@
             ],
             "events": [],
             "schedule": "",
-            "timeout": 900
+            "timeout": 60
         },
         {
             "$id": "nadeoCron",
@@ -453,7 +453,7 @@
             ],
             "events": [],
             "schedule": "3 * * * *",
-            "timeout": 900
+            "timeout": 300
         },
         {
             "$id": "convertId",
@@ -485,7 +485,7 @@
             ],
             "events": [],
             "schedule": "6 * * * *",
-            "timeout": 900
+            "timeout": 60
         }
     ]
 }
