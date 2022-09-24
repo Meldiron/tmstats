@@ -172,14 +172,8 @@ export default async function (req: any, res: any) {
   try {
     await func(req, res);
   } catch (err) {
-    console.log(err);
-
-    if (!err.message) {
-      err.message = "Unexpected error.";
-    }
-
     res.json({
-      message: err.message
+      message: err
     });
   }
 }

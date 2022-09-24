@@ -59,7 +59,7 @@ export default async function (req: any, res: any) {
 
   const tmRes = await (await getAxiod()).get("https://trackmania.io/api/players/find?search=" + payload.nick, {
     headers: {
-      'User-Agent': 'tmstats.eu / 0.0.1 matejbaco2000@gmail.com'
+      'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com'
     }
   });
   const bodyJson = tmRes.data;
