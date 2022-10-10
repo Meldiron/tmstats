@@ -83,7 +83,9 @@ export class Auth {
 
     private async loginAction() {
         const refresh = this.refreshToken ? JSON.parse(new TextDecoder().decode(new Uint8Array(decode((this.refreshToken as string).split(".")[1])))) : null;
-        if (refresh && refresh.exp - (Date.now() / 1000) < 0) {
+        // exp is 1664636705
+        // 1664636705 - 1665409921
+        if (refresh && refresh.exp > Date.now() / 1000) {
             await this.refreshTokenAction();
         } else {
             await this.newTokenAction();
