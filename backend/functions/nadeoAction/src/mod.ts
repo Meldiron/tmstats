@@ -6,19 +6,6 @@ import { getAxiod, sdk, RateLimiter } from "./deps.ts";
 
 // https://players.trackmania.com/server/dedicated
 
-/*
-  'req' variable has:
-    'headers' - object with request headers
-    'payload' - object with request body data
-    'variables' - object with function variables
-
-  'res' variable has:
-    'send(text, status)' - function to return text response. Status code defaults to 200
-    'json(obj, status)' - function to return JSON response. Status code defaults to 200
-  
-  If an error is thrown, a response with code 500 will be returned.
-*/
-
 RateLimiter.Limiter = new RateLimiter();
 
 let timeoutCache: any = {};
@@ -30,30 +17,26 @@ setInterval(() => {
 let client: sdk.Client = null as any;
 let db: sdk.Databases = null as any;
 
-const func = async function (req: any, res: any) {
+const func = async function (context: any) {
   if (
-    !req.variables['APPWRITE_FUNCTION_ENDPOINT'] ||
-    !req.variables['APPWRITE_FUNCTION_PROJECT_ID'] ||
-    !req.variables['APPWRITE_FUNCTION_API_KEY'] ||
-    !req.variables['NADE_AUTH'] ||
-    !req.variables['ADMIN_PASS']
+    !Deno.env.get('NADE_AUTH')
   ) {
-    return res.json({ message: "Missing environment variables", code: 500 });
+    return context.res.json({ message: "Missing environment variables", code: 500 });
   }
 
-  const appwriteUserId = req.variables['APPWRITE_FUNCTION_USER_ID'] as string;
+  const appwriteUserId = context.req.headers['x-appwrite-user-id'] as string;
 
-  const payload = JSON.parse(req.payload || '{}');
+  const payload = JSON.parse(context.req.body || '{}');
 
   client = new sdk.Client();
   db = new sdk.Databases(client);
 
   client
-    .setEndpoint(req.variables['APPWRITE_FUNCTION_ENDPOINT'] as string)
-    .setProject(req.variables['APPWRITE_FUNCTION_PROJECT_ID'] as string)
-    .setKey(req.variables['APPWRITE_FUNCTION_API_KEY'] as string);
+    .setEndpoint(Deno.env.get('APPWRITE_FUNCTION_API_ENDPOINT') as string)
+    .setProject(Deno.env.get('APPWRITE_FUNCTION_PROJECT_ID') as string)
+    .setKey(context.req.headers['x-appwrite-key'] as string);
 
-  const nadeoAuth = req.variables['NADE_AUTH'] as string;
+  const nadeoAuth = Deno.env.get('NADE_AUTH') as string;
 
   if (!Auth.Live) {
     Auth.Live = new Auth(db, "NadeoLiveServices", nadeoAuth);
@@ -66,7 +49,7 @@ const func = async function (req: any, res: any) {
   }
 
   if (!payload.userId) {
-    return res.json({ message: "This action requires 'userId'.", code: 500 });
+    return context.res.json({ message: "This action requires 'userId'.", code: 500 });
   }
 
   let lastUpdate = null;
@@ -76,13 +59,13 @@ const func = async function (req: any, res: any) {
     lastUpdate = docRes.lastUpdate;
   } catch (_err) {
     // If error occured, and not admin, exit
-    const adminPass = req.variables['ADMIN_PASS'] as string;
+    const adminPass = Deno.env.get('ADMIN_PASS') as string;
     if (!payload.password || payload.password !== adminPass) {
-      // return res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
+      return context.res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
     }
   }
 
-  const adminPass = req.variables['ADMIN_PASS'] as string;
+  const adminPass = Deno.env.get('ADMIN_PASS') as string;
 
   if (lastUpdate) {
     const now = Date.now();
@@ -90,14 +73,14 @@ const func = async function (req: any, res: any) {
     const h1 = 1000 * 60 * 60;
     if (lastUpdate + h1 > now) {
       if (!payload.password || payload.password !== adminPass) {
-        return res.json({ message: "You can only refresh profile once every hour.", code: 500 });
+        return context.res.json({ message: "You can only refresh profile once every hour.", code: 500 });
       }
     }
   }
 
   if (timeoutCache[appwriteUserId]) {
     if (!payload.password || payload.password !== adminPass) {
-      return res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
+      return context.res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
     }
   }
   timeoutCache[appwriteUserId] = Date.now();
@@ -105,17 +88,20 @@ const func = async function (req: any, res: any) {
     timeoutCache[appwriteUserId] = null;
   }, 60000);
 
+  /*
+  Deprecated: https://webservices.openplanet.dev/oauth/reference/accounts/id-to-name
   const accountRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/accounts/displayNames/?accountIdList=" + payload.userId, {
     headers: {
-      'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+      'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
 
       'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     }
   });
+   */
 
-  const nickname = accountRes.data[0].displayName;
+  const nickname = "Unknown";
 
   const allMedals = await Daily.getMedals(payload.userId, db);
 
@@ -163,16 +149,17 @@ const func = async function (req: any, res: any) {
     await db.createDocument("default", "profiles", payload.userId, newDocData);
   }
 
-  return res.json({
+  return context.res.json({
     message: "Profile successfully updated!",
   });
 };
 
-export default async function (req: any, res: any) {
+export default async function (context: any) {
   try {
-    await func(req, res);
+    return await func(context);
   } catch (err) {
-    res.json({
+    console.log(err);
+    return context.res.json({
       message: err
     });
   }

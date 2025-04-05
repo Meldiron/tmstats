@@ -4,7 +4,7 @@ import "toastify-js/src/toastify.css"
 
 const client = new Client();
 
-client.setEndpoint('https://demo.appwrite.io/v1').setProject('tmStats');
+client.setEndpoint('https://cloud.appwrite.io/v1').setProject('tmStats');
 
 const storage = new Storage(client);
 const functions = new Functions(client);
@@ -124,7 +124,8 @@ export class AppwriteService {
             const res = await functions.createExecution(
                 'nadeoAction',
                 JSON.stringify({
-                    userId: profileId
+                    userId: profileId,
+                    password: "kacalova123" // TODO: Remove
                 }),
                 false
             );

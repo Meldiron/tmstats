@@ -1,8 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { Auth } from "./Auth.ts";
-import { download } from "https://deno.land/x/download/mod.ts";
-import * as path from "https://deno.land/std/path/mod.ts";
 
 import { getAxiod, sdk } from "./deps.ts";
 
@@ -38,7 +36,7 @@ export class Daily {
     static async getFinishers(mapUid: string, time: number) {
         const timeRes = await (await getAxiod()).get(`https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/Personal_Best/map/${mapUid}/surround/0/0?score=${time}&onlyWorld=true`, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
 
                 'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
                 'Accept': 'application/json',
@@ -59,7 +57,7 @@ export class Daily {
 
         const dailyRes = await (await getAxiod()).get("https://live-services.trackmania.nadeo.live/api/token/campaign/month?offset=" + offset + "&length=1", {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
 
                 'Authorization': 'nadeo_v1 t=' + await Auth.Live.getToken(),
                 'Accept': 'application/json',
@@ -85,7 +83,7 @@ export class Daily {
 
         const mapIdsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/maps/?mapUidList=" + mapUId, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
 
                 'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                 'Accept': 'application/json',
@@ -224,7 +222,7 @@ export class Daily {
 
             const medalsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=" + userId + "&mapIdList=" + chunkOfIds.join(","), {
                 headers: {
-                    'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                    'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
 
                     'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                     'Accept': 'application/json',

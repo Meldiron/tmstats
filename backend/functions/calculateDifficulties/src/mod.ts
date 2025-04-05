@@ -36,28 +36,15 @@ const getDifficulty = (perc: number) => {
   return "easy";
 };
 
-/*
-  'req' variable has:
-    'headers' - object with request headers
-    'payload' - object with request body data
-    'variables' - object with function variables
-
-  'res' variable has:
-    'send(text, status)' - function to return text response. Status code defaults to 200
-    'json(obj, status)' - function to return JSON response. Status code defaults to 200
-  
-  If an error is thrown, a response with code 500 will be returned.
-*/
-
-const func = async function (req: any, res: any) {
+const func = async function (context: any) {
   const client = new sdk.Client();
 
-  let db = new sdk.Databases(client);
+  const db = new sdk.Databases(client);
 
   client
-    .setEndpoint(req.variables['APPWRITE_FUNCTION_ENDPOINT'] as string)
-    .setProject(req.variables['APPWRITE_FUNCTION_PROJECT_ID'] as string)
-    .setKey(req.variables['APPWRITE_FUNCTION_API_KEY'] as string);
+    .setEndpoint(Deno.env.get('APPWRITE_FUNCTION_API_ENDPOINT') as string)
+    .setProject(Deno.env.get('APPWRITE_FUNCTION_PROJECT_ID') as string)
+    .setKey(context.req.headers['x-appwrite-key'] as string);
 
   let didFail = false;
   let cursor: string | undefined = undefined;
@@ -72,7 +59,7 @@ const func = async function (req: any, res: any) {
         queries.push(sdk.Query.cursorAfter(cursor));
       }
 
-      const mapsResponse: sdk.Models.DocumentList<sdk.Models.Document> = await db.listDocuments("default", "dailyMaps", queries);
+      const mapsResponse = await db.listDocuments("default", "dailyMaps", queries);
 
       mapsArray.push(...mapsResponse.documents);
 
@@ -138,16 +125,16 @@ const func = async function (req: any, res: any) {
     await db.updateDocument("default", "dailyMaps", map.$id, mapUpdate);
   }
 
-  res.json({
+  return context.res.json({
     success: true,
   });
 }
 
-export default async function (req: any, res: any) {
+export default async function (context: any) {
   try {
-    await func(req, res);
+    return await func(context);
   } catch (err) {
-    res.json({
+    return context.res.json({
       message: err
     });
   }

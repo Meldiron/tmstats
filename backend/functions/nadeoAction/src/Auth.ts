@@ -83,8 +83,6 @@ export class Auth {
 
     private async loginAction() {
         const refresh = this.refreshToken ? JSON.parse(new TextDecoder().decode(new Uint8Array(decode((this.refreshToken as string).split(".")[1])))) : null;
-        // exp is 1664636705
-        // 1664636705 - 1665409921
         if (refresh && refresh.exp > Date.now() / 1000) {
             await this.refreshTokenAction();
         } else {
@@ -102,24 +100,29 @@ export class Auth {
             audience: this.service
         }, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
                 'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
                 'Authorization': 'Basic ' + this.nadeoAuth,
                 'Content-Type': 'application/json',
             }
         });
+        
+      console.log(authRes.data);
 
         const loginRes = await (await getAxiod()).post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices", {
             audience: this.service
         }, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
                 'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
                 'Authorization': 'ubi_v1 t=' + authRes.data.ticket,
                 'Content-Type': 'application/json',
             }
         });
 
+        
+        console.log(loginRes.data);
+        
         const auth = loginRes.data;
         this.accessToken = auth.accessToken;
         this.refreshToken = auth.refreshToken;
@@ -130,7 +133,7 @@ export class Auth {
             audience: this.service
         }, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
 
                 'Authorization': 'Basic ' + this.nadeoAuth,
                 'Content-Type': 'application/json',
@@ -148,7 +151,7 @@ export class Auth {
         console.warn("Refreshing tokens for " + this.service);
         const refreshRes = await (await getAxiod()).post("https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh", {}, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.2 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
 
                 'Content-Type': 'application/json',
                 'Authorization': 'nadeo_v1 t=' + this.refreshToken

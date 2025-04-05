@@ -45,12 +45,9 @@
 			integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ="
 			crossorigin="anonymous"
 		></script>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
-			rel="stylesheet"
-		/>
+		
+		<link rel="preconnect" href="https://fonts.bunny.net">
+		<link href="https://fonts.bunny.net/css?family=montserrat:200,200i,400,400i,600,600i,800,800i" rel="stylesheet" />
 
 		<style>
 			body {
@@ -124,12 +121,6 @@
 			};
 		</script>
 
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css"
-		/>
-
 		<style type="text/tailwindcss">
 			.yearselected {
 				@apply bg-author-500 hover:!bg-author-600 text-white;
@@ -140,50 +131,5 @@
 	</head>
 	<body class="bg-slate-100 px-2">
 		<div>%svelte.body%</div>
-
-		<script
-			src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js"
-			data-cfasync="false"
-		></script>
-		<script>
-			var analyticsScript = function (didConsent) {
-				if (didConsent) {
-					var script = document.createElement('script');
-					script.src = 'https://analytics.objednajsidomov.sk/js/plausible.js';
-					script.defer = true;
-					script.dataset.domain = 'tmstats.eu';
-
-					document.head.appendChild(script);
-				}
-			};
-
-			window.cookieconsent.initialise({
-				onStatusChange: function () {
-					analyticsScript(this.hasConsented());
-				},
-				onInitialise: function () {
-					analyticsScript(this.hasConsented());
-				},
-				onRevokeChoice: function () {
-					analyticsScript(this.hasConsented());
-				},
-				type: 'opt-in',
-				palette: {
-					popup: {
-						background: '#ecfdf5',
-						text: '#077558'
-					},
-					button: {
-						background: '#14b583',
-						text: '#ffffff'
-					}
-				},
-				theme: 'classic',
-				content: {
-					message:
-						'This website uses authentication and analytics cookies. Analytics data is not shared externally.'
-				}
-			});
-		</script>
 	</body>
 </html>
