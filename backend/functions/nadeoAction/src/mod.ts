@@ -26,7 +26,7 @@ const func = async function (context: any) {
 
   const appwriteUserId = context.req.headers['x-appwrite-user-id'] as string;
 
-  const payload = JSON.parse(context.req.body || '{}');
+  const payload = JSON.parse(context.req.bodyText || '{}');
 
   client = new sdk.Client();
   db = new sdk.Databases(client);
@@ -50,6 +50,10 @@ const func = async function (context: any) {
 
   if (!payload.userId) {
     return context.res.json({ message: "This action requires 'userId'.", code: 500 });
+  }
+  
+  if (!payload.year) {
+    return context.res.json({ message: "This action requires 'year'.", code: 500 });
   }
 
   let lastUpdate = null;
@@ -103,7 +107,7 @@ const func = async function (context: any) {
 
   const nickname = "Unknown";
 
-  const allMedals = await Daily.getMedals(payload.userId, db);
+  const allMedals = await Daily.getMedals(payload.userId, db, payload.year);
 
   let score = 0;
   let gold = 0;

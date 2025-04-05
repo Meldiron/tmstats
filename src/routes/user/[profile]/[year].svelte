@@ -117,7 +117,7 @@
 
 		for (const k in dataSet) {
 			const medal = dataSet[k].medal;
-
+			
 			if (medal === 0) {
 				finish++;
 
@@ -621,14 +621,14 @@
 									<img src="/bronze.png" class="w-7" alt="" />
 								{/if}
 
-								<p class="text-lg min-w-[100px]">{formatTime(modalData.raw.time)}</p>
+								<p class="text-lg min-w-[100px]">{modalData.raw.time ? formatTime(modalData.raw.time) : 'N/A'}</p>
 							</div>
 						{:else}
 							<p class="text-lg min-w-[100px]">
 								<span class="text-red-500 font-bold">NO MEDAL</span>
 
 								{#if modalData.raw}
-									<span>{formatTime(modalData.raw.time)}</span>
+									<span>{modalData.raw.time ? formatTime(modalData.raw.time) : 'N/A'}</span>
 								{/if}
 							</p>
 						{/if}
@@ -782,7 +782,6 @@
 			class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
 		>
 			<p class="text-slate-500">Last update <b class="font-bold">{lastUpdate}</b></p>
-
 			<button
 				on:click={updateData}
 				class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-white bg-author-500 hover:bg-author-600 py-2 px-6 font-bold"

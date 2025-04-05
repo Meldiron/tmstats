@@ -4,7 +4,7 @@ import { Auth } from "./Auth.ts";
 import { Daily } from "./Daily.ts";
 import { sdk, RateLimiter } from "./deps.ts";
 
-RateLimiter.Limiter = new RateLimiter(1, 2000);
+RateLimiter.Limiter = new RateLimiter();
 
 let client: sdk.Client = null as any;
 let db: sdk.Databases = null as any;

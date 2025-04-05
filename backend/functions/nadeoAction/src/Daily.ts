@@ -135,16 +135,26 @@ export class Daily {
 
     static async fetchMissingMaps(db: sdk.Databases): Promise<any[]> {
         const downloadedMaps = [];
-
-        let hasNext = true;
-        let offset = 0;
+        
+        let cursor = null;
         do {
-            const maps = await db.listDocuments<any>("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.offset(offset) ]);
-            downloadedMaps.push(...maps.documents);
-
-            hasNext = maps.documents.length > 0;
-            offset += 100;
-        } while (hasNext === true);
+          const queries = [
+            sdk.Query.limit(100),
+          ];
+          
+          if(cursor) {
+            queries.push(sdk.Query.cursorAfter(cursor));
+          }
+          
+          const maps = await db.listDocuments<any>("default", "dailyMaps", queries);
+          downloadedMaps.push(...maps.documents);
+          
+          if(maps.documents.length > 0) {
+            cursor = maps.documents[maps.documents.length - 1].$id;
+          } else {
+            cursor = null;
+          }
+        } while (cursor !== null);
 
         const missingKeys: string[] = [];
 
@@ -192,18 +202,29 @@ export class Daily {
         return mapsData;
     }
 
-    static async getMedals(userId: string, db: sdk.Databases): Promise<any> {
+    static async getMedals(userId: string, db: sdk.Databases, year: number): Promise<any> {
         const downloadedMaps: any[] = [];
-
-        let hasNext = true;
-        let offset = 0;
+        
+        let cursor = null;
         do {
-            const maps = await db.listDocuments("default", "dailyMaps", [ sdk.Query.limit(100), sdk.Query.offset(offset) ]);
-            downloadedMaps.push(...maps.documents);
-
-            hasNext = maps.documents.length > 0;
-            offset += 100;
-        } while (hasNext === true);
+          const queries = [
+            sdk.Query.limit(100),
+            sdk.Query.equal('year', year),
+          ];
+          
+          if(cursor) {
+            queries.push(sdk.Query.cursorAfter(cursor));
+          }
+          
+          const maps = await db.listDocuments("default", "dailyMaps", queries);
+          downloadedMaps.push(...maps.documents);
+          
+          if(maps.documents.length > 0) {
+            cursor = maps.documents[maps.documents.length - 1].$id;
+          } else {
+            cursor = null;
+          }
+        } while (cursor !== null);
 
         const mapIdList = downloadedMaps.map((d: any) => d.mapid);
 
@@ -213,32 +234,29 @@ export class Daily {
             mapData[map.mapid] = map.key;
         });
 
-        const chunkSize = 200;
-
         const responseData: any = {};
-
-        for (let i = 0; i < mapIdList.length; i += chunkSize) {
-            const chunkOfIds = mapIdList.slice(i, i + chunkSize);
-
-            const medalsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=" + userId + "&mapIdList=" + chunkOfIds.join(","), {
+        
+        for(const mapId of mapIdList) {
+          const mapInfo = mapData[mapId];
+          console.log("Fetching " + mapInfo);
+            
+            const medalsRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=" + userId + "&mapIdList=" + mapId, {
                 headers: {
                     'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
-
                     'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }
             });
 
-            medalsRes.data.forEach((medalData: any) => {
-                const mapId = medalData.mapId;
-                const mapInfo = mapData[mapId];
-
-                responseData[mapInfo] = {
-                    medal: medalData.medal,
-                    time: medalData.recordScore.time
-                };
-            });
+            const medalData = medalsRes.data[0];
+            
+            if(medalData) {
+              responseData[mapInfo] = {
+                  medal: medalData.medal,
+                  time: medalData.recordScore.time
+              };
+            }
         }
 
         return responseData;

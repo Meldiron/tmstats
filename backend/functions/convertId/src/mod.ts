@@ -38,7 +38,7 @@ export const getAxiod = async () => {
 }
 
 export default async function (context: any) {
-  const payload = JSON.parse(context.req.body || '{}');
+  const payload = JSON.parse(context.req.bodyText || '{}');
 
   if (!payload.nick) {
     return context.res.json({ message: "This action requires 'nick'.", code: 500 });

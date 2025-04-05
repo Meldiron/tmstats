@@ -125,7 +125,6 @@ export class AppwriteService {
                 'nadeoAction',
                 JSON.stringify({
                     userId: profileId,
-                    password: "kacalova123" // TODO: Remove
                 }),
                 false
             );
