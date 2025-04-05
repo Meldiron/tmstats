@@ -276,7 +276,7 @@
 							>
 						</div>
 
-						<a href={'/user/' + record.$id + '/' + new Date().getFullYear()}>
+						<a href={'/user/' + record.$id + '/cotd/' + new Date().getFullYear()}>
 							<button
 								class="transform translate-y-[2px] rounded-tl-lg rounded-br-lg text-white bg-author-500 hover:bg-author-600 p-[2px] font-bold"
 							>

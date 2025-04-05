@@ -2,9 +2,14 @@
 	import { onMount } from 'svelte';
 
 	import { page } from '$app/stores';
-	import { AppwriteService } from '../../../appwrite';
+	import { AppwriteService } from '../../../../appwrite';
 	import Badge from '$lib/badge.svelte';
-	import { raf } from 'svelte/internal';
+
+	const categories = [
+		{ name: 'Track of the day', url: '/cotd/' + new Date().getFullYear(), current: true },
+		{ name: 'Weekly shorts', url: '/shorts/1-2024', current: false },
+		{ name: 'Campaign', url: '/campaign/summer-2020', current: false }
+	];
 
 	let profileId;
 	let currentYear;
@@ -107,7 +112,11 @@
 			didFail = false;
 		}
 
-		dataSet = dbRes.medals;
+		const dataSetTmp: any = dbRes.medals;
+		dataSet = {};
+		for (const dataSetKey of Object.keys(dataSetTmp)) {
+			dataSet[dataSetKey.split('cotd-').join('')] = dataSetTmp[dataSetKey];
+		}
 
 		profileName = dbRes.nickname;
 
@@ -449,30 +458,6 @@
 
 				<div class="pt-0 p-6 space-y-6">
 					<div class="block">
-						<Badge score={modalData.mapData.difficulty} long={true} />
-
-						<span
-							class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
-						>
-							<svg class="h-4 w-4" viewBox="0 0 300.344 300.344">
-								<g>
-									<path
-										fill="currentColor"
-										d="M289.286,28.36c-6.773-3.386-14.885-2.655-20.945,1.892c-23.387,17.547-46.014,10.395-80.992-2.728
-							c-34.281-12.859-76.942-28.861-119.047,2.728c-5.034,3.777-7.997,9.704-7.997,15.998v119.112c0,7.576,4.281,14.502,11.058,17.89
-							s14.887,2.654,20.945-1.892c23.387-17.547,46.014-10.395,80.992,2.728c19.513,7.319,41.739,15.657,65.034,15.657
-							c17.631,0,35.874-4.776,54.013-18.385c5.034-3.777,7.997-9.704,7.997-15.998V46.25C300.344,38.674,296.063,31.748,289.286,28.36z"
-									/>
-									<path
-										fill="currentColor"
-										d="M20,7.819c-11.046,0-20,8.954-20,20v244.705c0,11.046,8.954,20,20,20s20-8.954,20-20V27.819
-							C40,16.773,31.046,7.819,20,7.819z"
-									/>
-								</g>
-							</svg>
-							<span>{modalData.mapData.totalScorePositions.toLocaleString()} finishes</span>
-						</span>
-
 						<span
 							class="bg-gray-800 text-gray-200 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
 							><svg
@@ -498,110 +483,18 @@
 							<div class="flex items-center space-x-3">
 								<img src="/author.png" class="w-7" alt="" />
 								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.authorScore)}</p>
-								<Badge score={modalData.mapData.authorDifficulty} long={false} />
-
-								<span
-									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
-								>
-									<svg class="h-4 w-4" viewBox="0 0 300.344 300.344">
-										<g>
-											<path
-												fill="currentColor"
-												d="M289.286,28.36c-6.773-3.386-14.885-2.655-20.945,1.892c-23.387,17.547-46.014,10.395-80.992-2.728
-									c-34.281-12.859-76.942-28.861-119.047,2.728c-5.034,3.777-7.997,9.704-7.997,15.998v119.112c0,7.576,4.281,14.502,11.058,17.89
-									s14.887,2.654,20.945-1.892c23.387-17.547,46.014-10.395,80.992,2.728c19.513,7.319,41.739,15.657,65.034,15.657
-									c17.631,0,35.874-4.776,54.013-18.385c5.034-3.777,7.997-9.704,7.997-15.998V46.25C300.344,38.674,296.063,31.748,289.286,28.36z"
-											/>
-											<path
-												fill="currentColor"
-												d="M20,7.819c-11.046,0-20,8.954-20,20v244.705c0,11.046,8.954,20,20,20s20-8.954,20-20V27.819
-									C40,16.773,31.046,7.819,20,7.819z"
-											/>
-										</g>
-									</svg>
-									<span>{modalData.mapData.authorScorePosition.toLocaleString()} finishes</span>
-								</span>
 							</div>
 							<div class="flex items-center space-x-3">
 								<img src="/gold.png" class="w-7" alt="" />
 								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.goldScore)}</p>
-								<Badge score={modalData.mapData.goldDifficulty} long={false} />
-
-								<span
-									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
-								>
-									<svg class="h-4 w-4" viewBox="0 0 300.344 300.344">
-										<g>
-											<path
-												fill="currentColor"
-												d="M289.286,28.36c-6.773-3.386-14.885-2.655-20.945,1.892c-23.387,17.547-46.014,10.395-80.992-2.728
-									c-34.281-12.859-76.942-28.861-119.047,2.728c-5.034,3.777-7.997,9.704-7.997,15.998v119.112c0,7.576,4.281,14.502,11.058,17.89
-									s14.887,2.654,20.945-1.892c23.387-17.547,46.014-10.395,80.992,2.728c19.513,7.319,41.739,15.657,65.034,15.657
-									c17.631,0,35.874-4.776,54.013-18.385c5.034-3.777,7.997-9.704,7.997-15.998V46.25C300.344,38.674,296.063,31.748,289.286,28.36z"
-											/>
-											<path
-												fill="currentColor"
-												d="M20,7.819c-11.046,0-20,8.954-20,20v244.705c0,11.046,8.954,20,20,20s20-8.954,20-20V27.819
-									C40,16.773,31.046,7.819,20,7.819z"
-											/>
-										</g>
-									</svg>
-									<span>{modalData.mapData.goldScorePosition.toLocaleString()} finishes</span>
-								</span>
 							</div>
 							<div class="flex items-center space-x-3">
 								<img src="/silver.png" class="w-7" alt="" />
 								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.silverScore)}</p>
-								<Badge score={modalData.mapData.silverDifficulty} long={false} />
-
-								<span
-									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
-								>
-									<svg class="h-4 w-4" viewBox="0 0 300.344 300.344">
-										<g>
-											<path
-												fill="currentColor"
-												d="M289.286,28.36c-6.773-3.386-14.885-2.655-20.945,1.892c-23.387,17.547-46.014,10.395-80.992-2.728
-									c-34.281-12.859-76.942-28.861-119.047,2.728c-5.034,3.777-7.997,9.704-7.997,15.998v119.112c0,7.576,4.281,14.502,11.058,17.89
-									s14.887,2.654,20.945-1.892c23.387-17.547,46.014-10.395,80.992,2.728c19.513,7.319,41.739,15.657,65.034,15.657
-									c17.631,0,35.874-4.776,54.013-18.385c5.034-3.777,7.997-9.704,7.997-15.998V46.25C300.344,38.674,296.063,31.748,289.286,28.36z"
-											/>
-											<path
-												fill="currentColor"
-												d="M20,7.819c-11.046,0-20,8.954-20,20v244.705c0,11.046,8.954,20,20,20s20-8.954,20-20V27.819
-									C40,16.773,31.046,7.819,20,7.819z"
-											/>
-										</g>
-									</svg>
-									<span>{modalData.mapData.silverScorePosition.toLocaleString()} finishes</span>
-								</span>
 							</div>
 							<div class="flex items-center space-x-3">
 								<img src="/bronze.png" class="w-7" alt="" />
 								<p class="text-lg min-w-[100px]">{formatTime(modalData.mapData.bronzeScore)}</p>
-								<Badge score={modalData.mapData.bronzeDifficulty} long={false} />
-
-								<span
-									class="bg-blue-100 text-blue-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
-								>
-									<svg class="h-4 w-4" viewBox="0 0 300.344 300.344">
-										<g>
-											<path
-												fill="currentColor"
-												d="M289.286,28.36c-6.773-3.386-14.885-2.655-20.945,1.892c-23.387,17.547-46.014,10.395-80.992-2.728
-									c-34.281-12.859-76.942-28.861-119.047,2.728c-5.034,3.777-7.997,9.704-7.997,15.998v119.112c0,7.576,4.281,14.502,11.058,17.89
-									s14.887,2.654,20.945-1.892c23.387-17.547,46.014-10.395,80.992,2.728c19.513,7.319,41.739,15.657,65.034,15.657
-									c17.631,0,35.874-4.776,54.013-18.385c5.034-3.777,7.997-9.704,7.997-15.998V46.25C300.344,38.674,296.063,31.748,289.286,28.36z"
-											/>
-											<path
-												fill="currentColor"
-												d="M20,7.819c-11.046,0-20,8.954-20,20v244.705c0,11.046,8.954,20,20,20s20-8.954,20-20V27.819
-									C40,16.773,31.046,7.819,20,7.819z"
-											/>
-										</g>
-									</svg>
-									<span>{modalData.mapData.bronzeScorePosition.toLocaleString()} finishes</span>
-								</span>
 							</div>
 						</div>
 					</div>
@@ -635,21 +528,6 @@
 							</p>
 						{/if}
 					</div>
-				</div>
-
-				<div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200">
-					<a
-						target="_blank"
-						href={`https://trackmania.io/#/totd/leaderboard/${modalData.mapData.seasonUid}/${modalData.mapData.mapUid}`}
-					>
-						<button
-							data-modal-toggle="defaultModal"
-							type="button"
-							class="flex items-center space-x-2 text-white bg-author-600 hover:bg-author-700 focus:ring-4 focus:outline-none focus:ring-author-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-						>
-							<p>Visit on Trackmania.io</p>
-						</button>
-					</a>
 				</div>
 			</div>
 		</div>
@@ -768,6 +646,21 @@
 
 	<div class="mt-6">
 		<div class="flex flex-wrap gap-2 items-center justify-start">
+			{#each categories as category}
+				<a rel="external" href={'/user/' + profileId + '/' + category.url}>
+					<button
+						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-slate-600 bg-slate-200 py-2 px-6 font-bold hover:bg-slate-300"
+						class:yearselected={category.current}
+					>
+						<p class="m-0 p-0">{category.name}</p>
+					</button></a
+				>
+			{/each}
+		</div>
+	</div>
+
+	<div class="mt-6">
+		<div class="flex flex-wrap gap-2 items-center justify-start">
 			{#each years as year}
 				<a rel="external" href={'/user/' + profileId + '/' + year}>
 					<button
@@ -873,10 +766,6 @@
 			<p>
 				New data is not fetched automatically. To request a data update, use 'Update Profile' button
 				at the top of the page. This usually takes only a few seconds.
-			</p>
-			<p>
-				Your score for year <strong>{currentYear}</strong> is
-				<strong>{currentYearScore}/{maxPoints} points.</strong>
 			</p>
 		</div>
 	</div>

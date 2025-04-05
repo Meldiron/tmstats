@@ -34,8 +34,9 @@ const func = async function (context: any) {
 		await Auth.Game.load();
 	}
 
-	const ids = await Daily.fetchMissingMaps(db);
+	const campaigns = await Daily.fetchMissingMapsCampaign(db);
 	const weeks = await Daily.fetchMissingMapsWeekly(db);
+	const ids = await Daily.fetchMissingMaps(db);
 
 	return context.res.json({
 		message:
@@ -46,7 +47,11 @@ const func = async function (context: any) {
 			' and ' +
 			weeks.length +
 			' weeks: ' +
-			weeks
+			weeks +
+			' and ' +
+			campaigns.length +
+			' campaigns: ' +
+			campaigns
 	});
 };
 

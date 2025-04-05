@@ -50,70 +50,60 @@ const func = async function (context: any) {
 		return context.res.json({ message: "This action requires 'userId'.", code: 500 });
 	}
 
-	if (!payload.year) {
-		return context.res.json({ message: "This action requires 'year'.", code: 500 });
+	let newMedals: any[];
+
+	if (payload.type === 'cotd') {
+		if (!payload.year) {
+			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+		}
+
+		if (!payload.month) {
+			return context.res.json({ message: "This action requires 'month'.", code: 500 });
+		}
+
+		newMedals = await Daily.getMedals(payload.userId, db, payload.year, payload.month);
+	} else if (payload.type === 'shorts') {
+		if (!payload.year) {
+			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+		}
+		if (!payload.week) {
+			return context.res.json({ message: "This action requires 'week'.", code: 500 });
+		}
+
+		newMedals = await Daily.getMedalsShorts(payload.userId, db, payload.year, payload.week);
+	} else if (payload.type === 'campaign') {
+		if (!payload.campaignUid) {
+			return context.res.json({ message: "This action requires 'campaignUid'.", code: 500 });
+		}
+
+		newMedals = await Daily.getMedalsCampaign(payload.userId, db, payload.campaignUid);
+	} else {
+		return context.res.json({
+			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', or 'campaign'.",
+			code: 500
+		});
 	}
 
-	if (!payload.month) {
-		return context.res.json({ message: "This action requires 'month'.", code: 500 });
-	}
-
-	let lastUpdate = null;
+	const tmRes = await (
+		await getAxiod()
+	).get('https://trackmania.io/api/players/find?search=' + payload.userId, {
+		headers: {
+			'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com'
+		}
+	});
+	const nickname = tmRes?.data?.[0]?.player?.name ?? 'Unknown';
 
 	try {
-		const docRes = await db.getDocument<any>('default', 'profiles', payload.userId);
-		lastUpdate = docRes.lastUpdate;
+		const docRes = await db.getDocument('default', 'profiles', payload.userId);
+		const docMedals = JSON.parse(docRes.medals);
+		for (const key of Object.keys(docMedals)) {
+			if (!newMedals[key]) {
+				newMedals[key] = docMedals[key];
+			}
+		}
 	} catch (_err) {
-		/*
-    // If error occured, and not admin, exit
-    const adminPass = Deno.env.get('ADMIN_PASS') as string;
-    if (!payload.password || payload.password !== adminPass) {
-      return context.res.json({ message: "Only administrator can add new players to leaderboard.", code: 500 });
-    }
-      */
+		// OK
 	}
-
-	const adminPass = Deno.env.get('ADMIN_PASS') as string;
-
-	/*
-  if (lastUpdate) {
-    const now = Date.now();
-
-    const h1 = 1000 * 60 * 60;
-    if (lastUpdate + h1 > now) {
-      if (!payload.password || payload.password !== adminPass) {
-        return context.res.json({ message: "You can only refresh profile once every hour.", code: 500 });
-      }
-    }
-  }
-
-  if (timeoutCache[appwriteUserId]) {
-    if (!payload.password || payload.password !== adminPass) {
-      return context.res.json({ message: "To prevent abuse, you can only use this button once every 60 seconds.", code: 500 });
-    }
-  }
-  timeoutCache[appwriteUserId] = Date.now();
-  setTimeout(() => {
-    timeoutCache[appwriteUserId] = null;
-  }, 60000);
-  */
-
-	/*
-  Deprecated: https://webservices.openplanet.dev/oauth/reference/accounts/id-to-name
-  const accountRes = await (await getAxiod()).get("https://prod.trackmania.core.nadeo.online/accounts/displayNames/?accountIdList=" + payload.userId, {
-    headers: {
-      'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
-
-      'Authorization': 'nadeo_v1 t=' + await Auth.Game.getToken(),
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
-  });
-   */
-
-	const nickname = 'Unknown';
-
-	const allMedals = await Daily.getMedals(payload.userId, db, payload.year, payload.month);
 
 	let score = 0;
 	let gold = 0;
@@ -121,8 +111,8 @@ const func = async function (context: any) {
 	let silver = 0;
 	let bronze = 0;
 
-	for (const date in allMedals) {
-		const medal = allMedals[date].medal;
+	for (const key in newMedals) {
+		const medal = newMedals[key].medal;
 
 		if (medal === 1) {
 			bronze++;
@@ -141,7 +131,7 @@ const func = async function (context: any) {
 
 	const newDocData = {
 		lastUpdate: Date.now(),
-		medals: JSON.stringify(allMedals),
+		medals: JSON.stringify(newMedals),
 		score,
 		gold,
 		author,
