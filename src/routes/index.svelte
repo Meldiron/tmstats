@@ -67,7 +67,7 @@
 			}).showToast();
 			return;
 		}
-		goto('/user/' + userId + '/' + new Date().getFullYear());
+		goto('/user/' + userId + '/cotd/' + new Date().getFullYear());
 	}
 
 	async function lookupProfile() {
@@ -76,7 +76,7 @@
 
 			const id = await AppwriteService.getId(userName);
 			if (id) {
-				goto('/user/' + id + '/' + new Date().getFullYear());
+				goto('/user/' + id + '/cotd/' + new Date().getFullYear());
 			}
 		} finally {
 			isLoading = false;

@@ -636,10 +636,7 @@
 						/>
 					</svg>
 				</div>
-				<p>
-					We don't have this profile yet. Click 'Update Profile' to start fetching data. This
-					usually takes only a few seconds.
-				</p>
+				<p>We don't have this profile yet. Profile gets created with first reload of medals.</p>
 			</div>
 		</div>
 	{/if}
@@ -662,7 +659,7 @@
 	<div class="mt-6">
 		<div class="flex flex-wrap gap-2 items-center justify-start">
 			{#each years as year}
-				<a rel="external" href={'/user/' + profileId + '/' + year}>
+				<a rel="external" href={'/user/' + profileId + '/cotd/' + year}>
 					<button
 						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-slate-600 bg-slate-200 py-2 px-6 font-bold hover:bg-slate-300"
 						class:yearselected={year === +currentYear}

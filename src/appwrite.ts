@@ -118,7 +118,8 @@ export class AppwriteService {
 				JSON.stringify({
 					userId: profileId,
 					year: year,
-					month: month
+					month: month,
+					type: 'cotd'
 				}),
 				false
 			);
