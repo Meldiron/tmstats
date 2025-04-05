@@ -117,7 +117,7 @@
 
 		for (const k in dataSet) {
 			const medal = dataSet[k].medal;
-			
+
 			if (medal === 0) {
 				finish++;
 
@@ -226,7 +226,7 @@
 			const colors = [
 				'#ff1493', // Finish Only, same as empty
 				'#cd7f32', // Bronze
-				'#ffffff', // Silver
+				'#e0e0e0', // Silver
 				'#ffd700', // Gold
 				'#14b583' // Author
 			];
@@ -349,7 +349,7 @@
 		}
 	});
 
-	async function updateData() {
+	async function updateData(year: number, month: number) {
 		if (isLoading) {
 			return;
 		}
@@ -357,7 +357,7 @@
 		isLoading = true;
 
 		try {
-			const res = await AppwriteService.nadeoAction(profileId);
+			const res = await AppwriteService.nadeoAction(profileId, year, month);
 
 			if (res) {
 				onMountFunction();
@@ -621,7 +621,9 @@
 									<img src="/bronze.png" class="w-7" alt="" />
 								{/if}
 
-								<p class="text-lg min-w-[100px]">{modalData.raw.time ? formatTime(modalData.raw.time) : 'N/A'}</p>
+								<p class="text-lg min-w-[100px]">
+									{modalData.raw.time ? formatTime(modalData.raw.time) : 'N/A'}
+								</p>
 							</div>
 						{:else}
 							<p class="text-lg min-w-[100px]">
@@ -764,8 +766,8 @@
 		</div>
 	{/if}
 
-	<div class="mt-6 flex flex-col md:flex-row items-center justify-between space-x-3">
-		<div class="flex items-center justify-start space-x-2">
+	<div class="mt-6">
+		<div class="flex flex-wrap gap-2 items-center justify-start">
 			{#each years as year}
 				<a rel="external" href={'/user/' + profileId + '/' + year}>
 					<button
@@ -776,41 +778,6 @@
 					</button></a
 				>
 			{/each}
-		</div>
-
-		<div
-			class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 items-center justify-end"
-		>
-			<p class="text-slate-500">Last update <b class="font-bold">{lastUpdate}</b></p>
-			<button
-				on:click={updateData}
-				class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-white bg-author-500 hover:bg-author-600 py-2 px-6 font-bold"
-			>
-				{#if isLoading}
-					<svg
-						class="w-5 h-5 animate-spin"
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-					>
-						<circle
-							class="opacity-25"
-							cx="12"
-							cy="12"
-							r="10"
-							stroke="currentColor"
-							stroke-width="4"
-						/>
-						<path
-							class="opacity-75"
-							fill="currentColor"
-							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-						/>
-					</svg>
-				{:else}
-					<p class="m-0 p-0">Update Profile</p>
-				{/if}
-			</button>
 		</div>
 	</div>
 
@@ -827,7 +794,31 @@
 					</div>
 				{/if}
 
-				<h3 class="mb-3 font-semibold text-lg text-gray-200">{month.name}</h3>
+				<div class="flex items-center justify-between mb-3 ">
+					<h3 class="font-semibold text-lg text-gray-200">{month.name}</h3>
+					<div>
+						<button
+							disabled={isLoading}
+							on:click={() => updateData(+currentYear, month.month)}
+							class="disabled:opacity-50 rounded-tl-xl rounded-br-xl text-white bg-gray-700 hover:bg-gray-600 py-1 px-3 font-bold"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="size-4"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+								/>
+							</svg>
+						</button>
+					</div>
+				</div>
 
 				<div id={'heatmap-' + month.month} />
 			</div>

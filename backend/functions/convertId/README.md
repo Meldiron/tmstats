@@ -12,16 +12,15 @@ _Example input:_
 
 ```json
 {
-    "nick": "MeldironSK"
+	"nick": "MeldironSK"
 }
 ```
-
 
 _Example output:_
 
 ```json
 {
-    "id": "06e99ad3-cded-4440-a19c-b3df4fda8004"
+	"id": "06e99ad3-cded-4440-a19c-b3df4fda8004"
 }
 ```
 

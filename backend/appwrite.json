@@ -1,764 +1,713 @@
 {
-    "projectId": "tmStats",
-    "projectName": "tmStats",
-    "collections": [
-        {
-            "$id": "profiles",
-            "$createdAt": "2022-09-22T16:49:10.072+00:00",
-            "$updatedAt": "2022-09-22T16:49:10.072+00:00",
-            "$permissions": [
-                "read(\"any\")"
-            ],
-            "databaseId": "default",
-            "name": "profiles",
-            "enabled": true,
-            "documentSecurity": false,
-            "attributes": [
-                {
-                    "key": "silver",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "lastUpdate",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "bronze",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "author",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "nickname",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "score",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "medals",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 999999,
-                    "default": null
-                },
-                {
-                    "key": "gold",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                }
-            ],
-            "indexes": [
-                {
-                    "key": "goldIndex",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "gold"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "authorIndex",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "author"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "scoreIndex",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "score"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "bronzeIndex",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "bronze"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "silverIndex",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "silver"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                }
-            ]
-        },
-        {
-            "$id": "nadeoCache",
-            "$createdAt": "2022-09-22T16:50:38.139+00:00",
-            "$updatedAt": "2022-09-22T16:50:38.139+00:00",
-            "$permissions": [],
-            "databaseId": "default",
-            "name": "nadeoCache",
-            "enabled": true,
-            "documentSecurity": false,
-            "attributes": [
-                {
-                    "key": "value",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 999999,
-                    "default": null
-                }
-            ],
-            "indexes": []
-        },
-        {
-            "$id": "dailyMaps",
-            "$createdAt": "2022-09-22T16:50:40.601+00:00",
-            "$updatedAt": "2022-09-22T16:50:40.601+00:00",
-            "$permissions": [
-                "read(\"any\")"
-            ],
-            "databaseId": "default",
-            "name": "dailyMaps",
-            "enabled": true,
-            "documentSecurity": false,
-            "attributes": [
-                {
-                    "key": "mapid",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "mapUid",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "day",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "silverScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "thumbnailUrl",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 2048,
-                    "default": null
-                },
-                {
-                    "key": "seasonUid",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "authorScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "month",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "bronzeScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "collectionName",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "goldScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "name",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "key",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "authorScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "bronzeScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "totalScorePositions",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "silverScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "year",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "goldScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "bronzeDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "silverDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "goldDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "authorDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "difficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                }
-            ],
-            "indexes": []
-        },
-        {
-            "$id": "weeklyMaps",
-            "$createdAt": "2022-09-22T16:50:40.601+00:00",
-            "$updatedAt": "2022-09-22T16:50:40.601+00:00",
-            "$permissions": [
-                "read(\"any\")"
-            ],
-            "databaseId": "default",
-            "name": "weeklyMaps",
-            "enabled": true,
-            "documentSecurity": false,
-            "attributes": [
-                {
-                    "key": "mapid",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "mapUid",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "year",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "week",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "position",
-                    "type": "integer",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "silverScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "thumbnailUrl",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 2048,
-                    "default": null
-                },
-                {
-                    "key": "seasonUid",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "authorScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "bronzeScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "collectionName",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "goldScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "name",
-                    "type": "string",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "key",
-                    "type": "string",
-                    "status": "available",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "authorScore",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "bronzeScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "totalScorePositions",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "silverScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "goldScorePosition",
-                    "type": "integer",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -9123372036854776000,
-                    "max": 9123372036854776000,
-                    "default": null
-                },
-                {
-                    "key": "bronzeDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "silverDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "goldDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "authorDifficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                },
-                {
-                    "key": "difficulty",
-                    "type": "double",
-                    "status": "available",
-                    "required": false,
-                    "array": false,
-                    "min": -1.7976931348623157e+308,
-                    "max": 1.7976931348623157e+308,
-                    "default": 0
-                }
-            ],
-            "indexes": []
-        }
-    ],
-    "functions": [
-        {
-            "$id": "nadeoAction",
-            "name": "nadeoAction",
-            "runtime": "deno-2.0",
-            "path": "functions/nadeoAction",
-            "entrypoint": "src/mod.ts",
-            "execute": [
-                "any"
-            ],
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "events": [],
-            "schedule": "",
-            "timeout": 60,
-            "enabled": true,
-            "logging": true,
-            "scopes": [
-                "documents.read",
-                "documents.write"
-            ],
-            "commands": ""
-        },
-        {
-            "$id": "nadeoCron",
-            "name": "nadeoCron",
-            "runtime": "deno-2.0",
-            "path": "functions/nadeoAction",
-            "entrypoint": "src/mod_daily_cron.ts",
-            "execute": [],
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "events": [],
-            "schedule": "3 * * * *",
-            "timeout": 300,
-            "enabled": true,
-            "logging": true,
-            "scopes": [
-                "documents.read",
-                "documents.write"
-            ],
-            "commands": ""
-        },
-        {
-            "$id": "convertId",
-            "name": "convertId",
-            "runtime": "deno-2.0",
-            "path": "functions/convertId",
-            "entrypoint": "src/mod.ts",
-            "execute": [
-                "any"
-            ],
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "events": [],
-            "schedule": "",
-            "timeout": 15,
-            "enabled": true,
-            "logging": true,
-            "scopes": [],
-            "commands": ""
-        },
-        {
-            "$id": "calculateDifficulties",
-            "name": "calculateDifficulties",
-            "runtime": "deno-2.0",
-            "path": "functions/calculateDifficulties",
-            "entrypoint": "src/mod.ts",
-            "execute": [],
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "events": [],
-            "schedule": "6 * * * *",
-            "timeout": 60,
-            "enabled": true,
-            "logging": true,
-            "scopes": [
-                "documents.read",
-                "documents.write"
-            ],
-            "commands": ""
-        }
-    ]
+	"projectId": "tmStats",
+	"projectName": "tmStats",
+	"collections": [
+		{
+			"$id": "profiles",
+			"$createdAt": "2022-09-22T16:49:10.072+00:00",
+			"$updatedAt": "2022-09-22T16:49:10.072+00:00",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "profiles",
+			"enabled": true,
+			"documentSecurity": false,
+			"attributes": [
+				{
+					"key": "silver",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "lastUpdate",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "bronze",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "author",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "nickname",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "score",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "medals",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 999999,
+					"default": null
+				},
+				{
+					"key": "gold",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				}
+			],
+			"indexes": [
+				{
+					"key": "goldIndex",
+					"type": "key",
+					"status": "available",
+					"attributes": ["gold"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "authorIndex",
+					"type": "key",
+					"status": "available",
+					"attributes": ["author"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "scoreIndex",
+					"type": "key",
+					"status": "available",
+					"attributes": ["score"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "bronzeIndex",
+					"type": "key",
+					"status": "available",
+					"attributes": ["bronze"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "silverIndex",
+					"type": "key",
+					"status": "available",
+					"attributes": ["silver"],
+					"orders": ["ASC"]
+				}
+			]
+		},
+		{
+			"$id": "nadeoCache",
+			"$createdAt": "2022-09-22T16:50:38.139+00:00",
+			"$updatedAt": "2022-09-22T16:50:38.139+00:00",
+			"$permissions": [],
+			"databaseId": "default",
+			"name": "nadeoCache",
+			"enabled": true,
+			"documentSecurity": false,
+			"attributes": [
+				{
+					"key": "value",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 999999,
+					"default": null
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "dailyMaps",
+			"$createdAt": "2022-09-22T16:50:40.601+00:00",
+			"$updatedAt": "2022-09-22T16:50:40.601+00:00",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "dailyMaps",
+			"enabled": true,
+			"documentSecurity": false,
+			"attributes": [
+				{
+					"key": "mapid",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "mapUid",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "day",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "silverScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "thumbnailUrl",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 2048,
+					"default": null
+				},
+				{
+					"key": "seasonUid",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "authorScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "month",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "bronzeScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "collectionName",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "goldScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "name",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "key",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "authorScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "bronzeScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "totalScorePositions",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "silverScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "year",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "goldScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "bronzeDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "silverDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "goldDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "authorDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "difficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "weeklyMaps",
+			"$createdAt": "2022-09-22T16:50:40.601+00:00",
+			"$updatedAt": "2022-09-22T16:50:40.601+00:00",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "weeklyMaps",
+			"enabled": true,
+			"documentSecurity": false,
+			"attributes": [
+				{
+					"key": "mapid",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "mapUid",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "week",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "silverScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "thumbnailUrl",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 2048,
+					"default": null
+				},
+				{
+					"key": "seasonUid",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "authorScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "bronzeScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "collectionName",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "goldScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "name",
+					"type": "string",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "key",
+					"type": "string",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "authorScore",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "bronzeScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "totalScorePositions",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "silverScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "year",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "position",
+					"type": "integer",
+					"status": "available",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "goldScorePosition",
+					"type": "integer",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "bronzeDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "silverDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "goldDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "authorDifficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				},
+				{
+					"key": "difficulty",
+					"type": "double",
+					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -1.7976931348623157e308,
+					"max": 1.7976931348623157e308,
+					"default": 0
+				}
+			],
+			"indexes": []
+		}
+	],
+	"functions": [
+		{
+			"$id": "nadeoAction",
+			"name": "nadeoAction",
+			"runtime": "deno-2.0",
+			"path": "functions/nadeoAction",
+			"entrypoint": "src/mod.ts",
+			"execute": ["any"],
+			"ignore": ["node_modules", ".npm"],
+			"events": [],
+			"schedule": "",
+			"timeout": 60,
+			"enabled": true,
+			"logging": true,
+			"scopes": ["documents.read", "documents.write"],
+			"commands": ""
+		},
+		{
+			"$id": "nadeoCron",
+			"name": "nadeoCron",
+			"runtime": "deno-2.0",
+			"path": "functions/nadeoAction",
+			"entrypoint": "src/mod_daily_cron.ts",
+			"execute": [],
+			"ignore": ["node_modules", ".npm"],
+			"events": [],
+			"schedule": "3 * * * *",
+			"timeout": 300,
+			"enabled": true,
+			"logging": true,
+			"scopes": ["documents.read", "documents.write"],
+			"commands": ""
+		},
+		{
+			"$id": "convertId",
+			"name": "convertId",
+			"runtime": "deno-2.0",
+			"path": "functions/convertId",
+			"entrypoint": "src/mod.ts",
+			"execute": ["any"],
+			"ignore": ["node_modules", ".npm"],
+			"events": [],
+			"schedule": "",
+			"timeout": 15,
+			"enabled": true,
+			"logging": true,
+			"scopes": [],
+			"commands": ""
+		},
+		{
+			"$id": "calculateDifficulties",
+			"name": "calculateDifficulties",
+			"runtime": "deno-2.0",
+			"path": "functions/calculateDifficulties",
+			"entrypoint": "src/mod.ts",
+			"execute": [],
+			"ignore": ["node_modules", ".npm"],
+			"events": [],
+			"schedule": "6 * * * *",
+			"timeout": 60,
+			"enabled": true,
+			"logging": true,
+			"scopes": ["documents.read", "documents.write"],
+			"commands": ""
+		}
+	]
 }
