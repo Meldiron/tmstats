@@ -40,6 +40,42 @@ export class AppwriteService {
 		}
 	}
 
+	static async getCampaignMaps() {
+		try {
+			const maps = [];
+			let cursor: any = null;
+
+			do {
+				const queries = [Query.limit(500)];
+
+				if (cursor) {
+					queries.push(Query.cursorAfter(cursor));
+				}
+
+				const dbRes = await database.listDocuments<any>('default', 'campaignMaps', queries);
+
+				maps.push(...dbRes.documents);
+
+				if (dbRes.documents.length > 0) {
+					cursor = dbRes.documents[dbRes.documents.length - 1].$id;
+				} else {
+					cursor = null;
+				}
+			} while (cursor !== null);
+
+			return maps;
+		} catch (err) {
+			console.error(err);
+
+			Toastify({
+				...toastConfig,
+				text: 'Could not load campaigns: ' + err.message
+			}).showToast();
+
+			return [];
+		}
+	}
+
 	static async getMapsDetails(year: number) {
 		try {
 			const allDocuments = [];
@@ -99,7 +135,14 @@ export class AppwriteService {
 		return [];
 	}
 
-	static async nadeoAction(profileId: string, year: number, month: number): Promise<string> {
+	static async nadeoAction(
+		profileId: string,
+		type: string,
+		year?: number,
+		month?: number,
+		week?: number,
+		campaignUid?: string
+	): Promise<string> {
 		try {
 			const execInterval = setInterval(() => {
 				Toastify({
@@ -117,9 +160,11 @@ export class AppwriteService {
 				'nadeoAction',
 				JSON.stringify({
 					userId: profileId,
-					year: year,
-					month: month,
-					type: 'cotd'
+					year,
+					week,
+					month,
+					type,
+					campaignUid
 				}),
 				false
 			);

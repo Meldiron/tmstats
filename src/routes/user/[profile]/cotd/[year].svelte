@@ -314,7 +314,7 @@
 		isLoading = true;
 
 		try {
-			const res = await AppwriteService.nadeoAction(profileId, year, month);
+			const res = await AppwriteService.nadeoAction(profileId, 'cotd', year, month);
 
 			if (res) {
 				onMountFunction();
@@ -638,7 +638,7 @@
 						<button
 							disabled={isLoading}
 							on:click={() => updateData(+currentYear, month.month)}
-							class="disabled:opacity-50 rounded-tl-xl rounded-br-xl text-white bg-gray-700 hover:bg-gray-600 py-1 px-3 font-bold"
+							class="disabled:opacity-50 rounded-tl-xl rounded-br-xl text-white bg-gray-700 enabled:hover:bg-gray-600 py-1 px-3 font-bold"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
