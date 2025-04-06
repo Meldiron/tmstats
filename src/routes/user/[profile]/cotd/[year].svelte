@@ -4,18 +4,17 @@
 	import { page } from '$app/stores';
 	import { AppwriteService } from '../../../../appwrite';
 	import Badge from '$lib/badge.svelte';
+	import Instructions from '$lib/instructions.svelte';
 
 	const categories = [
 		{ name: 'Track of the day', url: '/cotd/' + new Date().getFullYear(), current: true },
-		{ name: 'Weekly shorts', url: '/shorts/1-2024', current: false },
-		{ name: 'Campaign', url: '/campaign/summer-2020', current: false }
+		{ name: 'Weekly shorts', url: '/shorts', current: false },
+		{ name: 'Campaign', url: '/campaign', current: false }
 	];
 
 	let profileId;
 	let currentYear;
 	let profileName = '...';
-	let currentYearScore = 0;
-	let maxPoints = 0;
 	let didFail = null;
 	let dataSet = null;
 
@@ -49,14 +48,11 @@
 	];
 	const months = [];
 
-	let finish = 0;
 	let silver = 0;
 	let bronze = 0;
 	let gold = 0;
 	let author = 0;
 	let totalPoints = 0;
-	let noMedalMaps = null;
-	let lastUpdate = '...';
 
 	let modalData = null;
 
@@ -89,21 +85,23 @@
 			heatMap.$destroy();
 		}
 
-		finish = 0;
 		silver = 0;
 		bronze = 0;
 		gold = 0;
 		author = 0;
 		totalPoints = 0;
-		noMedalMaps = null;
-		lastUpdate = '...';
 		heatMaps = [];
-		currentYearScore = 0;
-		maxPoints = 0;
 		didFail = null;
 		dataSet = null;
 
 		let dbRes = await AppwriteService.getHeatmap(profileId);
+
+		silver = dbRes.silver;
+		bronze = dbRes.bronze;
+		gold = dbRes.gold;
+		author = dbRes.author;
+		totalPoints = dbRes.score;
+		profileName = dbRes.nickname;
 
 		if (!dbRes) {
 			didFail = true;
@@ -114,13 +112,9 @@
 
 		const dataSetTmp: any = dbRes.medals;
 		dataSet = {};
-		for (const dataSetKey of Object.keys(dataSetTmp)) {
+		for (const dataSetKey of Object.keys(dataSetTmp ?? '{}')) {
 			dataSet[dataSetKey.split('cotd-').join('')] = dataSetTmp[dataSetKey];
 		}
-
-		profileName = dbRes.nickname;
-
-		lastUpdate = moment(dbRes.lastUpdate).format('DD.MM.YYYY HH:mm');
 
 		let localNoMedals = [];
 
@@ -128,59 +122,13 @@
 			const medal = dataSet[k].medal;
 
 			if (medal === 0) {
-				finish++;
-
 				localNoMedals = [...localNoMedals, k];
-			} else if (medal === 1) {
-				bronze++;
-
-				totalPoints += 1;
-
-				if (+k.split('-')[2] === +currentYear) {
-					currentYearScore += 1;
-				}
-			} else if (medal === 2) {
-				silver++;
-
-				totalPoints += 2;
-				if (+k.split('-')[2] === +currentYear) {
-					currentYearScore += 2;
-				}
-			} else if (medal === 3) {
-				gold++;
-
-				totalPoints += 4;
-				if (+k.split('-')[2] === +currentYear) {
-					currentYearScore += 4;
-				}
-			} else if (medal === 4) {
-				author++;
-
-				totalPoints += 12;
-				if (+k.split('-')[2] === +currentYear) {
-					currentYearScore += 12;
-				}
 			}
 		}
 
 		const year = +currentYear;
 
 		const medalMapDocuments = await AppwriteService.getMapsDetails(year);
-
-		if (medalMapDocuments) {
-			noMedalMaps = medalMapDocuments
-				.filter((d) => localNoMedals.includes(d.$id))
-				.map((m) => {
-					return {
-						raw: dataSet[m.$id],
-						id: m.$id,
-						hover: true,
-						mapData: m
-					};
-				});
-		}
-
-		maxPoints = getMaxPoints(currentYear);
 
 		for (const month of months) {
 			const number = month.month;
@@ -607,11 +555,11 @@
 				{bronze}
 			</div>
 
-			<div
+			<!-- <div
 				class="w-10 h-10 text-xs flex items-center justify-center rounded-full bg-gray-700 text-gray-400"
 			>
-				{finish}
-			</div>
+			0
+			</div> -->
 		</div>
 	</div>
 
@@ -644,7 +592,7 @@
 	<div class="mt-6">
 		<div class="flex flex-wrap gap-2 items-center justify-start">
 			{#each categories as category}
-				<a rel="external" href={'/user/' + profileId + '/' + category.url}>
+				<a rel="external" href={'/user/' + profileId + category.url}>
 					<button
 						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl text-slate-600 bg-slate-200 py-2 px-6 font-bold hover:bg-slate-300"
 						class:yearselected={category.current}
@@ -715,55 +663,5 @@
 		{/each}
 	</div>
 
-	<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-		<h1 class="font-bold text-black text-2xl mb-3">How to Read Data?</h1>
-
-		<div class="prose">
-			<p>Cells on website follow same color pallete as medals in Trackmania game.</p>
-			<ul>
-				<li class="text-author-500">
-					Green is <b class="font-bold">Author Medal</b> worth <b class="font-bold">12 points</b>
-				</li>
-				<li class="text-gold-600">
-					Yellow is <b class="font-bold">Gold Medal</b> worth <b class="font-bold">4 points</b>
-				</li>
-				<li class="text-silver-500">
-					White is <b class="font-bold">Silver Medal</b> worth <b class="font-bold">2 points</b>
-				</li>
-				<li class="text-bronze-500">
-					Orange is <b class="font-bold">Bronze Medal</b> worth <b class="font-bold">1 points</b>
-				</li>
-			</ul>
-
-			{#if noMedalMaps !== null}
-				<p>
-					If you have finished a map but didn't get any medal in this year, the cell has the same
-					color as if you would never play the map. Try harder, you can do this! Here is a list of
-					maps you finished but didn't get medal on:
-				</p>
-				<ul>
-					{#each noMedalMaps as map}
-						<li>
-							<p>
-								<button on:click={() => (modalData = map)} class="font-bold text-blue-500 underline"
-									>{map.mapData.name}</button
-								>
-
-								<span class="ml-2 text-gray-400"> {map.mapData.$id} </span>
-							</p>
-						</li>
-					{/each}
-
-					{#if noMedalMaps.length <= 0}
-						<li class="text-author-500">All maps are fine!</li>
-					{/if}
-				</ul>
-			{/if}
-
-			<p>
-				New data is not fetched automatically. To request a data update, use 'Update Profile' button
-				at the top of the page. This usually takes only a few seconds.
-			</p>
-		</div>
-	</div>
+	<Instructions />
 </div>
