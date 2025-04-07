@@ -44,7 +44,7 @@
 	}
 
 	function mouseDown(map: any) {
-		const record = recordsMap[map.campaignUid][map.position];
+		const record = (recordsMap[map.campaignUid] ?? [])[map.position];
 
 		modalData = {
 			raw: {

@@ -75,6 +75,42 @@ export class AppwriteService {
 			return [];
 		}
 	}
+	
+	static async getWeeklyMaps() {
+		try {
+			const maps = [];
+			let cursor: any = null;
+
+			do {
+				const queries = [Query.limit(500)];
+
+				if (cursor) {
+					queries.push(Query.cursorAfter(cursor));
+				}
+
+				const dbRes = await database.listDocuments<any>('default', 'weeklyMaps', queries);
+
+				maps.push(...dbRes.documents);
+
+				if (dbRes.documents.length > 0) {
+					cursor = dbRes.documents[dbRes.documents.length - 1].$id;
+				} else {
+					cursor = null;
+				}
+			} while (cursor !== null);
+
+			return maps;
+		} catch (err) {
+			console.error(err);
+
+			Toastify({
+				...toastConfig,
+				text: 'Could not load shorts: ' + err.message
+			}).showToast();
+
+			return [];
+		}
+	}
 
 	static async getMapsDetails(year: number) {
 		try {
