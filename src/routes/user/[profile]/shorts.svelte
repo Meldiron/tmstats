@@ -123,6 +123,12 @@
 
 			mapsMap[weekUid].push(map);
 		}
+		
+		weeks = weeks.sort((a, b) => {
+			const [weekA, yearA] = a.split('-');
+			const [weekB, yearB] = b.split('-');
+			return yearB - yearA || weekB - weekA;
+		});
 
 		weeks = weeks;
 		mapsMap = mapsMap;
