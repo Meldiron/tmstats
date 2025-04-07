@@ -118,7 +118,11 @@ export class AppwriteService {
 			let cursor: string | undefined = undefined;
 			do {
 				try {
-					const queries = [Query.equal('year', year), Query.limit(100), Query.orderDesc('$createdAt')];
+					const queries = [
+						Query.equal('year', year),
+						Query.limit(100),
+						Query.orderDesc('$createdAt')
+					];
 
 					if (cursor) {
 						queries.push(Query.cursorAfter(cursor));

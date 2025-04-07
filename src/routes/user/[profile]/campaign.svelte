@@ -126,6 +126,21 @@
 			mapsMap[map.campaignUid].push(map);
 		}
 
+		campaigns = campaigns.sort((a, b) => {
+			const seasons = ['spring', 'summer', 'fall', 'winter'];
+			const [seasonA, yearA] = a.split('-');
+			const [seasonB, yearB] = b.split('-');
+			return seasons.indexOf(seasonA) - seasons.indexOf(seasonB) || yearB - yearA;
+		});
+
+		for (const key of Object.keys(mapsMap)) {
+			mapsMap[key] = mapsMap[key].sort((a, b) => {
+				const positionA = a.position;
+				const positionB = b.position;
+				return positionA - positionB;
+			});
+		}
+
 		campaigns = campaigns;
 		mapsMap = mapsMap;
 
