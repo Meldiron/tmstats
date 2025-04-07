@@ -62,17 +62,11 @@
 		}
 
 		isLoading = true;
-		
+
 		const [week, year] = uid.split('-');
 
 		try {
-			const res = await AppwriteService.nadeoAction(
-				profileId,
-				'shorts',
-				+year,
-				undefined,
-				+week
-			);
+			const res = await AppwriteService.nadeoAction(profileId, 'shorts', +year, undefined, +week);
 
 			if (res) {
 				onMountFunction();
@@ -116,9 +110,9 @@
 		let weeksRes = await AppwriteService.getWeeklyMaps();
 
 		for (const map of weeksRes) {
-		const [_position, weekName, yearName] = map.key.split('-');
-		  const weekUid = weekName + '-' + yearName;
-				
+			const [_position, weekName, yearName] = map.key.split('-');
+			const weekUid = weekName + '-' + yearName;
+
 			if (!weeks.includes(weekUid)) {
 				weeks.push(weekUid);
 			}
@@ -170,7 +164,7 @@
 	};
 
 	onMount(onMountFunction);
-	
+
 	function getWeekName(map: string) {
 		const [_position, uid1, uid2] = map.split('-');
 		return uid1 + '-' + uid2; // week-year
@@ -435,7 +429,7 @@
 			>
 				<div class="flex items-center justify-between">
 					<h3 class="font-bold text-2xl text-gray-200">
-					   Week {week.split('-')[0]}
+						Week {week.split('-')[0]}
 					</h3>
 					<div>
 						<button
@@ -460,12 +454,13 @@
 						</button>
 					</div>
 				</div>
-				
+
 				<h4 class="-mt-1 font-semibold text-gray-400 mb-3">Year {week.split('-')[1]}</h4>
 
 				<div class="flex flex-wrap gap-2">
 					{#each mapsMap[week] as map}
-						{@const medal = (recordsMap[getWeekName(map.key)] ?? [])[map.position]?.medal?.medal ?? 0}
+						{@const medal =
+							(recordsMap[getWeekName(map.key)] ?? [])[map.position]?.medal?.medal ?? 0}
 						<button
 							on:mouseleave={() => mouseLeave()}
 							on:mousedown={() => mouseDown(map)}

@@ -75,7 +75,7 @@ export class AppwriteService {
 			return [];
 		}
 	}
-	
+
 	static async getWeeklyMaps() {
 		try {
 			const maps = [];
