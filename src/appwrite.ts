@@ -190,11 +190,11 @@ export class AppwriteService {
 					style: {
 						background: '#3b82f6'
 					},
-					duration: 3000,
+					duration: 2800,
 					stopOnFocus: false,
 					text: 'Your profile update is still being processed ...'
 				}).showToast();
-			}, 5000);
+			}, 3000);
 
 			const res = await functions.createExecution(
 				'nadeoAction',

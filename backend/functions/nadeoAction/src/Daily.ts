@@ -40,7 +40,7 @@ export class Daily {
 			`https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/Personal_Best/map/${mapUid}/surround/0/0?score=${time}&onlyWorld=true`,
 			{
 				headers: {
-					'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+					'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 
 					Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
 					Accept: 'application/json',
@@ -72,7 +72,7 @@ export class Daily {
 				'&length=1',
 			{
 				headers: {
-					'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+					'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 
 					Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
 					Accept: 'application/json',
@@ -101,7 +101,7 @@ export class Daily {
 			await getAxiod()
 		).get('https://prod.trackmania.core.nadeo.online/maps/?mapUidList=' + mapUId, {
 			headers: {
-				'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+				'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 
 				Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
 				Accept: 'application/json',
@@ -236,7 +236,7 @@ export class Daily {
 					offset,
 				{
 					headers: {
-						'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 						Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
 						Accept: 'application/json'
 					}
@@ -266,7 +266,7 @@ export class Daily {
 					await getAxiod()
 				).get('https://live-services.trackmania.nadeo.live/api/token/map/' + mapUid, {
 					headers: {
-						'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 						Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
 						Accept: 'application/json'
 					}
@@ -353,7 +353,7 @@ export class Daily {
 					offset,
 				{
 					headers: {
-						'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 						Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
 						Accept: 'application/json'
 					}
@@ -386,7 +386,7 @@ export class Daily {
 					await getAxiod()
 				).get('https://live-services.trackmania.nadeo.live/api/token/map/' + mapUid, {
 					headers: {
-						'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 						Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
 						Accept: 'application/json'
 					}
@@ -492,7 +492,7 @@ export class Daily {
 					mapId,
 				{
 					headers: {
-						'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 						Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
 						Accept: 'application/json',
 						'Content-Type': 'application/json'
@@ -566,7 +566,7 @@ export class Daily {
 					mapId,
 				{
 					headers: {
-						'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 						Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
 						Accept: 'application/json',
 						'Content-Type': 'application/json'
@@ -635,7 +635,7 @@ export class Daily {
 					mapId,
 				{
 					headers: {
-						'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 						Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
 						Accept: 'application/json',
 						'Content-Type': 'application/json'

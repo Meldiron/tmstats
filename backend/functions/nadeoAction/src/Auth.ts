@@ -120,7 +120,7 @@ export class Auth {
 			},
 			{
 				headers: {
-					'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+					'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 					'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
 					Authorization: 'Basic ' + this.nadeoAuth,
 					'Content-Type': 'application/json'
@@ -139,7 +139,7 @@ export class Auth {
 			},
 			{
 				headers: {
-					'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+					'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 					'Ubi-AppId': '86263886-327a-4328-ac69-527f0d20a237',
 					Authorization: 'ubi_v1 t=' + authRes.data.ticket,
 					'Content-Type': 'application/json'
@@ -159,7 +159,7 @@ export class Auth {
             audience: this.service
         }, {
             headers: {
-                'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+                'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 
                 'Authorization': 'Basic ' + this.nadeoAuth,
                 'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ export class Auth {
 			{},
 			{
 				headers: {
-					'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com',
+					'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
 
 					'Content-Type': 'application/json',
 					Authorization: 'nadeo_v1 t=' + this.refreshToken

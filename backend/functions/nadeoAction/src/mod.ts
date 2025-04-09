@@ -86,12 +86,12 @@ const func = async function (context: any) {
 
 	const tmRes = await (
 		await getAxiod()
-	).get('https://trackmania.io/api/players/find?search=' + payload.userId, {
+	).get('https://trackmania.io/api/player/' + payload.userId, {
 		headers: {
-			'User-Agent': 'tmstats.eu / 0.0.3 matejbaco2000@gmail.com'
+			'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com'
 		}
 	});
-	const nickname = tmRes?.data?.[0]?.player?.name ?? 'Unknown';
+	const nickname = tmRes?.data?.displayname ?? 'Unknown';
 
 	try {
 		const docRes = await db.getDocument('default', 'profiles', payload.userId);

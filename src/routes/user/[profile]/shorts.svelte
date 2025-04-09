@@ -44,7 +44,7 @@
 	}
 
 	function mouseDown(map: any) {
-		const record = (recordsMap[getWeekName(map.key)] ?? [])[map.position];
+		const record = recordsMap[map.position + '-' + getWeekName(map.key)] ?? {};
 
 		modalData = {
 			raw: {
@@ -162,18 +162,14 @@
 				continue;
 			}
 
-			const [_type, _position, uid1, uid2] = key.split('-');
-			const uid = uid1 + '-' + uid2; // week-year
+			const [_type, position, uid1, uid2] = key.split('-');
+			const uid = position + '-' + uid1 + '-' + uid2; // week-year
 
 			const medal = dbRes.medals[key];
 
-			if (!recordsMap[uid]) {
-				recordsMap[uid] = [];
-			}
-
-			recordsMap[uid].push({
+			recordsMap[uid] = {
 				medal
-			});
+			};
 		}
 	};
 
@@ -474,7 +470,7 @@
 				<div class="flex flex-wrap gap-2">
 					{#each mapsMap[week] as map}
 						{@const medal =
-							(recordsMap[getWeekName(map.key)] ?? [])[map.position]?.medal?.medal ?? 0}
+							(recordsMap[map.position + '-' + getWeekName(map.key)] ?? {})?.medal?.medal ?? 0}
 						<button
 							on:mouseleave={() => mouseLeave()}
 							on:mousedown={() => mouseDown(map)}

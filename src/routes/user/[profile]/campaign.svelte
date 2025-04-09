@@ -44,7 +44,7 @@
 	}
 
 	function mouseDown(map: any) {
-		const record = (recordsMap[map.campaignUid] ?? [])[map.position];
+		const record = recordsMap[map.position + '-' + map.campaignUid] ?? {};
 
 		modalData = {
 			raw: {
@@ -165,18 +165,14 @@
 				continue;
 			}
 
-			const [_type, _position, uid1, uid2] = key.split('-');
-			const uid = uid1 + '-' + uid2;
+			const [_type, position, uid1, uid2] = key.split('-');
+			const uid = position + '-' + uid1 + '-' + uid2;
 
 			const medal = dbRes.medals[key];
 
-			if (!recordsMap[uid]) {
-				recordsMap[uid] = [];
-			}
-
-			recordsMap[uid].push({
+			recordsMap[uid] = {
 				medal
-			});
+			};
 		}
 	};
 
@@ -470,7 +466,8 @@
 
 				<div class="flex flex-wrap gap-2">
 					{#each mapsMap[campaign] as map}
-						{@const medal = (recordsMap[map.campaignUid] ?? [])[map.position]?.medal?.medal ?? 0}
+						{@const medal =
+							(recordsMap[map.position + '-' + map.campaignUid] ?? {})?.medal?.medal ?? 0}
 						<button
 							on:mouseleave={() => mouseLeave()}
 							on:mousedown={() => mouseDown(map)}
