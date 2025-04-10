@@ -127,10 +127,21 @@
 		}
 
 		campaigns = campaigns.sort((a, b) => {
-			const seasons = ['spring', 'summer', 'fall', 'winter'];
+			const seasons = ['winter', 'spring', 'summer', 'fall'];
 			const [seasonA, yearA] = a.split('-');
 			const [seasonB, yearB] = b.split('-');
-			return seasons.indexOf(seasonA) - seasons.indexOf(seasonB) || yearB - yearA;
+
+			if (yearA === yearB) {
+				return seasons.indexOf(seasonB) - seasons.indexOf(seasonA);
+			}
+
+			if (yearA < yearB) {
+				return 1;
+			}
+
+			if (yearA > yearB) {
+				return -1;
+			}
 		});
 
 		for (const key of Object.keys(mapsMap)) {
