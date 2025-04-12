@@ -509,7 +509,7 @@ export class Daily {
 		const records: any = {};
 
 		if (oauth) {
-			const batchSize = 100;
+			const batchSize = 25;
 			const mapIdBatches: string[][] = [];
 			for (let i = 0; i < mapIdList.length; i += batchSize) {
 				mapIdBatches.push(mapIdList.slice(i, i + batchSize));
