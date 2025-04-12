@@ -42,7 +42,6 @@ List of environment variables used by this cloud function:
 
 - **APPWRITE_FUNCTION_ENDPOINT** - Endpoint of Appwrite project
 - **APPWRITE_FUNCTION_API_KEY** - Appwrite API Key
-- **ADMIN_PASS** - If matched with payload `password`, a delay check for fetching profile is ignored
 - **NADE_AUTH** - Base64 URL encoded email:password of Trackmania (Ubisoft) account
 
 ## 2. Endpoint 'mod_daily_cron.ts'

@@ -66,5 +66,10 @@ export const load: PageServerLoad = async ({ url }) => {
 		expireAt
 	);
 
-	redirect(301, path ?? '/');
+	const token = await AppwriteService.serverCreateSession(APPWRITE_API_KEY, userId);
+
+	return {
+		token,
+		path
+	};
 };

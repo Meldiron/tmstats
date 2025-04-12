@@ -9,6 +9,7 @@
 <div class="mt-6 grid grid-cols-12 gap-6">
 	{#each data.weeks as week (week.uid)}
 		<Card
+			canSynchronize={data.user && data.user.$id === data.profile.$id ? true : false}
 			nadeoAction={async () => {
 				return await AppwriteService.nadeoAction(
 					data.profile.$id,

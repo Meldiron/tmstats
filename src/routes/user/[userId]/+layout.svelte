@@ -97,25 +97,28 @@
 		</div>
 	</div>
 
-	<!-- TODO: Only show if not authorized -->
-	<div
-		class="mx-auto mt-6 flex flex-col items-center justify-between space-y-4 rounded-tl-3xl rounded-br-3xl border border-orange-700 bg-orange-500 p-4 text-white sm:flex-row sm:space-y-0"
-	>
-		<p class="max-w-xl">
-			Profile loads can be slower. If this is your profile, to make synchronization faster, sign in
-			with your Trackmania account.
-		</p>
+	{#if !data.user}
+		<div
+			class="mx-auto mt-6 flex flex-col items-center justify-between space-y-4 rounded-tl-3xl rounded-br-3xl border border-blue-700 bg-blue-500 p-4 text-white sm:flex-row sm:space-y-0"
+		>
+			<p class="max-w-xl">
+				If this is your profile, sign in with your Trackmania account and you will gain access to
+				synchronize medals.
+			</p>
 
-		<div>
-			<a href={`/oauth/redirect?path=${encodeURIComponent('/user/' + data.profile.$id) + '/cotd'}`}>
-				<button
-					class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl bg-white px-6 py-2 font-bold text-nowrap text-slate-600 hover:bg-slate-100"
+			<div>
+				<a
+					href={`/oauth/redirect?path=${encodeURIComponent('/user/' + data.profile.$id) + '/cotd'}`}
 				>
-					<p class="m-0 p-0">Sign in with Trackmania</p>
-				</button>
-			</a>
+					<button
+						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl bg-white px-6 py-2 font-bold text-nowrap text-slate-600 hover:bg-slate-100"
+					>
+						<p class="m-0 p-0">Sign in with Trackmania</p>
+					</button>
+				</a>
+			</div>
 		</div>
-	</div>
+	{/if}
 
 	{@render children()}
 

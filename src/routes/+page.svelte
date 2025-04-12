@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { AppwriteService, toastConfig } from '$lib/appwrite';
 	import Toastify from 'toastify-js';
 	import type { PageProps } from './$types';
@@ -21,6 +21,20 @@
 			}
 		} finally {
 			isLoading = false;
+		}
+	}
+
+	let isSigningOut = $state(false);
+	async function signOut(event: Event) {
+		event.preventDefault();
+
+		try {
+			isSigningOut = true;
+
+			await AppwriteService.signOut();
+			await invalidateAll();
+		} finally {
+			isSigningOut = false;
 		}
 	}
 
@@ -76,6 +90,29 @@
 
 <div class="mx-auto mt-6 w-full max-w-5xl">
 	<Header />
+
+	{#if data.user}
+		<div class="mt-6 rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-4">
+			<h1 class="mb-3 text-2xl font-bold text-black">Welcome back, user!</h1>
+
+			<p class="mb-3">
+				If you wish to sign out, mostly useful to synchronize different account, you can do so
+				below.
+			</p>
+			<form
+				onsubmit={signOut}
+				class="flex max-w-sm flex-col space-y-3 sm:max-w-none sm:flex-row sm:space-y-0 sm:space-x-4"
+			>
+				<button
+					disabled={isSigningOut}
+					type="submit"
+					class="rounded-tl-3xl rounded-br-3xl bg-slate-500 px-6 py-2 font-bold text-white enabled:hover:bg-slate-600 disabled:opacity-50"
+				>
+					<p class="m-0 p-0">Sign out of account</p>
+				</button>
+			</form>
+		</div>
+	{/if}
 
 	<div class="mt-6 rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-4">
 		<h1 class="mb-3 text-2xl font-bold text-black">Profile Lookup by Nickname</h1>

@@ -1,5 +1,9 @@
-import { Client, Databases, Query, Functions, type Models } from 'appwrite';
-import { Client as ServerClient, Databases as ServerDatabases } from 'node-appwrite';
+import { Client, Databases, Query, Functions, type Models, Account } from 'appwrite';
+import {
+	Client as ServerClient,
+	Databases as ServerDatabases,
+	Users as ServerUsers
+} from 'node-appwrite';
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
 
@@ -47,6 +51,7 @@ const client = new Client();
 client.setEndpoint('https://cloud.appwrite.io/v1').setProject('tmStats');
 
 const functions = new Functions(client);
+const account = new Account(client);
 const database = new Databases(client);
 
 export const toastConfig: Toastify.Options = {
@@ -61,6 +66,22 @@ export const toastConfig: Toastify.Options = {
 	// onClick: function(){}
 };
 export class AppwriteService {
+	static async getAccount() {
+		try {
+			return await account.get();
+		} catch {
+			return null;
+		}
+	}
+
+	static async signOut() {
+		await account.deleteSession('current');
+	}
+
+	static async createSession(userId: string, secret: string) {
+		await account.createSession(userId, secret);
+	}
+
 	static async serverStoreCredentials(
 		apiKey: string,
 		userId: string,
@@ -85,6 +106,22 @@ export class AppwriteService {
 				expiresAt
 			});
 		}
+	}
+
+	static async serverCreateSession(apiKey: string, userId: string) {
+		const client = new ServerClient();
+		client.setEndpoint('https://cloud.appwrite.io/v1').setProject('tmStats').setKey(apiKey);
+		const users = new ServerUsers(client);
+
+		try {
+			await users.get(userId);
+		} catch {
+			await users.create(userId);
+		}
+
+		const token = await users.createToken(userId);
+
+		return token;
 	}
 
 	static async getProfile(id: string) {
