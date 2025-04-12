@@ -1,4 +1,5 @@
 import { Client, Databases, Query, Functions, type Models } from 'appwrite';
+import { Client as ServerClient, Databases as ServerDatabases } from 'node-appwrite';
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
 
@@ -43,7 +44,6 @@ export type AppwriteCampaignMap = {
 } & AppwriteMap;
 
 const client = new Client();
-
 client.setEndpoint('https://cloud.appwrite.io/v1').setProject('tmStats');
 
 const functions = new Functions(client);
@@ -61,6 +61,32 @@ export const toastConfig: Toastify.Options = {
 	// onClick: function(){}
 };
 export class AppwriteService {
+	static async serverStoreCredentials(
+		apiKey: string,
+		userId: string,
+		accessToken: string,
+		refreshToken: string,
+		expiresAt: number
+	) {
+		const client = new ServerClient();
+		client.setEndpoint('https://cloud.appwrite.io/v1').setProject('tmStats').setKey(apiKey);
+		const database = new ServerDatabases(client);
+
+		try {
+			await database.createDocument('default', 'oauthTokens', userId, {
+				accessToken,
+				refreshToken,
+				expiresAt
+			});
+		} catch {
+			await database.updateDocument('default', 'oauthTokens', userId, {
+				accessToken,
+				refreshToken,
+				expiresAt
+			});
+		}
+	}
+
 	static async getProfile(id: string) {
 		try {
 			const dbRes = await database.getDocument<AppwriteProfile>('default', 'profiles', id);

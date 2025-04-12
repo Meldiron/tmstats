@@ -51,3 +51,8 @@
 .yearselected {
 	@apply bg-author-500 hover:!bg-author-600 text-white;
 }
+
+button,
+a {
+	cursor: pointer;
+}

@@ -47,6 +47,7 @@
 	},
 	"dependencies": {
 		"appwrite": "^17.0.1",
+		"node-appwrite": "^15.0.1",
 		"toastify-js": "^1.12.0"
 	}
 }

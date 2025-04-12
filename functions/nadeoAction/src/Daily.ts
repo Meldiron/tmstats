@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { Auth } from './Auth.ts';
+import { OAuth } from './OAuth.ts';
 
 import { getAxiod, sdk } from './deps.ts';
 
@@ -479,38 +480,97 @@ export class Daily {
 
 		const responseData: any = {};
 
-		for (const mapId of mapIdList) {
+		const mapScores = await Daily.getMapScores(db, userId, mapIdList);
+
+		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
-			console.log('Fetching ' + mapInfo);
 
-			const medalsRes = await (
-				await getAxiod()
-			).get(
-				'https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=' +
-					userId +
-					'&mapIdList=' +
-					mapId,
-				{
-					headers: {
-						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
-						Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
-						Accept: 'application/json',
-						'Content-Type': 'application/json'
-					}
-				}
-			);
-
-			const medalData = medalsRes.data[0];
-
-			if (medalData) {
-				responseData[mapInfo] = {
-					medal: medalData.medal,
-					time: medalData.recordScore.time
-				};
-			}
+			responseData[mapInfo] = {
+				medal: mapScores[mapId].medal,
+				time: mapScores[mapId].time
+			};
 		}
 
 		return responseData;
+	}
+
+	static async getMapScores(db: sdk.Databases, userId: string, mapIdList: string[]) {
+		let oauth: null | OAuth = null;
+		try {
+			// Use OAuth for quick fetch
+			console.log(userId);
+			const tokens = await db.getDocument('default', 'oauthTokens', userId);
+			oauth = new OAuth(db, userId, tokens.accessToken, tokens.refreshToken, tokens.expiresAt);
+		} catch (err: any) {
+			console.warn(err);
+			// OK, fallback to flow processes
+		}
+
+		const records: any = {};
+
+		if (oauth) {
+			const batchSize = 100;
+			const mapIdBatches: string[][] = [];
+			for (let i = 0; i < mapIdList.length; i += batchSize) {
+				mapIdBatches.push(mapIdList.slice(i, i + batchSize));
+			}
+
+			for (const mapIdBatch of mapIdBatches) {
+				console.log('Quick-fetching ' + mapIdBatch.join(','));
+				const medalsRes = await (
+					await getAxiod()
+				).get(
+					'https://api.trackmania.com/api/user/map-records?' +
+						mapIdBatch.map((mapId) => `mapId[]=${mapId}`).join('&'),
+					{
+						headers: {
+							'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
+							Authorization: 'Bearer ' + (await oauth.getToken()),
+							Accept: 'application/json',
+							'Content-Type': 'application/json'
+						}
+					}
+				);
+
+				for (const record of medalsRes.data) {
+					records[record.mapId] = {
+						medal: record.medal,
+						time: record.time
+					};
+				}
+			}
+		} else {
+			for (const mapId of mapIdList) {
+				console.log('Fetching ' + mapId);
+				const medalsRes = await (
+					await getAxiod()
+				).get(
+					'https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=' +
+						userId +
+						'&mapIdList=' +
+						mapId,
+					{
+						headers: {
+							'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
+							Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
+							Accept: 'application/json',
+							'Content-Type': 'application/json'
+						}
+					}
+				);
+
+				const medalData = medalsRes.data[0];
+
+				if (medalData) {
+					records[mapId] = {
+						medal: medalData.medal,
+						time: medalData.recordScore.time
+					};
+				}
+			}
+		}
+
+		return records;
 	}
 
 	static async getMedalsShorts(
@@ -553,35 +613,15 @@ export class Daily {
 
 		const responseData: any = {};
 
-		for (const mapId of mapIdList) {
+		const mapScores = await Daily.getMapScores(db, userId, mapIdList);
+
+		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
-			console.log('Fetching ' + mapInfo);
 
-			const medalsRes = await (
-				await getAxiod()
-			).get(
-				'https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=' +
-					userId +
-					'&mapIdList=' +
-					mapId,
-				{
-					headers: {
-						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
-						Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
-						Accept: 'application/json',
-						'Content-Type': 'application/json'
-					}
-				}
-			);
-
-			const medalData = medalsRes.data[0];
-
-			if (medalData) {
-				responseData[mapInfo] = {
-					medal: medalData.medal,
-					time: medalData.recordScore.time
-				};
-			}
+			responseData[mapInfo] = {
+				medal: mapScores[mapId].medal,
+				time: mapScores[mapId].time
+			};
 		}
 
 		return responseData;
@@ -622,35 +662,15 @@ export class Daily {
 
 		const responseData: any = {};
 
-		for (const mapId of mapIdList) {
+		const mapScores = await Daily.getMapScores(db, userId, mapIdList);
+
+		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
-			console.log('Fetching ' + mapInfo);
 
-			const medalsRes = await (
-				await getAxiod()
-			).get(
-				'https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=' +
-					userId +
-					'&mapIdList=' +
-					mapId,
-				{
-					headers: {
-						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
-						Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
-						Accept: 'application/json',
-						'Content-Type': 'application/json'
-					}
-				}
-			);
-
-			const medalData = medalsRes.data[0];
-
-			if (medalData) {
-				responseData[mapInfo] = {
-					medal: medalData.medal,
-					time: medalData.recordScore.time
-				};
-			}
+			responseData[mapInfo] = {
+				medal: mapScores[mapId].medal,
+				time: mapScores[mapId].time
+			};
 		}
 
 		return responseData;

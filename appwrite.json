@@ -4,8 +4,6 @@
 	"collections": [
 		{
 			"$id": "profiles",
-			"$createdAt": "2022-09-22T16:49:10.072+00:00",
-			"$updatedAt": "2022-09-22T16:49:10.072+00:00",
 			"$permissions": ["read(\"any\")"],
 			"databaseId": "default",
 			"name": "profiles",
@@ -15,7 +13,6 @@
 				{
 					"key": "silver",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -25,7 +22,6 @@
 				{
 					"key": "bronze",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -35,7 +31,6 @@
 				{
 					"key": "author",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -45,7 +40,6 @@
 				{
 					"key": "nickname",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 255,
@@ -54,7 +48,15 @@
 				{
 					"key": "score",
 					"type": "integer",
-					"status": "available",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "gold",
+					"type": "integer",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -64,20 +66,9 @@
 				{
 					"key": "medals",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 999999,
-					"default": null
-				},
-				{
-					"key": "gold",
-					"type": "integer",
-					"status": "available",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
 					"default": null
 				}
 			],
@@ -121,8 +112,6 @@
 		},
 		{
 			"$id": "nadeoCache",
-			"$createdAt": "2022-09-22T16:50:38.139+00:00",
-			"$updatedAt": "2022-09-22T16:50:38.139+00:00",
 			"$permissions": [],
 			"databaseId": "default",
 			"name": "nadeoCache",
@@ -132,7 +121,6 @@
 				{
 					"key": "value",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 999999,
@@ -143,8 +131,6 @@
 		},
 		{
 			"$id": "dailyMaps",
-			"$createdAt": "2022-09-22T16:50:40.601+00:00",
-			"$updatedAt": "2022-09-22T16:50:40.601+00:00",
 			"$permissions": ["read(\"any\")"],
 			"databaseId": "default",
 			"name": "dailyMaps",
@@ -154,7 +140,6 @@
 				{
 					"key": "mapid",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -163,7 +148,6 @@
 				{
 					"key": "mapUid",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -172,7 +156,6 @@
 				{
 					"key": "day",
 					"type": "integer",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"min": -9123372036854776000,
@@ -182,7 +165,6 @@
 				{
 					"key": "silverScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -192,7 +174,6 @@
 				{
 					"key": "thumbnailUrl",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 2048,
@@ -201,7 +182,6 @@
 				{
 					"key": "month",
 					"type": "integer",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"min": -9123372036854776000,
@@ -211,7 +191,6 @@
 				{
 					"key": "bronzeScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -221,7 +200,6 @@
 				{
 					"key": "collectionName",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 255,
@@ -230,7 +208,6 @@
 				{
 					"key": "goldScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -240,7 +217,6 @@
 				{
 					"key": "name",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 255,
@@ -249,7 +225,6 @@
 				{
 					"key": "key",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -258,7 +233,6 @@
 				{
 					"key": "authorScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -268,7 +242,6 @@
 				{
 					"key": "year",
 					"type": "integer",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"min": -9123372036854776000,
@@ -280,8 +253,6 @@
 		},
 		{
 			"$id": "weeklyMaps",
-			"$createdAt": "2022-09-22T16:50:40.601+00:00",
-			"$updatedAt": "2022-09-22T16:50:40.601+00:00",
 			"$permissions": ["read(\"any\")"],
 			"databaseId": "default",
 			"name": "weeklyMaps",
@@ -291,7 +262,6 @@
 				{
 					"key": "mapid",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -300,7 +270,6 @@
 				{
 					"key": "mapUid",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -309,7 +278,6 @@
 				{
 					"key": "week",
 					"type": "integer",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"min": -9123372036854776000,
@@ -319,7 +287,6 @@
 				{
 					"key": "silverScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -329,7 +296,6 @@
 				{
 					"key": "thumbnailUrl",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 2048,
@@ -338,7 +304,6 @@
 				{
 					"key": "bronzeScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -348,7 +313,6 @@
 				{
 					"key": "collectionName",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 255,
@@ -357,7 +321,6 @@
 				{
 					"key": "goldScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -367,7 +330,6 @@
 				{
 					"key": "name",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 255,
@@ -376,7 +338,6 @@
 				{
 					"key": "key",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -385,7 +346,6 @@
 				{
 					"key": "authorScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -395,7 +355,6 @@
 				{
 					"key": "year",
 					"type": "integer",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"min": -9123372036854776000,
@@ -405,7 +364,6 @@
 				{
 					"key": "position",
 					"type": "integer",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"min": -9123372036854776000,
@@ -417,8 +375,6 @@
 		},
 		{
 			"$id": "campaignMaps",
-			"$createdAt": "2022-09-22T16:50:40.601+00:00",
-			"$updatedAt": "2022-09-22T16:50:40.601+00:00",
 			"$permissions": ["read(\"any\")"],
 			"databaseId": "default",
 			"name": "campaignMaps",
@@ -426,18 +382,8 @@
 			"documentSecurity": false,
 			"attributes": [
 				{
-					"key": "campaignUid",
-					"type": "string",
-					"status": "available",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
 					"key": "mapid",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -446,7 +392,6 @@
 				{
 					"key": "mapUid",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -455,7 +400,6 @@
 				{
 					"key": "silverScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -465,7 +409,6 @@
 				{
 					"key": "thumbnailUrl",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 2048,
@@ -474,7 +417,6 @@
 				{
 					"key": "bronzeScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -484,7 +426,6 @@
 				{
 					"key": "collectionName",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 255,
@@ -493,7 +434,6 @@
 				{
 					"key": "goldScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -503,7 +443,6 @@
 				{
 					"key": "name",
 					"type": "string",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"size": 255,
@@ -512,7 +451,6 @@
 				{
 					"key": "key",
 					"type": "string",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"size": 255,
@@ -521,7 +459,6 @@
 				{
 					"key": "authorScore",
 					"type": "integer",
-					"status": "available",
 					"required": false,
 					"array": false,
 					"min": -9123372036854776000,
@@ -531,11 +468,54 @@
 				{
 					"key": "position",
 					"type": "integer",
-					"status": "available",
 					"required": true,
 					"array": false,
 					"min": -9123372036854776000,
 					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "campaignUid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "oauthTokens",
+			"$permissions": [],
+			"databaseId": "default",
+			"name": "oauthTokens",
+			"enabled": true,
+			"documentSecurity": false,
+			"attributes": [
+				{
+					"key": "accessToken",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 100000,
+					"default": null
+				},
+				{
+					"key": "refreshToken",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 100000,
+					"default": null
+				},
+				{
+					"key": "expiresAt",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807,
 					"default": null
 				}
 			],
@@ -590,6 +570,13 @@
 			"logging": true,
 			"scopes": [],
 			"commands": ""
+		}
+	],
+	"databases": [
+		{
+			"$id": "default",
+			"name": "default",
+			"enabled": true
 		}
 	]
 }
