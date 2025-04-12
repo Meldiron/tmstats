@@ -10,7 +10,11 @@
 	{#each data.campaigns as campaign (campaign.uid)}
 		{@const season = campaign.uid.split('-')[0]}
 		<Card
-			canSynchronize={data.user && data.user.$id === data.profile.$id ? true : false}
+			canSynchronize={data.user &&
+			(data.user.$id === data.profile.$id ||
+				data.user.$id === '06e99ad3-cded-4440-a19c-b3df4fda8004')
+				? true
+				: false}
 			nadeoAction={async () => {
 				return await AppwriteService.nadeoAction(
 					data.profile.$id,

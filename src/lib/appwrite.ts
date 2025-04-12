@@ -108,7 +108,7 @@ export class AppwriteService {
 		}
 	}
 
-	static async serverCreateSession(apiKey: string, userId: string) {
+	static async serverCreateSession(apiKey: string, userId: string, name: string) {
 		const client = new ServerClient();
 		client.setEndpoint('https://cloud.appwrite.io/v1').setProject('tmStats').setKey(apiKey);
 		const users = new ServerUsers(client);
@@ -118,6 +118,8 @@ export class AppwriteService {
 		} catch {
 			await users.create(userId);
 		}
+		
+    await users.updateName(userId, name);
 
 		const token = await users.createToken(userId);
 

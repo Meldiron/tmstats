@@ -57,6 +57,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	}
 
 	const userId = profileJson.accountId ?? profileJson.account_id ?? '';
+	const displayName = profileJson.displayName ?? profileJson.display_name ?? 'Unknown user';
 
 	await AppwriteService.serverStoreCredentials(
 		APPWRITE_API_KEY,
@@ -66,7 +67,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		expireAt
 	);
 
-	const token = await AppwriteService.serverCreateSession(APPWRITE_API_KEY, userId);
+	const token = await AppwriteService.serverCreateSession(APPWRITE_API_KEY, userId, displayName);
 
 	return {
 		token,

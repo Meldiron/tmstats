@@ -93,12 +93,16 @@
 
 	{#if data.user}
 		<div class="mt-6 rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-4">
-			<h1 class="mb-3 text-2xl font-bold text-black">Welcome back, user!</h1>
+			<h1 class="mb-3 text-2xl font-bold text-black">Welcome back, {data.user.name}!</h1>
 
 			<p class="mb-3">
-				If you wish to sign out, mostly useful to synchronize different account, you can do so
-				below.
+			You can find most common actions for your account below.
 			</p>
+		
+			<div class="flex flex-col sm:flex-row gap-3">
+			
+			<a 	class="rounded-tl-3xl rounded-br-3xl bg-author-500 px-6 py-2 font-bold text-white hover:bg-author-600 "  href={`/user/${data.user.$id}/cotd`}>
+			My profile</a>
 			<form
 				onsubmit={signOut}
 				class="flex max-w-sm flex-col space-y-3 sm:max-w-none sm:flex-row sm:space-y-0 sm:space-x-4"
@@ -108,9 +112,12 @@
 					type="submit"
 					class="rounded-tl-3xl rounded-br-3xl bg-slate-500 px-6 py-2 font-bold text-white enabled:hover:bg-slate-600 disabled:opacity-50"
 				>
-					<p class="m-0 p-0">Sign out of account</p>
+					<p class="m-0 p-0">Sign out</p>
 				</button>
 			</form>
+			
+			
+			</div>
 		</div>
 	{/if}
 
