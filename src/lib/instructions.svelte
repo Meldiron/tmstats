@@ -1,5 +1,5 @@
-<div class="mt-6 rounded-tl-3xl rounded-br-3xl bg-white border border-gray-200 p-4">
-	<h1 class="font-bold text-black text-2xl mb-3">How to Read Data?</h1>
+<div class="mt-6 rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-4">
+	<h1 class="mb-3 text-2xl font-bold text-black">How to Read Data?</h1>
 
 	<div class="prose">
 		<p>Cells on website follow same color pallete as medals in Trackmania game.</p>

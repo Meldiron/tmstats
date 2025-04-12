@@ -80,7 +80,7 @@ export class Auth {
 					new TextDecoder().decode(
 						new Uint8Array(decode((this.accessToken as string).split('.')[1]))
 					)
-			  )
+				)
 			: null;
 
 		if (access && access.rat - Date.now() / 1000 < 0) {
@@ -96,7 +96,7 @@ export class Auth {
 					new TextDecoder().decode(
 						new Uint8Array(decode((this.refreshToken as string).split('.')[1]))
 					)
-			  )
+				)
 			: null;
 		if (refresh && refresh.exp > Date.now() / 1000) {
 			await this.refreshTokenAction();

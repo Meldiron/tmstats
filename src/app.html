@@ -1,41 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="description" content="" />
-		<link rel="icon" href="/favicon.png" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
 
 		<title>TMStats | Medal Tracker</title>
 
-		<!-- HTML Meta Tags -->
 		<meta
 			name="description"
-			content="Overview of all Trackmania medals you achieved. Share your campaign or daily maps medals with anyone!"
+			content="Overview of all Trackmania medals you achieved. Share your campaign, weekly, or daily maps medals with anyone!"
 		/>
 
-		<!-- Facebook Meta Tags -->
 		<meta property="og:url" content="https://www.tmstats.almostapps.eu/" />
 		<meta property="og:type" content="website" />
 		<meta property="og:title" content="TMStats | Medal Tracker" />
 		<meta
 			property="og:description"
-			content="Overview of all Trackmania medals you achieved. Share your campaign or daily maps medals with anyone!"
+			content="Overview of all Trackmania medals you achieved. Share your campaign, weekly, or daily maps medals with anyone!"
 		/>
 		<meta property="og:image" content="https://www.tmstats.almostapps.eu/cover_tmstats.png" />
 
-		<!-- Twitter Meta Tags -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta property="twitter:domain" content="www.tmstats.almostapps.eu" />
 		<meta property="twitter:url" content="https://www.tmstats.almostapps.eu/" />
 		<meta name="twitter:title" content="TMStats | Medal Tracker" />
 		<meta
 			name="twitter:description"
-			content="Overview of all Trackmania medals you achieved. Share your campaign or daily maps medals with anyone!"
+			content="Overview of all Trackmania medals you achieved. Share your campaign, weekly, or daily maps medals with anyone!"
 		/>
 		<meta name="twitter:image" content="https://www.tmstats.almostapps.eu/cover_tmstats.png" />
-
-		<!-- Meta Tags Generated via https://www.opengraph.xyz -->
 
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
@@ -62,77 +57,8 @@
 				background-color: rgb(8 147 107) !important;
 			}
 		</style>
-
-		<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-		<script>
-			tailwind.config = {
-				theme: {
-					extend: {
-						colors: {
-							author: {
-								50: '#ecfdf5',
-								100: '#d2f9e6',
-								200: '#a9f1d1',
-								300: '#71e4b8',
-								400: '#38cf9b',
-								500: '#14b583',
-								600: '#08936b',
-								700: '#077558',
-								800: '#085d47',
-								900: '#053227'
-							},
-
-							silver: {
-								50: '#f8f8f8',
-								100: '#f0f0f0',
-								200: '#e4e4e4',
-								300: '#d1d1d1',
-								400: '#c0c0c0',
-								500: '#9a9a9a',
-								600: '#818181',
-								700: '#6a6a6a',
-								800: '#5a5a5a',
-								900: '#4e4e4e'
-							},
-							gold: {
-								50: '#ffffe7',
-								100: '#feffc1',
-								200: '#fffd86',
-								300: '#fff441',
-								400: '#ffe60d',
-								500: '#ffd700',
-								600: '#d19e00',
-								700: '#a67102',
-								800: '#89580a',
-								900: '#74480f'
-							},
-							bronze: {
-								50: '#fcf7ee',
-								100: '#f5e8d0',
-								200: '#e9d09e',
-								300: '#deb46b',
-								400: '#d69c49',
-								500: '#cd7f32',
-								600: '#b5622a',
-								700: '#974826',
-								800: '#7c3924',
-								900: '#663121'
-							}
-						}
-					}
-				}
-			};
-		</script>
-
-		<style type="text/tailwindcss">
-			.yearselected {
-				@apply bg-author-500 hover:!bg-author-600 text-white;
-			}
-		</style>
-
-		%svelte.head%
 	</head>
-	<body class="bg-slate-100 px-2">
-		<div>%svelte.body%</div>
+	<body data-sveltekit-preload-data="hover" class="bg-slate-100 px-2">
+		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

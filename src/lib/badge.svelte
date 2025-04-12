@@ -1,11 +1,10 @@
-<script>
-	export let score;
-	export let long = true;
+<script lang="ts">
+	let { score, long = true } = $props();
 </script>
 
 {#if score <= 0.27}
 	<span
-		class="bg-red-100 text-red-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+		class="inline-flex items-center space-x-2 rounded bg-red-100 px-3 py-1.5 text-xs font-medium text-red-800"
 	>
 		<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
 			<path
@@ -18,7 +17,7 @@
 	</span>
 {:else if score <= 0.73}
 	<span
-		class="bg-orange-100 text-orange-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+		class="inline-flex items-center space-x-2 rounded bg-orange-100 px-3 py-1.5 text-xs font-medium text-orange-800"
 	>
 		<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
 			<path
@@ -31,7 +30,7 @@
 	</span>
 {:else}
 	<span
-		class="bg-green-100 text-green-800 space-x-2 text-xs font-medium inline-flex items-center px-3 py-1.5 rounded"
+		class="inline-flex items-center space-x-2 rounded bg-green-100 px-3 py-1.5 text-xs font-medium text-green-800"
 	>
 		<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
 			<path

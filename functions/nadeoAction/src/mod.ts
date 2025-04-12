@@ -130,7 +130,6 @@ const func = async function (context: any) {
 	}
 
 	const newDocData = {
-		lastUpdate: Date.now(),
 		medals: JSON.stringify(newMedals),
 		score,
 		gold,

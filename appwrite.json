@@ -23,16 +23,6 @@
 					"default": null
 				},
 				{
-					"key": "lastUpdate",
-					"type": "integer",
-					"status": "available",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
 					"key": "bronze",
 					"type": "integer",
 					"status": "available",

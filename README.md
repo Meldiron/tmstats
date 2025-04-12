@@ -4,16 +4,17 @@
 
 ## 👋 Introduction
 
-TMStats is a medal tracker that shows overview of all Trackmania medals an user achieved. The website allows user to share campaign or daily maps medals with anyone.
+TMStats is a medal tracker that shows overview of all Trackmania medals an user achieved. The website allows user to share campaign, weekly, or daily maps medals with anyone.
 
 Project focuses on multiple aspects and features:
 
-- [x] Track of the day (TOTD) medals in yearly view
-- [ ] Campaign medals in season view
-- [ ] Custom map medals in list view
+- [x] Track of the day (TOTD) medals
+- [x] Campaign medals
+- [x] Weekly shorts medals
+- [ ] Custom map medals
 - [ ] Gamified achievement & quests system
 
-As of right now, project has no business model and is fully free and open-sourced. Project generates expenses, and business model might be added in the future.
+As of right now, project has no business model and is fully free and open-sourced. Project generates expenses, and business model may be added in the future.
 
 ## 🤖 Tech Stack
 
@@ -22,7 +23,7 @@ TMStats uses multiple frontend and backend technologies with focus of simplifyin
 - [TailwindCSS](https://tailwindcss.com/), a CSS library to rapidly design components using HTML classes
 - [Svelte](https://svelte.dev/), a JS library to build reactive frontend. Alongside this, application uses [TypeScript](https://www.typescriptlang.org/)
 - [Svelte Kit](https://kit.svelte.dev/), a Svelte framework to give proejct proper structure, routing and other cool features
-- **[Appwrite](https://appwrite.io/)**, a secure backend as a service that provides 90% of necessary backend functionality out of the box
+- [Appwrite](https://appwrite.io/), a secure backend as a service that provides 90% of necessary backend functionality out of the box
 
 ## 💻 Development Setup
 
@@ -32,21 +33,18 @@ TMStats uses multiple frontend and backend technologies with focus of simplifyin
 2. Spin-up HTTP server: `npm run dev`
 3. Visit [localhost:3000](http://localhost:3000/)
 
-> If you get `Network Failed` error, it most likely means CORS error, and backend refuses your hostname. To prevent this, either make sure you use `localhost` hostname, or make sure to add your hostname as platform inside Appwrite Project.
-
 **Backend:**
 
 > You only need to spin-up backend if you man on backend changes. For frontend changes, you can skip this step as project is connected to production backend instance.
 
 1. Install [Appwrite](https://appwrite.io/docs/installation) locally, or on development server
 
-> Make soure your `.env` file `_APP_FUNCTIONS_RUNTIMES` variable includes `deno-1.14` runtime. This runtime is used by all functions in this project. Changes to `.env` are applied using command `docker-compose up -d`.
+> Make sure your `.env` file `_APP_FUNCTIONS_RUNTIMES` variable includes `deno-2.0` runtime. This runtime is used by all functions in this project. Changes to `.env` are applied using command `docker-compose up -d`.
 
 2. Sign up into your Appwrite instance and create project with both name and ID set to `tmStats`
 3. Install [Appwrite CLI](https://appwrite.io/docs/command-line) locally, and login: `appwrite login`
-4. Enter `cd backend`
-5. Deploy collections: `appwrite deploy collection`
-6. Deploy functions: `appwrite deploy functions`
+4. Deploy collections: `appwrite push collection`
+5. Deploy functions: `appwrite push functions`
 
 To prepare your changes from your Appwrite instance database to production one:
 
@@ -56,7 +54,7 @@ To create a new function:
 
 1. Create function: `appwrite init function`
 
-> Make sure you create functions using `deno-1.14` runtime.
+> Make sure you create functions using `deno-2.0` runtime.
 
 Feel free to do manual changes to [appwrite.json](appwrite.json) if you are familiar with this file.
 
@@ -66,31 +64,31 @@ Feel free to do manual changes to [appwrite.json](appwrite.json) if you are fami
 
 1. Install dependencies: `npm install`
 2. Build project: `npm run build`
-3. Deploy folder `build` on a static hosting
+3. Deploy to adapter of a choice
 
 > Frontend build does not use any special environment variables.
 
 **Backend:**
 
-1. Deploy database changes, if necessary: `appwrite deploy collection`
-2. Deploy function changes, if necessary: `appwrite deploy function`
+1. Deploy database changes, if necessary: `appwrite push collection`
+2. Deploy function changes, if necessary: `appwrite push function`
 
 ---
 
 ## 📚 Svelte Kit Resources (Generated)
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
 ## Creating a project
 
-If you're seeing this, you've probably already done this step. Congrats!!!
+If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
 # create a new project in the current directory
-npm init svelte
+npx sv create
 
 # create a new project in my-app
-npm init svelte my-app
+npx sv create my-app
 ```
 
 ## Developing
@@ -114,4 +112,4 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.

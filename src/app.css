@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@theme {
+	--color-author-50: #ecfdf5;
+	--color-author-100: #d2f9e6;
+	--color-author-200: #a9f1d1;
+	--color-author-300: #71e4b8;
+	--color-author-400: #38cf9b;
+	--color-author-500: #14b583;
+	--color-author-600: #08936b;
+	--color-author-700: #077558;
+	--color-author-800: #085d47;
+	--color-author-900: #053227;
+
+	--color-silver-50: #f8f8f8;
+	--color-silver-100: #f0f0f0;
+	--color-silver-200: #e4e4e4;
+	--color-silver-300: #d1d1d1;
+	--color-silver-400: #c0c0c0;
+	--color-silver-500: #9a9a9a;
+	--color-silver-600: #818181;
+	--color-silver-700: #6a6a6a;
+	--color-silver-800: #5a5a5a;
+	--color-silver-900: #4e4e4e;
+
+	--color-gold-50: #ffffe7;
+	--color-gold-100: #feffc1;
+	--color-gold-200: #fffd86;
+	--color-gold-300: #fff441;
+	--color-gold-400: #ffe60d;
+	--color-gold-500: #ffd700;
+	--color-gold-600: #d19e00;
+	--color-gold-700: #a67102;
+	--color-gold-800: #89580a;
+	--color-gold-900: #74480f;
+
+	--color-bronze-50: #fcf7ee;
+	--color-bronze-100: #f5e8d0;
+	--color-bronze-200: #e9d09e;
+	--color-bronze-300: #deb46b;
+	--color-bronze-400: #d69c49;
+	--color-bronze-500: #cd7f32;
+	--color-bronze-600: #b5622a;
+	--color-bronze-700: #974826;
+	--color-bronze-800: #7c3924;
+	--color-bronze-900: #663121;
+}
+
+.yearselected {
+	@apply bg-author-500 hover:!bg-author-600 text-white;
+}
