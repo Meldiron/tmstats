@@ -118,8 +118,8 @@ export class AppwriteService {
 		} catch {
 			await users.create(userId);
 		}
-		
-    await users.updateName(userId, name);
+
+		await users.updateName(userId, name);
 
 		const token = await users.createToken(userId);
 
