@@ -143,7 +143,7 @@ export class Daily {
 
 		let cursor = null;
 		do {
-			const queries = [sdk.Query.limit(100)];
+			const queries = [sdk.Query.limit(500)];
 
 			if (cursor) {
 				queries.push(sdk.Query.cursorAfter(cursor));
@@ -210,7 +210,7 @@ export class Daily {
 
 		let cursor = null;
 		do {
-			const queries = [sdk.Query.limit(100)];
+			const queries = [sdk.Query.limit(500)];
 
 			if (cursor) {
 				queries.push(sdk.Query.cursorAfter(cursor));
@@ -327,7 +327,7 @@ export class Daily {
 
 		let cursor = null;
 		do {
-			const queries = [sdk.Query.limit(100)];
+			const queries = [sdk.Query.limit(500)];
 
 			if (cursor) {
 				queries.push(sdk.Query.cursorAfter(cursor));
@@ -443,18 +443,22 @@ export class Daily {
 	static async getMedals(
 		userId: string,
 		db: sdk.Databases,
-		year: number,
-		month: number
+		year: number | null,
+		month: number | null
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
 		let cursor = null;
 		do {
-			const queries = [
-				sdk.Query.limit(100),
-				sdk.Query.equal('year', year),
-				sdk.Query.equal('month', month)
-			];
+			const queries = [sdk.Query.limit(500)];
+
+			if (year) {
+				queries.push(sdk.Query.equal('year', year));
+			}
+
+			if (month) {
+				queries.push(sdk.Query.equal('month', month));
+			}
 
 			if (cursor) {
 				queries.push(sdk.Query.cursorAfter(cursor));
@@ -576,18 +580,22 @@ export class Daily {
 	static async getMedalsShorts(
 		userId: string,
 		db: sdk.Databases,
-		year: number,
-		week: number
+		year: number | null,
+		week: number | null
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
 		let cursor = null;
 		do {
-			const queries = [
-				sdk.Query.limit(100),
-				sdk.Query.equal('year', year),
-				sdk.Query.equal('week', week)
-			];
+			const queries = [sdk.Query.limit(500)];
+
+			if (year) {
+				queries.push(sdk.Query.equal('year', year));
+			}
+
+			if (week) {
+				queries.push(sdk.Query.equal('week', week));
+			}
 
 			if (cursor) {
 				queries.push(sdk.Query.cursorAfter(cursor));
@@ -630,13 +638,17 @@ export class Daily {
 	static async getMedalsCampaign(
 		userId: string,
 		db: sdk.Databases,
-		campaignUid: string
+		campaignUid: string | null
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
 		let cursor = null;
 		do {
-			const queries = [sdk.Query.limit(100), sdk.Query.equal('campaignUid', campaignUid)];
+			const queries = [sdk.Query.limit(500)];
+
+			if (campaignUid) {
+				queries.push(sdk.Query.equal('campaignUid', campaignUid));
+			}
 
 			if (cursor) {
 				queries.push(sdk.Query.cursorAfter(cursor));

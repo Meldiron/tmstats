@@ -35,6 +35,7 @@ const func = async function (context: any) {
 		.setKey(context.req.headers['x-appwrite-key'] as string);
 
 	const nadeoAuth = Deno.env.get('NADE_AUTH') as string;
+	const isDevelopmentMode = !!Deno.env.get('DEVELOPMENT_MODE');
 
 	if (!Auth.Live) {
 		Auth.Live = new Auth(db, 'NadeoLiveServices', nadeoAuth);
@@ -50,9 +51,14 @@ const func = async function (context: any) {
 		return context.res.json({ message: "This action requires 'userId'.", code: 500 });
 	}
 
-	let newMedals: any[];
+	let newMedals: any;
 
-	if (payload.type === 'cotd') {
+	if (isDevelopmentMode && payload.type === 'all') {
+		newMedals = {};
+		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(payload.userId, db, null, null)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(payload.userId, db, null)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedals(payload.userId, db, null, null)) };
+	} else if (payload.type === 'cotd') {
 		if (!payload.year) {
 			return context.res.json({ message: "This action requires 'year'.", code: 500 });
 		}
