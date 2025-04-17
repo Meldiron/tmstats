@@ -1,21 +1,11 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { AppwriteService } from '$lib/appwrite';
+	import { goto, invalidateAll } from '$app/navigation';
 
 	let { data } = $props();
 
 	(async () => {
-		if (!data.token) {
-			return;
-		}
-
-		try {
-			await AppwriteService.createSession(data.token.userId, data.token.secret);
-			await goto('/oauth/callback-authorize?path=' + encodeURIComponent(data.path));
-		} catch (error) {
-			await goto(data.path);
-			console.error(error);
-		}
+		await invalidateAll();
+		await goto(data.path);
 	})();
 </script>
 
