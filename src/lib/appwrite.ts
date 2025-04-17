@@ -317,8 +317,66 @@ export class AppwriteService {
 		return [];
 	}
 
+	static async nadeoActionAll(): Promise<boolean> {
+		try {
+			const execInterval = setInterval(() => {
+				Toastify({
+					...toastConfig,
+					style: {
+						background: '#3b82f6'
+					},
+					duration: 2800,
+					stopOnFocus: false,
+					text: 'Your profile update is still being processed ...'
+				}).showToast();
+			}, 3000);
+
+			let res = await functions.createExecution(
+				'nadeoAction',
+				JSON.stringify({
+					type: 'all'
+				}),
+				true
+			);
+
+			do {
+				res = await functions.getExecution('nadeoAction', res.$id);
+
+				await new Promise((res) => setTimeout(() => res(true), 1000));
+			} while (res.status === 'processing' || res.status === 'pending');
+
+			if (execInterval) {
+				clearInterval(execInterval);
+			}
+
+			if (res.responseStatusCode >= 400) {
+				throw new Error('An internal error occured.');
+			}
+
+			Toastify({
+				...toastConfig,
+				text: 'Medals successfully updated.',
+				style: {
+					background: '#14b583'
+				}
+			}).showToast();
+
+			return true;
+		} catch (err: unknown) {
+			let msg = err instanceof Error ? err.message : 'An unknown error occurred';
+
+			msg = 'Could not update profile: ' + msg;
+
+			Toastify({
+				...toastConfig,
+				text: msg
+			}).showToast();
+		}
+
+		return false;
+	}
+
 	static async nadeoAction(
-		profileId: string,
 		type: string,
 		year?: number,
 		month?: number,
@@ -341,7 +399,6 @@ export class AppwriteService {
 			const res = await functions.createExecution(
 				'nadeoAction',
 				JSON.stringify({
-					userId: profileId,
 					year,
 					week,
 					month,

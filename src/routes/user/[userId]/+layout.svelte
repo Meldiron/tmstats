@@ -1,5 +1,8 @@
 <script>
+	import { invalidateAll } from '$app/navigation';
+	import { AppwriteService, toastConfig } from '$lib/appwrite.js';
 	import Instructions from '$lib/instructions.svelte';
+	import Toastify from 'toastify-js';
 
 	let { children, data } = $props();
 
@@ -26,6 +29,32 @@
 			activeCategory = '';
 		}
 	});
+
+	let isSynchronizing = $state(false);
+	async function onSynchronize() {
+		if (isSynchronizing) {
+			return;
+		}
+
+		isSynchronizing = true;
+
+		try {
+			Toastify({
+				...toastConfig,
+				style: {
+					background: '#3b82f6'
+				},
+				duration: 2800,
+				stopOnFocus: false,
+				text: 'Sync of entire profile takes few minutes.'
+			}).showToast();
+
+			await AppwriteService.nadeoActionAll();
+			await invalidateAll();
+		} finally {
+			isSynchronizing = false;
+		}
+	}
 </script>
 
 <div class="mx-auto mt-6 w-full max-w-5xl">
@@ -54,6 +83,17 @@
 			</h1>
 		</div>
 		<div class="flex items-center justify-center space-x-3">
+			<div>
+				<button
+					aria-label="Synchronize data"
+					disabled={isSynchronizing}
+					onclick={onSynchronize}
+					class="rounded-tl-2xl rounded-br-2xl bg-gray-700 px-4 py-3 text-sm font-semibold text-white enabled:hover:bg-gray-600 disabled:opacity-50"
+				>
+					Sync
+				</button>
+			</div>
+
 			<div
 				class="bg-author-500 text-author-800 flex h-10 w-10 items-center justify-center rounded-full text-xs"
 			>

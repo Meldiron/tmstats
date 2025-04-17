@@ -35,7 +35,6 @@ const func = async function (context: any) {
 		.setKey(context.req.headers['x-appwrite-key'] as string);
 
 	const nadeoAuth = Deno.env.get('NADE_AUTH') as string;
-	const isDevelopmentMode = !!Deno.env.get('DEVELOPMENT_MODE');
 
 	if (!Auth.Live) {
 		Auth.Live = new Auth(db, 'NadeoLiveServices', nadeoAuth);
@@ -47,17 +46,13 @@ const func = async function (context: any) {
 		await Auth.Game.load();
 	}
 
-	if (!payload.userId) {
-		return context.res.json({ message: "This action requires 'userId'.", code: 500 });
-	}
-
 	let newMedals: any;
 
-	if (isDevelopmentMode && payload.type === 'all') {
+	if (payload.type === 'all') {
 		newMedals = {};
-		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(payload.userId, db, null, null)) };
-		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(payload.userId, db, null)) };
-		newMedals = { ...newMedals, ...(await Daily.getMedals(payload.userId, db, null, null)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null)) };
 	} else if (payload.type === 'cotd') {
 		if (!payload.year) {
 			return context.res.json({ message: "This action requires 'year'.", code: 500 });
@@ -67,7 +62,7 @@ const func = async function (context: any) {
 			return context.res.json({ message: "This action requires 'month'.", code: 500 });
 		}
 
-		newMedals = await Daily.getMedals(payload.userId, db, payload.year, payload.month);
+		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month);
 	} else if (payload.type === 'shorts') {
 		if (!payload.year) {
 			return context.res.json({ message: "This action requires 'year'.", code: 500 });
@@ -76,13 +71,13 @@ const func = async function (context: any) {
 			return context.res.json({ message: "This action requires 'week'.", code: 500 });
 		}
 
-		newMedals = await Daily.getMedalsShorts(payload.userId, db, payload.year, payload.week);
+		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week);
 	} else if (payload.type === 'campaign') {
 		if (!payload.campaignUid) {
 			return context.res.json({ message: "This action requires 'campaignUid'.", code: 500 });
 		}
 
-		newMedals = await Daily.getMedalsCampaign(payload.userId, db, payload.campaignUid);
+		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid);
 	} else {
 		return context.res.json({
 			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', or 'campaign'.",
@@ -92,7 +87,7 @@ const func = async function (context: any) {
 
 	const tmRes = await (
 		await getAxiod()
-	).get('https://trackmania.io/api/player/' + payload.userId, {
+	).get('https://trackmania.io/api/player/' + appwriteUserId, {
 		headers: {
 			'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com'
 		}
@@ -100,7 +95,7 @@ const func = async function (context: any) {
 	const nickname = tmRes?.data?.displayname ?? 'Unknown';
 
 	try {
-		const docRes = await db.getDocument('default', 'profiles', payload.userId);
+		const docRes = await db.getDocument('default', 'profiles', appwriteUserId);
 		const docMedals = JSON.parse(docRes.medals);
 		for (const key of Object.keys(docMedals)) {
 			if (!newMedals[key]) {
@@ -146,12 +141,12 @@ const func = async function (context: any) {
 	};
 
 	try {
-		const docRes = await db.getDocument('default', 'profiles', payload.userId);
+		const docRes = await db.getDocument('default', 'profiles', appwriteUserId);
 		const docId = docRes.$id;
 
 		await db.updateDocument('default', 'profiles', docId, newDocData);
 	} catch (_err) {
-		await db.createDocument('default', 'profiles', payload.userId, newDocData);
+		await db.createDocument('default', 'profiles', appwriteUserId, newDocData);
 	}
 
 	return context.res.json({

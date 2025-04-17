@@ -13,7 +13,6 @@
 			canSynchronize={data.user && data.user.$id === data.profile.$id ? true : false}
 			nadeoAction={async () => {
 				return await AppwriteService.nadeoAction(
-					data.profile.$id,
 					'campaign',
 					undefined,
 					undefined,
