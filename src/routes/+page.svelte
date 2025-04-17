@@ -86,6 +86,8 @@
 			isLeaderboardLoading = false;
 		}
 	}
+
+	let isOauthStarted = $state(false);
 </script>
 
 <div class="mx-auto mt-6 w-full max-w-5xl">
@@ -99,7 +101,7 @@
 
 			<div class="flex flex-col gap-3 sm:flex-row">
 				<a
-					class="bg-author-500 hover:bg-author-600 rounded-tl-3xl rounded-br-3xl px-6 py-2 font-bold text-white"
+					class="bg-author-500 hover:bg-author-600 rounded-tl-3xl rounded-br-3xl px-6 py-2 text-center font-bold text-white"
 					href={`/user/${data.user.$id}/cotd`}
 				>
 					My profile</a
@@ -125,12 +127,15 @@
 			<p class="mb-3">To access, update, and syhcornize your profile, you need to be signed in.</p>
 
 			<div class="flex flex-col gap-3 sm:flex-row">
-				<a
-					href="/oauth/redirect?path=PLACEHOLDER_USER_PROFILE"
-					class="bg-author-500 hover:bg-author-600 rounded-tl-3xl rounded-br-3xl px-6 py-2 font-bold text-white"
-				>
-					Sign in with Trackmania</a
-				>
+				<a href="/oauth/redirect?path=PLACEHOLDER_USER_PROFILE">
+					<button
+						class=" bg-author-500 active:hover:bg-author-600 rounded-tl-3xl rounded-br-3xl px-6 py-2 text-center font-bold text-white disabled:opacity-50"
+						onclick={() => (isOauthStarted = true)}
+						disabled={isOauthStarted}
+					>
+						Sign in with Trackmania
+					</button>
+				</a>
 			</div>
 		</div>
 	{/if}
@@ -195,7 +200,7 @@
 						<a aria-label="Visit profile" href={'/user/' + record.$id + '/cotd'}>
 							<button
 								aria-label="Visit profile"
-								class="bg-author-500 hover:bg-author-600 translate-y-[2px] transform rounded-tl-lg rounded-br-lg p-[2px] font-bold text-white"
+								class="bg-author-500 hover:bg-author-600 translate-y-[2px] transform rounded-tl-lg rounded-br-lg p-[2px] text-center font-bold text-white"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -287,7 +292,7 @@
 
 			<button
 				type="submit"
-				class="bg-author-500 hover:bg-author-600 rounded-tl-3xl rounded-br-3xl px-6 py-2 font-bold text-white"
+				class="bg-author-500 hover:bg-author-600 rounded-tl-3xl rounded-br-3xl px-6 py-2 text-center font-bold text-white"
 			>
 				<p class="m-0 p-0">Visit Profile</p>
 			</button>
