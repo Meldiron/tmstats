@@ -102,8 +102,8 @@
 			class="mx-auto mt-6 flex flex-col items-center justify-between space-y-4 rounded-tl-3xl rounded-br-3xl border border-blue-700 bg-blue-500 p-4 text-white sm:flex-row sm:space-y-0"
 		>
 			<p class="max-w-xl">
-				If this is your profile, sign in with your Trackmania account and you will gain access to
-				synchronize medals.
+				Sign in with your Trackmania account and you will gain access to synchronize medals. You can
+				also add your own profile for free.
 			</p>
 
 			<div>

@@ -82,6 +82,26 @@ export class AppwriteService {
 		await account.createSession(userId, secret);
 	}
 
+	static async serverSetupProfile(apiKey: string, id: string, nickname: string) {
+		const client = new ServerClient();
+		client.setEndpoint('https://cloud.appwrite.io/v1').setProject('tmStats').setKey(apiKey);
+		const database = new ServerDatabases(client);
+
+		try {
+			await database.getDocument<AppwriteProfile>('default', 'profiles', id);
+		} catch {
+			await database.createDocument('default', 'profiles', id, {
+				medals: JSON.stringify({}),
+				score: 0,
+				gold: 0,
+				author: 0,
+				bronze: 0,
+				silver: 0,
+				nickname
+			});
+		}
+	}
+
 	static async serverStoreCredentials(
 		apiKey: string,
 		userId: string,

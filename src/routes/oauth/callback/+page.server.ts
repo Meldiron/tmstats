@@ -12,10 +12,13 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const urlParams = new URLSearchParams(url.search);
 	const code = urlParams.get('code');
-	const pathEncoded = urlParams.get('state');
-	const path = decodeURIComponent(pathEncoded ?? '');
+	let pathEncoded = urlParams.get('state');
+	let path = decodeURIComponent(pathEncoded ?? '');
 
 	if (!code) {
+		if (pathEncoded === 'PLACEHOLDER_USER_PROFILE') {
+			pathEncoded = '';
+		}
 		redirect(301, '/oauth/redirect?path=' + pathEncoded);
 	}
 
@@ -67,7 +70,13 @@ export const load: PageServerLoad = async ({ url }) => {
 		expireAt
 	);
 
+	await AppwriteService.serverSetupProfile(APPWRITE_API_KEY, userId, displayName);
+
 	const token = await AppwriteService.serverCreateSession(APPWRITE_API_KEY, userId, displayName);
+
+	if (path === 'PLACEHOLDER_USER_PROFILE') {
+		path = '/user/' + userId + '/cotd';
+	}
 
 	return {
 		token,
