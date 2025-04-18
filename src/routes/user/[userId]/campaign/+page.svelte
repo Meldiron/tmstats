@@ -10,7 +10,7 @@
 	{#each data.campaigns as campaign (campaign.uid)}
 		{@const season = campaign.uid.split('-')[0]}
 		<Card
-			canSynchronize={data.user && data.user.$id === data.profile.$id ? true : false}
+			canSynchronize={data.user && data.user.$id === data.profile.$id}
 			nadeoAction={async () => {
 				return await AppwriteService.nadeoAction(
 					'campaign',

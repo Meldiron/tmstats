@@ -24,7 +24,7 @@
 <div class="mt-6 grid grid-cols-12 gap-6">
 	{#each data.months as month (month.uid)}
 		<Card
-			canSynchronize={data.user && data.user.$id === data.profile.$id ? true : false}
+			canSynchronize={data.user && data.user.$id === data.profile.$id}
 			nadeoAction={async () => {
 				return await AppwriteService.nadeoAction(
 					'cotd',

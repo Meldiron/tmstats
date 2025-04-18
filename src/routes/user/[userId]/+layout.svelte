@@ -83,16 +83,18 @@
 			</h1>
 		</div>
 		<div class="flex items-center justify-center space-x-3">
-			<div>
-				<button
-					aria-label="Synchronize data"
-					disabled={isSynchronizing}
-					onclick={onSynchronize}
-					class="rounded-tl-2xl rounded-br-2xl bg-gray-700 px-4 py-3 text-sm font-semibold text-white enabled:hover:bg-gray-600 disabled:opacity-50"
-				>
-					Sync
-				</button>
-			</div>
+			{#if data.user && data.user.$id === data.profile.$id}
+				<div>
+					<button
+						aria-label="Synchronize data"
+						disabled={isSynchronizing}
+						onclick={onSynchronize}
+						class="rounded-tl-2xl rounded-br-2xl bg-gray-700 px-4 py-3 text-sm font-semibold text-white enabled:hover:bg-gray-600 disabled:opacity-50"
+					>
+						Sync
+					</button>
+				</div>
+			{/if}
 
 			<div
 				class="bg-author-500 text-author-800 flex h-10 w-10 items-center justify-center rounded-full text-xs"
@@ -137,26 +139,26 @@
 		</div>
 	</div>
 
-	{#if !data.user}
+	{#if new Date(data.profile.$updatedAt).getTime() < Date.now() - 1000 * 60 * 60 * 24}
 		<div
 			class="mx-auto mt-6 flex flex-col items-center justify-between space-y-4 rounded-tl-3xl rounded-br-3xl border border-blue-700 bg-blue-500 p-4 text-white sm:flex-row sm:space-y-0"
 		>
-			<p class="max-w-xl">
-				Sign in with your Trackmania account and you will gain access to synchronize medals. You can
-				also add your own profile for free.
+			<p class="max-w-lg">
+				This profile has not been updated in last 24 hours. It might be missing medals, or have them
+				out of date.
 			</p>
 
-			<div>
-				<a
-					href={`/oauth/redirect?path=${encodeURIComponent('/user/' + data.profile.$id) + '/cotd'}`}
-				>
+			{#if data.user && data.user.$id === data.profile.$id}
+				<div>
 					<button
+						disabled={isSynchronizing}
+						onclick={onSynchronize}
 						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl bg-white px-6 py-2 font-bold text-nowrap text-slate-600 hover:bg-slate-100"
 					>
-						<p class="m-0 p-0">Sign in with Trackmania</p>
+						<p class="m-0 p-0">Synchronize medals</p>
 					</button>
-				</a>
-			</div>
+				</div>
+			{/if}
 		</div>
 	{/if}
 
