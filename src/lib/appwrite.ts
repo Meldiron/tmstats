@@ -396,7 +396,7 @@ export class AppwriteService {
 				}).showToast();
 			}, 3000);
 
-			const res = await functions.createExecution(
+			let res = await functions.createExecution(
 				'nadeoAction',
 				JSON.stringify({
 					year,
@@ -405,31 +405,26 @@ export class AppwriteService {
 					type,
 					campaignUid
 				}),
-				false
+				true
 			);
+
+			const terminalStatuses = ['completed', 'failed', 'cancelled'];
+			do {
+				res = await functions.getExecution('nadeoAction', res.$id);
+				await new Promise((r) => setTimeout(() => r(true), 1000));
+			} while (!terminalStatuses.includes(res.status));
 
 			if (execInterval) {
 				clearInterval(execInterval);
 			}
 
 			if (res.responseStatusCode >= 400) {
-				try {
-					const json = JSON.parse(res.responseBody);
-					throw new Error(json.message);
-				} catch {
-					throw new Error(res.responseBody);
-				}
-			}
-
-			const json = JSON.parse(res.responseBody);
-
-			if (json.code >= 400) {
-				throw new Error(json.message);
-			}
+				throw new Error('An internal error occured.');
+      }
 
 			Toastify({
 				...toastConfig,
-				text: json.message,
+				text: 'Medals updated successfully.',
 				style: {
 					background: '#14b583'
 				}
