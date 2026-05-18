@@ -20,11 +20,28 @@ let db: sdk.Databases = null as any;
 const func = async function (context: any) {
 	if (!Deno.env.get('NADE_AUTH')) {
 		return context.res.json({ message: 'Missing environment variables', code: 500 });
-	}
+  }
 
-	const appwriteUserId = context.req.headers['x-appwrite-user-id'] as string;
+  context.log(context.req.bodyText);
+  context.log('---');
 
 	const payload = JSON.parse(context.req.bodyText || '{}');
+
+  let appwriteUserId = context.req.headers['x-appwrite-user-id'] as string;
+
+  context.log(payload);
+
+	if (payload.adminPassword) {
+		if (payload.adminPassword !== Deno.env.get('ADMIN_PASSWORD')) {
+			return context.res.json({ message: 'Invalid admin password.', code: 403 });
+		}
+
+		if (!payload.userId) {
+			return context.res.json({ message: "This action requires 'userId' when using admin password.", code: 500 });
+		}
+
+		appwriteUserId = payload.userId;
+	}
 
 	client = new sdk.Client();
 	db = new sdk.Databases(client);
