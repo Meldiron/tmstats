@@ -445,7 +445,8 @@ export class Daily {
 		db: sdk.Databases,
 		year: number | null,
 		month: number | null,
-		existingMedals: any = {}
+		existingMedals: any = {},
+		onProgress?: (data: any) => void | Promise<void>
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -491,7 +492,26 @@ export class Daily {
 
 		const responseData: any = {};
 
-		const mapScores = await Daily.getMapScores(db, userId, mapIdList);
+		const mapScores = await Daily.getMapScores(
+			db,
+			userId,
+			mapIdList,
+			onProgress
+				? async (partialRecords) => {
+						const partialResponse: any = {};
+						for (const mapId in partialRecords) {
+							const mapInfo = mapData[mapId];
+							if (mapInfo) {
+								partialResponse[mapInfo] = {
+									medal: partialRecords[mapId].medal,
+									time: partialRecords[mapId].time
+								};
+							}
+						}
+						await onProgress(partialResponse);
+					}
+				: undefined
+		);
 
 		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
@@ -505,7 +525,12 @@ export class Daily {
 		return responseData;
 	}
 
-	static async getMapScores(db: sdk.Databases, userId: string, mapIdList: string[]) {
+	static async getMapScores(
+		db: sdk.Databases,
+		userId: string,
+		mapIdList: string[],
+		onProgress?: (records: any) => void | Promise<void>
+	) {
 		let oauth: null | OAuth = null;
 		try {
 			// Use OAuth for quick fetch
@@ -549,23 +574,21 @@ export class Daily {
 						time: record.time
 					};
 				}
-			}
-		} else {
-			const batchSize = 50;
-			const mapIdBatches: string[][] = [];
-			for (let i = 0; i < mapIdList.length; i += batchSize) {
-				mapIdBatches.push(mapIdList.slice(i, i + batchSize));
-			}
 
-			for (const mapIdBatch of mapIdBatches) {
-				console.log('Fetching ' + mapIdBatch.join(','));
+				if (onProgress) {
+					await onProgress({ ...records });
+				}
+			}
+    } else {
+      for (const mapId of mapIdList) {
+        console.log('Fetching ' + mapId);
 				const medalsRes = await (
 					await getAxiod()
 				).get(
 					'https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=' +
 						userId +
 						'&mapIdList=' +
-						mapIdBatch.join(','),
+						mapId,
 					{
 						headers: {
 							'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
@@ -575,14 +598,20 @@ export class Daily {
 						}
 					}
 				);
+      
+				const medalData = medalsRes.data[0];
+      
+				if (medalData) {
+          records[mapId] = {
+            medal: medalData.medal,
+            time: medalData.recordScore.time
+          };
 
-				for (const record of medalsRes.data) {
-					records[record.mapId] = {
-						medal: record.medal,
-						time: record.recordScore.time
-					};
-				}
-			}
+          if (onProgress) {
+            await onProgress({ ...records });
+          }
+        }
+      }
 		}
 
 		return records;
@@ -593,7 +622,8 @@ export class Daily {
 		db: sdk.Databases,
 		year: number | null,
 		week: number | null,
-		existingMedals: any = {}
+		existingMedals: any = {},
+		onProgress?: (data: any) => void | Promise<void>
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -639,7 +669,26 @@ export class Daily {
 
 		const responseData: any = {};
 
-		const mapScores = await Daily.getMapScores(db, userId, mapIdList);
+		const mapScores = await Daily.getMapScores(
+			db,
+			userId,
+			mapIdList,
+			onProgress
+				? async (partialRecords) => {
+						const partialResponse: any = {};
+						for (const mapId in partialRecords) {
+							const mapInfo = mapData[mapId];
+							if (mapInfo) {
+								partialResponse[mapInfo] = {
+									medal: partialRecords[mapId].medal,
+									time: partialRecords[mapId].time
+								};
+							}
+						}
+						await onProgress(partialResponse);
+					}
+				: undefined
+		);
 
 		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
@@ -657,7 +706,8 @@ export class Daily {
 		userId: string,
 		db: sdk.Databases,
 		campaignUid: string | null,
-		existingMedals: any = {}
+		existingMedals: any = {},
+		onProgress?: (data: any) => void | Promise<void>
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -699,7 +749,26 @@ export class Daily {
 
 		const responseData: any = {};
 
-		const mapScores = await Daily.getMapScores(db, userId, mapIdList);
+		const mapScores = await Daily.getMapScores(
+			db,
+			userId,
+			mapIdList,
+			onProgress
+				? async (partialRecords) => {
+						const partialResponse: any = {};
+						for (const mapId in partialRecords) {
+							const mapInfo = mapData[mapId];
+							if (mapInfo) {
+								partialResponse[mapInfo] = {
+									medal: partialRecords[mapId].medal,
+									time: partialRecords[mapId].time
+								};
+							}
+						}
+						await onProgress(partialResponse);
+					}
+				: undefined
+		);
 
 		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];

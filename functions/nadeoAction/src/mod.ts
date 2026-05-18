@@ -63,7 +63,7 @@ const func = async function (context: any) {
 		await Auth.Game.load();
 	}
 
-	let newMedals: any;
+	let newMedals: any = {};
 	let existingMedals: any = {};
 
 	try {
@@ -71,43 +71,6 @@ const func = async function (context: any) {
 		existingMedals = JSON.parse(docRes.medals);
 	} catch (_err) {
 		// OK
-	}
-
-	if (payload.type === 'all') {
-		newMedals = {};
-		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null, existingMedals)) };
-		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null, existingMedals)) };
-		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null, existingMedals)) };
-	} else if (payload.type === 'cotd') {
-		if (!payload.year) {
-			return context.res.json({ message: "This action requires 'year'.", code: 500 });
-		}
-
-		if (!payload.month) {
-			return context.res.json({ message: "This action requires 'month'.", code: 500 });
-		}
-
-		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month, existingMedals);
-	} else if (payload.type === 'shorts') {
-		if (!payload.year) {
-			return context.res.json({ message: "This action requires 'year'.", code: 500 });
-		}
-		if (!payload.week) {
-			return context.res.json({ message: "This action requires 'week'.", code: 500 });
-		}
-
-		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week, existingMedals);
-	} else if (payload.type === 'campaign') {
-		if (!payload.campaignUid) {
-			return context.res.json({ message: "This action requires 'campaignUid'.", code: 500 });
-		}
-
-		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid, existingMedals);
-	} else {
-		return context.res.json({
-			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', or 'campaign'.",
-			code: 500
-		});
 	}
 
 	const tmRes = await (
@@ -119,54 +82,93 @@ const func = async function (context: any) {
 	});
 	const nickname = tmRes?.data?.displayname ?? 'Unknown';
 
-	for (const key of Object.keys(existingMedals)) {
-		if (!newMedals[key]) {
-			newMedals[key] = existingMedals[key];
+	const saveProgress = async (partialMedals: any) => {
+		newMedals = { ...newMedals, ...partialMedals };
+
+		const mergedMedals = { ...existingMedals, ...newMedals };
+
+		let score = 0;
+		let gold = 0;
+		let author = 0;
+		let silver = 0;
+		let bronze = 0;
+
+		for (const key in mergedMedals) {
+			const medal = mergedMedals[key].medal;
+
+			if (medal === 1) {
+				bronze++;
+				score += 1;
+			} else if (medal === 2) {
+				silver++;
+				score += 2;
+			} else if (medal === 3) {
+				gold++;
+				score += 4;
+			} else if (medal === 4) {
+				author++;
+				score += 12;
+			}
 		}
-	}
 
-	let score = 0;
-	let gold = 0;
-	let author = 0;
-	let silver = 0;
-	let bronze = 0;
+		const newDocData = {
+			medals: JSON.stringify(mergedMedals),
+			score,
+			gold,
+			author,
+			bronze,
+			silver,
+			nickname
+		};
 
-	for (const key in newMedals) {
-		const medal = newMedals[key].medal;
+		try {
+			const docRes = await db.getDocument('default', 'profiles', appwriteUserId);
+			const docId = docRes.$id;
 
-		if (medal === 1) {
-			bronze++;
-			score += 1;
-		} else if (medal === 2) {
-			silver++;
-			score += 2;
-		} else if (medal === 3) {
-			gold++;
-			score += 4;
-		} else if (medal === 4) {
-			author++;
-			score += 12;
+			await db.updateDocument('default', 'profiles', docId, newDocData);
+		} catch (_err) {
+			await db.createDocument('default', 'profiles', appwriteUserId, newDocData);
 		}
-	}
-
-	const newDocData = {
-		medals: JSON.stringify(newMedals),
-		score,
-		gold,
-		author,
-		bronze,
-		silver,
-		nickname
 	};
 
-	try {
-		const docRes = await db.getDocument('default', 'profiles', appwriteUserId);
-		const docId = docRes.$id;
+	if (payload.type === 'all') {
+		newMedals = {};
+		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null, existingMedals, saveProgress)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+	} else if (payload.type === 'cotd') {
+		if (!payload.year) {
+			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+		}
 
-		await db.updateDocument('default', 'profiles', docId, newDocData);
-	} catch (_err) {
-		await db.createDocument('default', 'profiles', appwriteUserId, newDocData);
+		if (!payload.month) {
+			return context.res.json({ message: "This action requires 'month'.", code: 500 });
+		}
+
+		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month, existingMedals, saveProgress);
+	} else if (payload.type === 'shorts') {
+		if (!payload.year) {
+			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+		}
+		if (!payload.week) {
+			return context.res.json({ message: "This action requires 'week'.", code: 500 });
+		}
+
+		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week, existingMedals, saveProgress);
+	} else if (payload.type === 'campaign') {
+		if (!payload.campaignUid) {
+			return context.res.json({ message: "This action requires 'campaignUid'.", code: 500 });
+		}
+
+		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid, existingMedals, saveProgress);
+	} else {
+		return context.res.json({
+			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', or 'campaign'.",
+			code: 500
+		});
 	}
+
+	await saveProgress({});
 
 	return context.res.json({
 		message: 'Profile successfully updated!'
