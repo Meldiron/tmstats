@@ -1,26 +1,27 @@
-<div class="mt-6 rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-4">
-	<h1 class="mb-3 text-2xl font-bold text-black">How to Read Data?</h1>
+<div class="mt-6 rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-5">
+	<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+		<div>
+			<h2 class="text-lg font-bold text-gray-900">Points scoring</h2>
+			<p class="text-xs text-gray-500">Points per medal tier</p>
+		</div>
 
-	<div class="prose">
-		<p>Cells on website follow same color pallete as medals in Trackmania game.</p>
-		<ul>
-			<li class="text-author-500">
-				Green is <b class="font-bold">Author Medal</b> worth <b class="font-bold">12 points</b>
-			</li>
-			<li class="text-gold-600">
-				Yellow is <b class="font-bold">Gold Medal</b> worth <b class="font-bold">4 points</b>
-			</li>
-			<li class="text-silver-500">
-				White is <b class="font-bold">Silver Medal</b> worth <b class="font-bold">2 points</b>
-			</li>
-			<li class="text-bronze-500">
-				Orange is <b class="font-bold">Bronze Medal</b> worth <b class="font-bold">1 points</b>
-			</li>
-		</ul>
-
-		<p>
-			New data is not fetched automatically. To request a data update, use 'reload' button. This
-			usually takes less than a minute.
-		</p>
+		<div class="grid grid-cols-4 gap-3">
+			<div class="flex flex-col items-center gap-1.5 rounded-xl bg-author-50 px-3 py-3">
+				<img src="/author.png" class="h-6 w-6" alt="Author" />
+				<span class="text-xs font-bold text-author-700">12 pts</span>
+			</div>
+			<div class="flex flex-col items-center gap-1.5 rounded-xl bg-gold-50 px-3 py-3">
+				<img src="/gold.png" class="h-6 w-6" alt="Gold" />
+				<span class="text-xs font-bold text-gold-700">4 pts</span>
+			</div>
+			<div class="flex flex-col items-center gap-1.5 rounded-xl bg-silver-50 px-3 py-3">
+				<img src="/silver.png" class="h-6 w-6" alt="Silver" />
+				<span class="text-xs font-bold text-silver-700">2 pts</span>
+			</div>
+			<div class="flex flex-col items-center gap-1.5 rounded-xl bg-bronze-50 px-3 py-3">
+				<img src="/bronze.png" class="h-6 w-6" alt="Bronze" />
+				<span class="text-xs font-bold text-bronze-700">1 pt</span>
+			</div>
+		</div>
 	</div>
 </div>
