@@ -1,4 +1,4 @@
-import { AppwriteService } from '$lib/appwrite';
+import { AppwriteService, type AppwriteProfile } from '$lib/appwrite';
 import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async ({ params, url }) => {
@@ -8,14 +8,19 @@ export const load: LayoutLoad = async ({ params, url }) => {
 		return {
 			profile: {
 				$id: params.userId,
+				$collectionId: '',
+				$databaseId: '',
+				$createdAt: '',
+				$updatedAt: '',
+				$permissions: [],
 				silver: 0,
 				bronze: 0,
 				gold: 0,
 				author: 0,
 				nickname: 'NOT FOUND',
 				score: 0,
-				medals: {}
-			},
+				medals: '{}'
+			} as AppwriteProfile,
 			path: url.pathname
 		};
 	}

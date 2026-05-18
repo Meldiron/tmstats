@@ -8,6 +8,12 @@
 
 	const categories = [
 		{
+			id: 'overview',
+			name: 'Overview',
+			url: '',
+			current: false
+		},
+		{
 			id: 'cotd',
 			name: 'Track of the day',
 			url: '/cotd',
@@ -19,7 +25,12 @@
 
 	let activeCategory = $state('');
 	$effect(() => {
-		if (data.path.includes('cotd')) {
+		if (
+			data.path === '/user/' + data.profile.$id ||
+			data.path === '/user/' + data.profile.$id + '/'
+		) {
+			activeCategory = 'overview';
+		} else if (data.path.includes('cotd')) {
 			activeCategory = 'cotd';
 		} else if (data.path.includes('shorts')) {
 			activeCategory = 'shorts';
@@ -139,7 +150,7 @@
 		</div>
 	</div>
 
-	{#if new Date(data.profile.$updatedAt).getTime() < Date.now() - 1000 * 60 * 60 * 24}
+	{#if data.profile.$updatedAt && new Date(data.profile.$updatedAt).getTime() < Date.now() - 1000 * 60 * 60 * 24}
 		<div
 			class="mx-auto mt-6 flex flex-col items-center justify-between space-y-4 rounded-tl-3xl rounded-br-3xl border border-blue-700 bg-blue-500 p-4 text-white sm:flex-row sm:space-y-0"
 		>
