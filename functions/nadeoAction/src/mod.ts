@@ -47,12 +47,20 @@ const func = async function (context: any) {
 	}
 
 	let newMedals: any;
+	let existingMedals: any = {};
+
+	try {
+		const docRes = await db.getDocument('default', 'profiles', appwriteUserId);
+		existingMedals = JSON.parse(docRes.medals);
+	} catch (_err) {
+		// OK
+	}
 
 	if (payload.type === 'all') {
 		newMedals = {};
-		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null)) };
-		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null)) };
-		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null, existingMedals)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null, existingMedals)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null, existingMedals)) };
 	} else if (payload.type === 'cotd') {
 		if (!payload.year) {
 			return context.res.json({ message: "This action requires 'year'.", code: 500 });
@@ -62,7 +70,7 @@ const func = async function (context: any) {
 			return context.res.json({ message: "This action requires 'month'.", code: 500 });
 		}
 
-		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month);
+		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month, existingMedals);
 	} else if (payload.type === 'shorts') {
 		if (!payload.year) {
 			return context.res.json({ message: "This action requires 'year'.", code: 500 });
@@ -71,13 +79,13 @@ const func = async function (context: any) {
 			return context.res.json({ message: "This action requires 'week'.", code: 500 });
 		}
 
-		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week);
+		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week, existingMedals);
 	} else if (payload.type === 'campaign') {
 		if (!payload.campaignUid) {
 			return context.res.json({ message: "This action requires 'campaignUid'.", code: 500 });
 		}
 
-		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid);
+		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid, existingMedals);
 	} else {
 		return context.res.json({
 			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', or 'campaign'.",
@@ -94,16 +102,10 @@ const func = async function (context: any) {
 	});
 	const nickname = tmRes?.data?.displayname ?? 'Unknown';
 
-	try {
-		const docRes = await db.getDocument('default', 'profiles', appwriteUserId);
-		const docMedals = JSON.parse(docRes.medals);
-		for (const key of Object.keys(docMedals)) {
-			if (!newMedals[key]) {
-				newMedals[key] = docMedals[key];
-			}
+	for (const key of Object.keys(existingMedals)) {
+		if (!newMedals[key]) {
+			newMedals[key] = existingMedals[key];
 		}
-	} catch (_err) {
-		// OK
 	}
 
 	let score = 0;

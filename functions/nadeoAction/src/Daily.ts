@@ -444,7 +444,8 @@ export class Daily {
 		userId: string,
 		db: sdk.Databases,
 		year: number | null,
-		month: number | null
+		month: number | null,
+		existingMedals: any = {}
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -474,13 +475,19 @@ export class Daily {
 			}
 		} while (cursor !== null);
 
-		const mapIdList = downloadedMaps.map((d: any) => d.mapid);
-
 		const mapData: any = {};
 
 		downloadedMaps.forEach((map: any) => {
 			mapData[map.mapid] = 'cotd-' + map.key;
 		});
+
+		const mapIdList = downloadedMaps
+			.map((d: any) => d.mapid)
+			.filter((mapId: string) => {
+				const key = mapData[mapId];
+				const existing = existingMedals[key];
+				return !existing || existing.medal !== 4;
+			});
 
 		const responseData: any = {};
 
@@ -544,15 +551,21 @@ export class Daily {
 				}
 			}
 		} else {
-			for (const mapId of mapIdList) {
-				console.log('Fetching ' + mapId);
+			const batchSize = 50;
+			const mapIdBatches: string[][] = [];
+			for (let i = 0; i < mapIdList.length; i += batchSize) {
+				mapIdBatches.push(mapIdList.slice(i, i + batchSize));
+			}
+
+			for (const mapIdBatch of mapIdBatches) {
+				console.log('Fetching ' + mapIdBatch.join(','));
 				const medalsRes = await (
 					await getAxiod()
 				).get(
 					'https://prod.trackmania.core.nadeo.online/mapRecords/?accountIdList=' +
 						userId +
 						'&mapIdList=' +
-						mapId,
+						mapIdBatch.join(','),
 					{
 						headers: {
 							'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
@@ -563,12 +576,10 @@ export class Daily {
 					}
 				);
 
-				const medalData = medalsRes.data[0];
-
-				if (medalData) {
-					records[mapId] = {
-						medal: medalData.medal,
-						time: medalData.recordScore.time
+				for (const record of medalsRes.data) {
+					records[record.mapId] = {
+						medal: record.medal,
+						time: record.recordScore.time
 					};
 				}
 			}
@@ -581,7 +592,8 @@ export class Daily {
 		userId: string,
 		db: sdk.Databases,
 		year: number | null,
-		week: number | null
+		week: number | null,
+		existingMedals: any = {}
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -611,13 +623,19 @@ export class Daily {
 			}
 		} while (cursor !== null);
 
-		const mapIdList = downloadedMaps.map((d: any) => d.mapid);
-
 		const mapData: any = {};
 
 		downloadedMaps.forEach((map: any) => {
 			mapData[map.mapid] = 'shorts-' + map.key;
 		});
+
+		const mapIdList = downloadedMaps
+			.map((d: any) => d.mapid)
+			.filter((mapId: string) => {
+				const key = mapData[mapId];
+				const existing = existingMedals[key];
+				return !existing || existing.medal !== 4;
+			});
 
 		const responseData: any = {};
 
@@ -638,7 +656,8 @@ export class Daily {
 	static async getMedalsCampaign(
 		userId: string,
 		db: sdk.Databases,
-		campaignUid: string | null
+		campaignUid: string | null,
+		existingMedals: any = {}
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -664,13 +683,19 @@ export class Daily {
 			}
 		} while (cursor !== null);
 
-		const mapIdList = downloadedMaps.map((d: any) => d.mapid);
-
 		const mapData: any = {};
 
 		downloadedMaps.forEach((map: any) => {
 			mapData[map.mapid] = 'campaign-' + map.key;
 		});
+
+		const mapIdList = downloadedMaps
+			.map((d: any) => d.mapid)
+			.filter((mapId: string) => {
+				const key = mapData[mapId];
+				const existing = existingMedals[key];
+				return !existing || existing.medal !== 4;
+			});
 
 		const responseData: any = {};
 
