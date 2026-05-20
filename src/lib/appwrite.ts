@@ -339,11 +339,11 @@ export class AppwriteService {
 				true
 			);
 
+			const terminalStatuses = ['completed', 'failed', 'cancelled'];
 			do {
 				res = await functions.getExecution('nadeoAction', res.$id);
-
-				await new Promise((res) => setTimeout(() => res(true), 1000));
-			} while (res.status === 'processing' || res.status === 'pending');
+				await new Promise((r) => setTimeout(() => r(true), 1000));
+			} while (!terminalStatuses.includes(res.status));
 
 			if (execInterval) {
 				clearInterval(execInterval);
