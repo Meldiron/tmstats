@@ -17,6 +17,7 @@ export interface CategoryStats {
 	completionPercent: number;
 	score: number;
 	finishedGroups: number;
+	totalGroups: number;
 	authorPerfectGroups: number;
 }
 
@@ -59,6 +60,9 @@ export interface MapGroup {
 	completedCount: number;
 	totalCount: number;
 	authorCount: number;
+	goldCount: number;
+	silverCount: number;
+	bronzeCount: number;
 	isFinished: boolean;
 	isAuthorPerfect: boolean;
 }
@@ -102,7 +106,12 @@ export const RANKS: RankTier[] = [
 	{ name: 'Trackmaster II', stage: 2, threshold: 11000, color: 'author', baseRank: 'Trackmaster' },
 	{ name: 'Trackmaster III', stage: 3, threshold: 12000, color: 'author', baseRank: 'Trackmaster' },
 	{ name: 'Trackmaster IV', stage: 4, threshold: 13000, color: 'author', baseRank: 'Trackmaster' },
-	{ name: 'Trackmaster V', stage: 5, threshold: 14000, color: 'author', baseRank: 'Trackmaster' }
+	{ name: 'Trackmaster V', stage: 5, threshold: 14000, color: 'author', baseRank: 'Trackmaster' },
+	{ name: 'Legend I', stage: 1, threshold: 16000, color: 'red', baseRank: 'Legend' },
+	{ name: 'Legend II', stage: 2, threshold: 18000, color: 'red', baseRank: 'Legend' },
+	{ name: 'Legend III', stage: 3, threshold: 20000, color: 'red', baseRank: 'Legend' },
+	{ name: 'Legend IV', stage: 4, threshold: 22500, color: 'red', baseRank: 'Legend' },
+	{ name: 'Legend V', stage: 5, threshold: 25000, color: 'red', baseRank: 'Legend' }
 ];
 
 export const MONTH_NAMES = [
@@ -189,6 +198,7 @@ export function countCategoryMedals(
 		completionPercent: totalMaps > 0 ? completedMaps / totalMaps : 0,
 		score,
 		finishedGroups: 0,
+		totalGroups: 0,
 		authorPerfectGroups: 0
 	};
 }
@@ -211,6 +221,9 @@ export function getGroups(
 				completedCount: 0,
 				totalCount: 0,
 				authorCount: 0,
+				goldCount: 0,
+				silverCount: 0,
+				bronzeCount: 0,
 				isFinished: false,
 				isAuthorPerfect: false
 			});
@@ -222,6 +235,9 @@ export function getGroups(
 		if (entry) {
 			group.completedCount++;
 			if (entry.medal === 4) group.authorCount++;
+			else if (entry.medal === 3) group.goldCount++;
+			else if (entry.medal === 2) group.silverCount++;
+			else if (entry.medal === 1) group.bronzeCount++;
 		}
 	}
 
@@ -365,15 +381,15 @@ export function getAllAchievements(
 			icon: 'globe',
 			tier: 'silver',
 			unlocked:
-				hasCategoryMedals('cotd') && hasCategoryMedals('shorts') && hasCategoryMedals('campaign')
+				hasCategoryMedals('totd') && hasCategoryMedals('shorts') && hasCategoryMedals('campaign')
 		},
 		{
 			id: 'daily-driver',
 			name: 'Daily Driver',
-			description: 'Complete 100% of any COTD month',
+			description: 'Complete 100% of any track of the day month',
 			icon: 'calendar',
 			tier: 'gold',
-			unlocked: (categories.cotd?.finishedGroups ?? 0) > 0
+			unlocked: (categories.totd?.finishedGroups ?? 0) > 0
 		},
 		{
 			id: 'weekly-warrior',
@@ -448,7 +464,7 @@ export function getNextMilestones(
 	const milestones: Milestone[] = [];
 
 	// Score milestones
-	const scoreTargets = [500, 1000, 2000, 5000, 10000, 20000];
+	const scoreTargets = [500, 1000, 2000, 5000, 10000, 16000, 20000, 25000];
 	const nextScore = scoreTargets.find((t) => t > profile.score);
 	if (nextScore)
 		milestones.push({
@@ -485,7 +501,7 @@ export function getNextMilestones(
 	for (const [catId, cat] of Object.entries(categories)) {
 		if (cat.completionPercent < 1) {
 			milestones.push({
-				label: `Complete all ${catId === 'cotd' ? 'COTD' : catId === 'shorts' ? 'Shorts' : 'Campaign'} maps`,
+				label: `Complete all ${catId === 'totd' ? 'Track of the day' : catId === 'shorts' ? 'Shorts' : 'Campaign'} maps`,
 				current: cat.completedMaps,
 				target: cat.totalMaps,
 				unit: 'maps',
@@ -509,12 +525,12 @@ export function computeGamification(
 ) {
 	const medals = (profile.medals as unknown as Record<string, MedalEntry>) || {};
 
-	const cotdStats = countCategoryMedals(dailyMaps, 'cotd', medals);
+	const totdStats = countCategoryMedals(dailyMaps, 'cotd', medals);
 	const shortsStats = countCategoryMedals(weeklyMaps, 'shorts', medals);
 	const campaignStats = countCategoryMedals(campaignMaps, 'campaign', medals);
 
 	// Compute perfect groups
-	const cotdGroups = getGroups(dailyMaps, medals, 'cotd', (m) => {
+	const totdGroups = getGroups(dailyMaps, medals, 'cotd', (m) => {
 		return {
 			id: `${m.month}-${m.year}`,
 			name: `${MONTH_NAMES[m.month - 1]} ${m.year}`
@@ -531,19 +547,23 @@ export function computeGamification(
 		};
 	});
 
-	cotdStats.finishedGroups = cotdGroups.filter((g) => g.isFinished).length;
+	totdStats.finishedGroups = totdGroups.filter((g) => g.isFinished).length;
 	shortsStats.finishedGroups = shortsGroups.filter((g) => g.isFinished).length;
 	campaignStats.finishedGroups = campaignGroups.filter((g) => g.isFinished).length;
 
-	cotdStats.authorPerfectGroups = cotdGroups.filter((g) => g.isAuthorPerfect).length;
+	totdStats.totalGroups = totdGroups.length;
+	shortsStats.totalGroups = shortsGroups.length;
+	campaignStats.totalGroups = campaignGroups.length;
+
+	totdStats.authorPerfectGroups = totdGroups.filter((g) => g.isAuthorPerfect).length;
 	shortsStats.authorPerfectGroups = shortsGroups.filter((g) => g.isAuthorPerfect).length;
 	campaignStats.authorPerfectGroups = campaignGroups.filter((g) => g.isAuthorPerfect).length;
 
-	const categories = { cotd: cotdStats, shorts: shortsStats, campaign: campaignStats };
+	const categories = { totd: totdStats, shorts: shortsStats, campaign: campaignStats };
 
 	const totalMaps = dailyMaps.length + weeklyMaps.length + campaignMaps.length;
 	const completedMaps =
-		cotdStats.completedMaps + shortsStats.completedMaps + campaignStats.completedMaps;
+		totdStats.completedMaps + shortsStats.completedMaps + campaignStats.completedMaps;
 
 	const silverPlus = profile.silver + profile.gold + profile.author;
 	const goldPlus = profile.gold + profile.author;
@@ -564,14 +584,14 @@ export function computeGamification(
 	const rank = getRank(profile.score);
 	const level = getLevel(profile.score);
 
-	const allGroups = [...cotdGroups, ...shortsGroups, ...campaignGroups];
+	const allGroups = [...totdGroups, ...shortsGroups, ...campaignGroups];
 	const achievements = getAllAchievements(profile, medals, categories, totalMaps, completedMaps);
 	const nextMilestones = getNextMilestones(profile, categories, totalMaps, completedMaps);
 
 	// Best/worst category
 	const catEntries: [string, CategoryStats][] = Object.entries(categories);
-	let bestCategory: [string, CategoryStats] = ['cotd', cotdStats];
-	let worstCategory: [string, CategoryStats] = ['cotd', cotdStats];
+	let bestCategory: [string, CategoryStats] = ['totd', totdStats];
+	let worstCategory: [string, CategoryStats] = ['totd', totdStats];
 
 	if (catEntries.length > 0) {
 		bestCategory = catEntries.reduce((a, b) =>
@@ -583,7 +603,7 @@ export function computeGamification(
 	}
 
 	// Year-level groups for COTD
-	const cotdYearGroups = getGroups(dailyMaps, medals, 'cotd', (m) => {
+	const totdYearGroups = getGroups(dailyMaps, medals, 'totd', (m) => {
 		return { id: String(m.year), name: String(m.year) };
 	});
 
@@ -596,8 +616,8 @@ export function computeGamification(
 
 	// Unfinished business: top unfinished groups across all categories, sorted globally by completion %
 	const unfinishedBusiness = [
-		...getUnfinished(cotdGroups, 3),
-		...getUnfinished(cotdYearGroups, 3),
+		...getUnfinished(totdGroups, 3),
+		...getUnfinished(totdYearGroups, 3),
 		...getUnfinished(shortsGroups, 3),
 		...getUnfinished(campaignGroups, 3)
 	]
@@ -613,7 +633,7 @@ export function computeGamification(
 		achievements,
 		nextMilestones,
 		finishedGroups: [
-			{ label: 'Finished Months', count: cotdStats.finishedGroups, total: cotdGroups.length },
+			{ label: 'Finished Months', count: totdStats.finishedGroups, total: totdGroups.length },
 			{ label: 'Finished Weeks', count: shortsStats.finishedGroups, total: shortsGroups.length },
 			{
 				label: 'Finished Campaigns',

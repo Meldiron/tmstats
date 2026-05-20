@@ -75,7 +75,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const token = await AppwriteService.serverCreateSession(APPWRITE_API_KEY, userId, displayName);
 
 	if (path === 'PLACEHOLDER_USER_PROFILE') {
-		path = '/user/' + userId + '/cotd';
+		path = '/user/' + userId + '/';
 	}
 
 	return {

@@ -17,7 +17,7 @@
 
 			const id = await AppwriteService.getId(userName);
 			if (id) {
-				goto('/user/' + id + '/cotd');
+				goto('/user/' + id + '/');
 			}
 		} finally {
 			isLoading = false;
@@ -52,7 +52,7 @@
 			}).showToast();
 			return;
 		}
-		goto('/user/' + userId + '/cotd');
+		goto('/user/' + userId + '/');
 	}
 	function isAccountId(id: string): boolean {
 		const regexp = new RegExp(
@@ -102,7 +102,7 @@
 			<div class="flex flex-col gap-3 sm:flex-row">
 				<a
 					class="bg-author-500 hover:bg-author-600 rounded-tl-3xl rounded-br-3xl px-6 py-2 text-center font-bold text-white"
-					href={`/user/${data.user.$id}/cotd`}
+					href={`/user/${data.user.$id}/`}
 				>
 					My profile</a
 				>
@@ -197,7 +197,7 @@
 							<button class="ml-2 text-sm leading-4 text-gray-500">{record.score} points</button>
 						</div>
 
-						<a aria-label="Visit profile" href={'/user/' + record.$id + '/cotd'}>
+						<a aria-label="Visit profile" href={'/user/' + record.$id + '/'}>
 							<button
 								aria-label="Visit profile"
 								class="bg-author-500 hover:bg-author-600 translate-y-[2px] transform rounded-tl-lg rounded-br-lg p-[2px] text-center font-bold text-white"

@@ -20,8 +20,8 @@
 			<span
 				class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600 uppercase"
 			>
-				{milestone.category === 'cotd'
-					? 'COTD'
+				{milestone.category === 'totd'
+					? 'Track of the day'
 					: milestone.category === 'shorts'
 						? 'Shorts'
 						: 'Campaign'}

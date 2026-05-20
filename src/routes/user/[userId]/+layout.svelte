@@ -14,9 +14,9 @@
 			current: false
 		},
 		{
-			id: 'cotd',
+			id: 'totd',
 			name: 'Track of the day',
-			url: '/cotd',
+			url: '/totd',
 			current: false
 		},
 		{ id: 'shorts', name: 'Weekly shorts', url: '/shorts', current: true },
@@ -30,8 +30,8 @@
 			data.path === '/user/' + data.profile.$id + '/'
 		) {
 			activeCategory = 'overview';
-		} else if (data.path.includes('cotd')) {
-			activeCategory = 'cotd';
+		} else if (data.path.includes('totd')) {
+			activeCategory = 'totd';
 		} else if (data.path.includes('shorts')) {
 			activeCategory = 'shorts';
 		} else if (data.path.includes('campaign')) {
@@ -149,29 +149,6 @@
 			</div>
 		</div>
 	</div>
-
-	{#if data.profile.$updatedAt && new Date(data.profile.$updatedAt).getTime() < Date.now() - 1000 * 60 * 60 * 24}
-		<div
-			class="mx-auto mt-6 flex flex-col items-center justify-between space-y-4 rounded-tl-3xl rounded-br-3xl border border-blue-700 bg-blue-500 p-4 text-white sm:flex-row sm:space-y-0"
-		>
-			<p class="">
-				This profile has not been updated in last 24 hours. It might be missing medals, or have them
-				out of date.
-			</p>
-
-			{#if data.user && data.user.$id === data.profile.$id}
-				<div>
-					<button
-						disabled={isSynchronizing}
-						onclick={onSynchronize}
-						class="flex items-center justify-center space-x-3 rounded-tl-3xl rounded-br-3xl bg-white px-6 py-2 font-bold text-nowrap text-slate-600 hover:bg-slate-100"
-					>
-						<p class="m-0 p-0">Synchronize medals</p>
-					</button>
-				</div>
-			{/if}
-		</div>
-	{/if}
 
 	{@render children()}
 

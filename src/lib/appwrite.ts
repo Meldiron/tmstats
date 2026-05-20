@@ -285,7 +285,7 @@ export class AppwriteService {
 
 			Toastify({
 				...toastConfig,
-				text: 'Could not load cup of the day maps: ' + msg
+				text: 'Could not load track of the day maps: ' + msg
 			}).showToast();
 
 			return [];

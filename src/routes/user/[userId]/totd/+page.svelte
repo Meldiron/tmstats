@@ -5,30 +5,42 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const monthNames = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
 </script>
 
 <div class="mt-6 grid grid-cols-12 gap-6">
-	{#await data.campaigns}
+	{#await data.months}
 		{#each Array(9) as _}
 			<SkeletonCard />
 		{/each}
-	{:then campaigns}
-		{#each campaigns as campaign (campaign.uid)}
-			{@const season = campaign.uid.split('-')[0]}
+	{:then months}
+		{#each months as month (month.uid)}
 			<Card
 				canSynchronize={data.user && data.user.$id === data.profile.$id}
 				nadeoAction={async () => {
 					return await AppwriteService.nadeoAction(
-						'campaign',
-						undefined,
-						undefined,
-						undefined,
-						campaign.uid
+						'cotd',
+						+month.uid.split('-')[1],
+						+month.uid.split('-')[0]
 					);
 				}}
-				medalType="campaign"
-				maps={campaign.maps}
-				title={`${String(season).charAt(0).toUpperCase()}${String(season).slice(1)} ${campaign.uid.split('-')[1]}`}
+				medalType="cotd"
+				maps={month.maps}
+				title={`${monthNames[Number(month.uid.split('-')[0]) - 1]} ${month.uid.split('-')[1]}`}
 				subtitle=""
 				medals={data.profile.medals}
 			/>

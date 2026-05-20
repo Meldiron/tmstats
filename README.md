@@ -8,9 +8,8 @@ TMStats is a medal tracker that shows overview of all Trackmania medals an user 
 
 Project focuses on multiple aspects and features:
 
-- [x] Track of the day (TOTD) medals
-- [x] Campaign medals
-- [x] Weekly shorts medals
+- [ ] Weekly grands
+- [ ] Warrior medals and Champion medals
 - [ ] Custom map medals
 - [ ] Gamified achievement & quests system
 

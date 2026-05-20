@@ -21,20 +21,22 @@
 
 	const stageDots = [1, 2, 3, 4, 5];
 
-	const baseRankOrder = ['Rookie', 'Challenger', 'Professional', 'Elite', 'Trackmaster'];
+	const baseRankOrder = ['Rookie', 'Challenger', 'Professional', 'Elite', 'Trackmaster', 'Legend'];
 	const baseRankColors: Record<string, string> = {
 		Rookie: 'text-gray-800',
 		Challenger: 'text-bronze-600',
 		Professional: 'text-silver-600',
 		Elite: 'text-gold-600',
-		Trackmaster: 'text-author-600'
+		Trackmaster: 'text-author-600',
+		Legend: 'text-red-600'
 	};
 	const baseRankBg: Record<string, string> = {
 		Rookie: 'bg-gray-500',
 		Challenger: 'bg-bronze-500',
 		Professional: 'bg-silver-500',
 		Elite: 'bg-gold-500',
-		Trackmaster: 'bg-author-500'
+		Trackmaster: 'bg-author-500',
+		Legend: 'bg-red-500'
 	};
 </script>
 
@@ -77,7 +79,7 @@
 				</div>
 
 				<p class="mb-4 text-sm text-gray-500">
-					Advance through 5 base ranks, each with 5 stages. Earn score by collecting medals to climb
+					Advance through 6 base ranks, each with 5 stages. Earn score by collecting medals to climb
 					higher.
 				</p>
 

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import ProgressBar from './ProgressBar.svelte';
+	import SegmentedBar from './SegmentedBar.svelte';
 	import type { CategoryStats } from './gamification';
 	interface Props {
-		category: 'cotd' | 'shorts' | 'campaign';
+		category: 'totd' | 'shorts' | 'campaign';
 		stats: CategoryStats;
 	}
 	let { category, stats }: Props = $props();
 
 	const catLabel: Record<string, string> = {
-		cotd: 'Track of the Day',
+		totd: 'Track of the Day',
 		shorts: 'Weekly Shorts',
 		campaign: 'Campaign'
 	};
@@ -29,12 +29,13 @@
 		>
 	</div>
 
-	<ProgressBar
-		value={stats.completedMaps}
-		max={stats.totalMaps}
-		color="author"
+	<SegmentedBar
+		author={stats.author}
+		gold={stats.gold}
+		silver={stats.silver}
+		bronze={stats.bronze}
+		total={stats.totalMaps}
 		height="h-3"
-		showLabel={false}
 	/>
 
 	<div class="mt-3 grid grid-cols-4 gap-2 text-center">
@@ -65,7 +66,9 @@
 		</div>
 		<div class="text-center">
 			<p class="text-xs text-gray-500">Finished Groups</p>
-			<p class="text-sm font-bold text-gray-900">{stats.finishedGroups}</p>
+			<p class="text-sm font-bold text-gray-900">
+				{stats.finishedGroups} <span class="font-normal text-gray-400">/ {stats.totalGroups}</span>
+			</p>
 		</div>
 		<div class="text-center">
 			<p class="text-xs text-gray-500">Score</p>

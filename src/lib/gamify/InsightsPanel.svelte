@@ -14,7 +14,7 @@
 	let { insights, finishedGroups }: Props = $props();
 
 	const catNames: Record<string, string> = {
-		cotd: 'Track of the Day',
+		totd: 'Track of the Day',
 		shorts: 'Weekly Shorts',
 		campaign: 'Campaign'
 	};
@@ -117,8 +117,8 @@
 						<div class="mb-1 flex items-center justify-between">
 							<span class="text-sm font-bold text-gray-900">{group.name}</span>
 							<span class="text-xs font-medium text-gray-500">
-								{group.category === 'cotd'
-									? 'COTD'
+								{group.category === 'totd'
+									? 'Track of the day'
 									: group.category === 'shorts'
 										? 'Shorts'
 										: 'Campaign'}
@@ -126,7 +126,7 @@
 						</div>
 						<div class="mb-1 flex justify-between text-xs text-gray-500">
 							<span>{group.completedCount} / {group.totalCount} maps</span>
-							<span>{Math.round((group.completedCount / group.totalCount) * 100)}%</span>
+							<span>{Math.floor((group.completedCount / group.totalCount) * 100)}%</span>
 						</div>
 						<div class="h-2 w-full overflow-hidden rounded-full bg-gray-200">
 							<div
