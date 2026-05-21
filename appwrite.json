@@ -533,7 +533,7 @@
 			"ignore": ["node_modules", ".npm"],
 			"events": [],
 			"schedule": "",
-			"timeout": 600,
+			"timeout": 900,
 			"buildSpecification": "s-4vcpu-4gb",
 			"runtimeSpecification": "s-4vcpu-4gb",
 			"deploymentRetention": 0,

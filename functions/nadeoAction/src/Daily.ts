@@ -242,7 +242,7 @@ export class Daily {
 						Accept: 'application/json'
 					}
 				}
-			);
+      );
 
 			if (weeklyRes.data.campaignList.length === 0) {
 				break;
@@ -566,7 +566,7 @@ export class Daily {
 							'Content-Type': 'application/json'
 						}
 					}
-				);
+        );
 
 				for (const record of medalsRes.data) {
 					records[record.mapId] = {

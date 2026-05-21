@@ -51,12 +51,13 @@
 								>
 							</span>
 						</div>
-						<ProgressBar
-							value={g.overall.completedMaps}
-							max={g.overall.totalMaps}
-							color="author"
+						<SegmentedBar
+							author={g.overall.author}
+							gold={g.overall.gold}
+							silver={g.overall.silver}
+							bronze={g.overall.bronze}
+							total={g.overall.totalMaps}
 							height="h-2"
-							showLabel={false}
 						/>
 					</div>
 
@@ -78,7 +79,7 @@
 						<ProgressBar
 							value={g.overall.silverPlus}
 							max={g.overall.totalMaps}
-							color="author"
+							color="silver"
 							height="h-2"
 							showLabel={false}
 						/>
@@ -102,7 +103,7 @@
 						<ProgressBar
 							value={g.overall.goldPlus}
 							max={g.overall.totalMaps}
-							color="author"
+							color="gold"
 							height="h-2"
 							showLabel={false}
 						/>
