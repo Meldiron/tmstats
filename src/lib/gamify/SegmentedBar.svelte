@@ -14,9 +14,9 @@
 	const segments = [
 		{ count: author, color: 'bg-[#14b583]' },
 		{ count: gold, color: 'bg-[#ffd700]' },
-		{ count: silver, color: 'bg-[#e0e0e0]' },
+		{ count: silver, color: 'bg-[#c8c8c8]' },
 		{ count: bronze, color: 'bg-[#cd7f32]' },
-		{ count: noMedal, color: 'bg-gray-700' }
+		{ count: noMedal, color: 'bg-gray-50' }
 	];
 
 	function pct(count: number) {

@@ -20,9 +20,9 @@
 	const segments = [
 		{ label: 'Author', count: overall.author, color: 'bg-[#14b583]', text: 'text-[#14b583]' },
 		{ label: 'Gold', count: overall.gold, color: 'bg-[#ffd700]', text: 'text-[#ffd700]' },
-		{ label: 'Silver', count: overall.silver, color: 'bg-[#e0e0e0]', text: 'text-[#9a9a9a]' },
+		{ label: 'Silver', count: overall.silver, color: 'bg-[#c8c8c8]', text: 'text-[#9a9a9a]' },
 		{ label: 'Bronze', count: overall.bronze, color: 'bg-[#cd7f32]', text: 'text-[#cd7f32]' },
-		{ label: 'No Medal', count: noMedal, color: 'bg-gray-700', text: 'text-gray-500' }
+		{ label: 'No Medal', count: noMedal, color: 'bg-gray-50', text: 'text-gray-500' }
 	];
 
 	function pct(count: number) {
