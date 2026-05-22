@@ -742,57 +742,37 @@ export class Daily {
 
 	static async getMapScoresGrand(
 		db: sdk.Databases,
+		userId: string,
 		maps: any[],
 		onProgress?: (records: any) => void | Promise<void>
 	) {
 		const records: any = {};
 
-		const batchSize = 50;
-		for (let i = 0; i < maps.length; i += batchSize) {
-			const batch = maps.slice(i, i + batchSize);
-
-			console.log('Leaderboard-fetching ' + batch.map((m) => m.mapUid).join(','));
+		for (const map of maps) {
+			console.log('Fetching grand record for map ' + map.mapid);
 
 			const res = await (
 				await getAxiod()
-			).post(
-				'https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/map',
-				{
-					maps: batch.map((map) => ({
-						mapUid: map.mapUid,
-						groupUid: 'Personal_Best'
-					}))
-				},
+			).get(
+				`https://prod.trackmania.core.nadeo.online/v2/mapRecords/by-account/?accountIdList=${userId}&mapId=${map.mapid}&gameMode=TimeAttackClone`,
 				{
 					headers: {
 						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
-						Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
+						Authorization: 'nadeo_v1 t=' + (await Auth.Game.getToken()),
 						Accept: 'application/json',
 						'Content-Type': 'application/json'
 					}
 				}
 			);
 
-			for (const record of res.data) {
-				const map = batch.find((m) => m.mapUid === record.mapUid);
-				if (map) {
-					const score = record.score;
-					let medal = 0;
-					if (score <= map.authorScore) {
-						medal = 4;
-					} else if (score <= map.goldScore) {
-						medal = 3;
-					} else if (score <= map.silverScore) {
-						medal = 2;
-					} else if (score <= map.bronzeScore) {
-						medal = 1;
-					}
+			const recordArray = Array.isArray(res.data) ? res.data : [];
+			const record = recordArray[0];
 
-					records[map.mapid] = {
-						medal,
-						time: score
-					};
-				}
+			if (record) {
+				records[map.mapid] = {
+					medal: record.medal,
+					time: record.recordScore?.time ?? 0
+				};
 			}
 
 			if (onProgress) {
@@ -927,11 +907,11 @@ export class Daily {
 		const mapData: any = {};
 
 		downloadedMaps.forEach((map: any) => {
-			mapData[map.mapUid] = 'grand-' + map.key;
+			mapData[map.mapid] = 'grand-' + map.key;
 		});
 
 		const mapList = downloadedMaps.filter((map: any) => {
-			const key = mapData[map.mapUid];
+			const key = mapData[map.mapid];
 			const existing = existingMedals[key];
 			return !existing || existing.medal !== 4;
 		});
@@ -940,6 +920,7 @@ export class Daily {
 
 		const mapScores = await Daily.getMapScoresGrand(
 			db,
+			userId,
 			mapList,
 			onProgress
 				? async (partialRecords) => {
