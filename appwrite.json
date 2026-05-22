@@ -374,6 +374,128 @@
 			"indexes": []
 		},
 		{
+			"$id": "weeklyGrandMaps",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "weeklyGrandMaps",
+			"enabled": true,
+			"documentSecurity": false,
+			"attributes": [
+				{
+					"key": "mapid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "mapUid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "week",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "silverScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "thumbnailUrl",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 2048,
+					"default": null
+				},
+				{
+					"key": "bronzeScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "collectionName",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "goldScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "name",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "key",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null
+				},
+				{
+					"key": "authorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "year",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "position",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				}
+			],
+			"indexes": []
+		},
+		{
 			"$id": "campaignMaps",
 			"$permissions": ["read(\"any\")"],
 			"databaseId": "default",
@@ -552,6 +674,9 @@
 			"ignore": ["node_modules", ".npm"],
 			"events": [],
 			"schedule": "3 * * * *",
+			"buildSpecification": "s-4vcpu-4gb",
+			"runtimeSpecification": "s-4vcpu-4gb",
+			"deploymentRetention": 0,
 			"timeout": 300,
 			"enabled": true,
 			"logging": true,

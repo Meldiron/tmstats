@@ -134,6 +134,7 @@ const func = async function (context: any) {
 	if (payload.type === 'all') {
 		newMedals = {};
 		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+		newMedals = { ...newMedals, ...(await Daily.getMedalsWeeklyGrand(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
 		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null, existingMedals, saveProgress)) };
 		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
 	} else if (payload.type === 'cotd') {
@@ -155,6 +156,12 @@ const func = async function (context: any) {
 		}
 
 		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week, existingMedals, saveProgress);
+	} else if (payload.type === 'grands') {
+		if (!payload.year) {
+			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+		}
+
+		newMedals = await Daily.getMedalsWeeklyGrand(appwriteUserId, db, payload.year, payload.week ?? null, existingMedals, saveProgress);
 	} else if (payload.type === 'campaign') {
 		if (!payload.campaignUid) {
 			return context.res.json({ message: "This action requires 'campaignUid'.", code: 500 });
@@ -163,7 +170,7 @@ const func = async function (context: any) {
 		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid, existingMedals, saveProgress);
 	} else {
 		return context.res.json({
-			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', or 'campaign'.",
+			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', 'grands', or 'campaign'.",
 			code: 500
 		});
 	}

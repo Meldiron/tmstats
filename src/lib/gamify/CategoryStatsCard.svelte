@@ -2,7 +2,7 @@
 	import SegmentedBar from './SegmentedBar.svelte';
 	import type { CategoryStats } from './gamification';
 	interface Props {
-		category: 'totd' | 'shorts' | 'campaign';
+		category: 'totd' | 'shorts' | 'grands' | 'campaign';
 		stats: CategoryStats;
 	}
 	let { category, stats }: Props = $props();
@@ -10,6 +10,7 @@
 	const catLabel: Record<string, string> = {
 		totd: 'Track of the Day',
 		shorts: 'Weekly Shorts',
+		grands: 'Weekly Grands',
 		campaign: 'Campaign'
 	};
 

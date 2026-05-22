@@ -2,7 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import type { AppwriteMap } from './appwrite';
 
-	const { title, subtitle, maps, medals, medalType, nadeoAction, canSynchronize } = $props();
+	const { title, subtitle, maps, medals, medalType, nadeoAction, canSynchronize, fullWidth = false, subdued = false } = $props();
 
 	let isLoading = $state(false);
 	async function load() {
@@ -178,10 +178,16 @@
 {/if}
 
 <section
-	class="relative col-span-6 rounded-tl-3xl rounded-br-3xl border border-gray-900 bg-gray-800 p-4 sm:col-span-6 md:col-span-4 lg:col-span-4"
+	class={[
+		'relative',
+		'col-span-6 sm:col-span-6 md:col-span-4 lg:col-span-4',
+			subdued
+				? 'rounded-tl-2xl rounded-br-2xl border border-slate-600/40 bg-slate-700/60 p-3'
+				: 'rounded-tl-3xl rounded-br-3xl border border-gray-900 bg-gray-800 p-4'
+	].join(' ')}
 >
 	<div class="flex items-center justify-between">
-		<h3 class="text-2xl font-bold text-gray-200">
+		<h3 class={subdued ? 'text-sm font-semibold text-slate-300' : 'text-2xl font-bold text-gray-200'}>
 			{title}
 		</h3>
 		{#if canSynchronize}
@@ -215,16 +221,10 @@
 		<h4 class="-mt-1 mb-3 font-semibold text-gray-400">{subtitle}</h4>
 	{/if}
 
-	<div class="mt-4 flex flex-wrap gap-x-[0.35rem]">
+	<div class="mt-4" class:flex-wrap={!fullWidth} class:gap-x-[0.35rem]={!fullWidth} class:flex={!fullWidth}>
 		{#each maps as map (map['$id'])}
 			{@const medal = medals[medalType + '-' + map.key]?.medal ?? 0}
-			<div class="group relative">
-				<div
-					class="absolute bottom-[calc(100%+0.5rem)] z-20 hidden rounded-tl-xl rounded-br-xl border border-slate-600 bg-slate-900 px-3 py-1 text-center whitespace-nowrap text-white group-hover:block"
-				>
-					{map.name}
-				</div>
-
+			{#if fullWidth}
 				<button
 					onclick={(event) => openModal(event, map)}
 					aria-label="View map"
@@ -238,9 +238,33 @@
 									: medal === 1
 										? 'bg-[#cd7f32]'
 										: 'bg-[#374151]'
-					} h-6 w-6 rounded-tl-lg rounded-br-lg`}
+					} w-full h-10 rounded-tl-xl rounded-br-xl`}
 				></button>
-			</div>
+			{:else}
+				<div class="group relative">
+					<div
+						class="absolute bottom-[calc(100%+0.5rem)] z-20 hidden rounded-tl-xl rounded-br-xl border border-slate-600 bg-slate-900 px-3 py-1 text-center whitespace-nowrap text-white group-hover:block"
+					>
+						{map.name}
+					</div>
+
+					<button
+						onclick={(event) => openModal(event, map)}
+						aria-label="View map"
+						class={`${
+							medal === 4
+								? 'bg-[#14b583]'
+								: medal === 3
+									? 'bg-[#ffd700]'
+									: medal === 2
+										? 'bg-[#c8c8c8]'
+										: medal === 1
+											? 'bg-[#cd7f32]'
+											: 'bg-[#374151]'
+						} h-6 w-6 rounded-tl-lg rounded-br-lg`}
+					></button>
+				</div>
+			{/if}
 		{/each}
 	</div>
 </section>

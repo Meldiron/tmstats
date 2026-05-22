@@ -320,6 +320,123 @@ export class Daily {
 		return fetchedIds;
 	}
 
+	static async fetchMissingMapsWeeklyGrand(db: sdk.Databases): Promise<any[]> {
+		const fetchedIds: any = [];
+
+		const downloadedMaps = [];
+
+		let cursor = null;
+		do {
+			const queries = [sdk.Query.limit(500)];
+
+			if (cursor) {
+				queries.push(sdk.Query.cursorAfter(cursor));
+			}
+
+			const maps = await db.listDocuments<any>('default', 'weeklyGrandMaps', queries);
+			downloadedMaps.push(...maps.documents);
+
+			if (maps.documents.length > 0) {
+				cursor = maps.documents[maps.documents.length - 1].$id;
+			} else {
+				cursor = null;
+			}
+		} while (cursor !== null);
+
+		const downloadedMapKeys = downloadedMaps.map((d: any) => d.key);
+
+		let offset = 0;
+		while (offset < 100) {
+			const weeklyRes = await (
+				await getAxiod()
+			).get(
+				'https://live-services.trackmania.nadeo.live/api/campaign/weekly-grands?length=1&offset=' +
+					offset,
+				{
+					headers: {
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
+						Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
+						Accept: 'application/json'
+					}
+				}
+			);
+
+			if (weeklyRes.data.campaignList.length === 0) {
+				break;
+			}
+
+			const { year, week } = weeklyRes.data.campaignList[0];
+
+			console.log('Fetching grand year ' + year + ', week ' + week);
+
+			for (const map of weeklyRes.data.campaignList[0].playlist) {
+				const mapUid = map.mapUid;
+				const position = map.position;
+
+				const exists = downloadedMapKeys.includes(`${position}-${week}-${year}`);
+				if (exists && offset > 1) {
+					break;
+				}
+
+				console.log('Fetching grand map ' + mapUid);
+
+				const mapIdRes = await (
+					await getAxiod()
+				).get('https://live-services.trackmania.nadeo.live/api/token/map/' + mapUid, {
+					headers: {
+						'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com',
+						Authorization: 'nadeo_v1 t=' + (await Auth.Live.getToken()),
+						Accept: 'application/json'
+					}
+				});
+
+				const mapId = mapIdRes.data.mapId;
+
+				const mapName = mapIdRes.data.name;
+				const mapThumbnail = mapIdRes.data.thumbnailUrl;
+				const mapCollection = mapIdRes.data.collectionName;
+				const mapAuthorTime = mapIdRes.data.authorTime;
+				const mapGoldTime = mapIdRes.data.goldTime;
+				const mapSilverTime = mapIdRes.data.silverTime;
+				const mapBronzeTime = mapIdRes.data.bronzeTime;
+
+				const doc = {
+					mapid: mapId,
+					mapUid: mapUid,
+					name: this.formatTMText(mapName),
+					position,
+					week,
+					year,
+					key: `${position}-${week}-${year}`,
+
+					bronzeScore: mapBronzeTime,
+
+					silverScore: mapSilverTime,
+
+					goldScore: mapGoldTime,
+
+					authorScore: mapAuthorTime,
+
+					collectionName: this.formatTMText(mapCollection),
+					thumbnailUrl: mapThumbnail
+				};
+
+				fetchedIds.push(doc.key);
+
+				try {
+					await db.getDocument('default', 'weeklyGrandMaps', doc.key);
+					await db.updateDocument('default', 'weeklyGrandMaps', doc.key, doc);
+				} catch (_err) {
+					await db.createDocument('default', 'weeklyGrandMaps', doc.key, doc);
+				}
+			}
+
+			offset++;
+		}
+
+		return fetchedIds;
+	}
+
 	static async fetchMissingMapsCampaign(db: sdk.Databases): Promise<any[]> {
 		const fetchedIds: any = [];
 
@@ -568,7 +685,13 @@ export class Daily {
 					}
         );
 
-				for (const record of medalsRes.data) {
+        console.log(await oauth.getToken());
+
+        const medalsArray = Array.isArray(medalsRes.data)
+					? medalsRes.data
+					: medalsRes.data?.medals || [];
+
+				for (const record of medalsArray) {
 					records[record.mapId] = {
 						medal: record.medal,
 						time: record.time
@@ -657,6 +780,91 @@ export class Daily {
 
 		downloadedMaps.forEach((map: any) => {
 			mapData[map.mapid] = 'shorts-' + map.key;
+		});
+
+		const mapIdList = downloadedMaps
+			.map((d: any) => d.mapid)
+			.filter((mapId: string) => {
+				const key = mapData[mapId];
+				const existing = existingMedals[key];
+				return !existing || existing.medal !== 4;
+			});
+
+		const responseData: any = {};
+
+		const mapScores = await Daily.getMapScores(
+			db,
+			userId,
+			mapIdList,
+			onProgress
+				? async (partialRecords) => {
+						const partialResponse: any = {};
+						for (const mapId in partialRecords) {
+							const mapInfo = mapData[mapId];
+							if (mapInfo) {
+								partialResponse[mapInfo] = {
+									medal: partialRecords[mapId].medal,
+									time: partialRecords[mapId].time
+								};
+							}
+						}
+						await onProgress(partialResponse);
+					}
+				: undefined
+		);
+
+		for (const mapId in mapScores) {
+			const mapInfo = mapData[mapId];
+
+			responseData[mapInfo] = {
+				medal: mapScores[mapId].medal,
+				time: mapScores[mapId].time
+			};
+		}
+
+		return responseData;
+	}
+
+	static async getMedalsWeeklyGrand(
+		userId: string,
+		db: sdk.Databases,
+		year: number | null,
+		week: number | null,
+		existingMedals: any = {},
+		onProgress?: (data: any) => void | Promise<void>
+	): Promise<any> {
+		const downloadedMaps: any[] = [];
+
+		let cursor = null;
+		do {
+			const queries = [sdk.Query.limit(500)];
+
+			if (year) {
+				queries.push(sdk.Query.equal('year', year));
+			}
+
+			if (week) {
+				queries.push(sdk.Query.equal('week', week));
+			}
+
+			if (cursor) {
+				queries.push(sdk.Query.cursorAfter(cursor));
+			}
+
+			const maps = await db.listDocuments('default', 'weeklyGrandMaps', queries);
+			downloadedMaps.push(...maps.documents);
+
+			if (maps.documents.length > 0) {
+				cursor = maps.documents[maps.documents.length - 1].$id;
+			} else {
+				cursor = null;
+			}
+		} while (cursor !== null);
+
+		const mapData: any = {};
+
+		downloadedMaps.forEach((map: any) => {
+			mapData[map.mapid] = 'grand-' + map.key;
 		});
 
 		const mapIdList = downloadedMaps

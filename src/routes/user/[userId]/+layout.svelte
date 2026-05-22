@@ -20,6 +20,7 @@
 			current: false
 		},
 		{ id: 'shorts', name: 'Weekly shorts', url: '/shorts', current: true },
+		{ id: 'grands', name: 'Weekly grands', url: '/grands', current: false },
 		{ id: 'campaign', name: 'Campaign', url: '/campaign', current: false }
 	];
 
@@ -34,6 +35,8 @@
 			activeCategory = 'totd';
 		} else if (data.path.includes('shorts')) {
 			activeCategory = 'shorts';
+		} else if (data.path.includes('grands')) {
+			activeCategory = 'grands';
 		} else if (data.path.includes('campaign')) {
 			activeCategory = 'campaign';
 		} else {

@@ -8,10 +8,10 @@ TMStats is a medal tracker that shows overview of all Trackmania medals an user 
 
 Project focuses on multiple aspects and features:
 
-- [ ] Weekly grands
+- [ ] Improved homepage
 - [ ] Warrior medals and Champion medals
-- [ ] Custom map medals
 - [ ] Gamified achievement & quests system
+- [ ] Club campaigns medals tracking
 
 As of right now, project has no business model and is fully free and open-sourced. Project generates expenses, and business model may be added in the future.
 

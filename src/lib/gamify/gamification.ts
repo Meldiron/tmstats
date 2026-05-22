@@ -377,11 +377,11 @@ export function getAllAchievements(
 		{
 			id: 'jack-trades',
 			name: 'Jack of All Trades',
-			description: 'Earn medals in all 3 categories',
+			description: 'Earn medals in all 4 categories',
 			icon: 'globe',
 			tier: 'silver',
 			unlocked:
-				hasCategoryMedals('totd') && hasCategoryMedals('shorts') && hasCategoryMedals('campaign')
+				hasCategoryMedals('totd') && hasCategoryMedals('shorts') && hasCategoryMedals('grand') && hasCategoryMedals('campaign')
 		},
 		{
 			id: 'daily-driver',
@@ -398,6 +398,14 @@ export function getAllAchievements(
 			icon: 'clock',
 			tier: 'gold',
 			unlocked: (categories.shorts?.finishedGroups ?? 0) > 0
+		},
+		{
+			id: 'grand-master',
+			name: 'Grand Master',
+			description: 'Complete 100% of any grand week',
+			icon: 'crown',
+			tier: 'gold',
+			unlocked: (categories.grands?.finishedGroups ?? 0) > 0
 		},
 		{
 			id: 'campaign-conqueror',
@@ -501,7 +509,7 @@ export function getNextMilestones(
 	for (const [catId, cat] of Object.entries(categories)) {
 		if (cat.completionPercent < 1) {
 			milestones.push({
-				label: `Complete all ${catId === 'totd' ? 'Track of the day' : catId === 'shorts' ? 'Shorts' : 'Campaign'} maps`,
+				label: `Complete all ${catId === 'totd' ? 'Track of the day' : catId === 'shorts' ? 'Shorts' : catId === 'grands' ? 'Grands' : 'Campaign'} maps`,
 				current: cat.completedMaps,
 				target: cat.totalMaps,
 				unit: 'maps',
@@ -521,12 +529,14 @@ export function computeGamification(
 	profile: AppwriteProfile,
 	dailyMaps: AppwriteDailyMaps[],
 	weeklyMaps: AppwriteWeeklyMaps[],
-	campaignMaps: AppwriteCampaignMap[]
+	campaignMaps: AppwriteCampaignMap[],
+	weeklyGrandMaps: AppwriteWeeklyMaps[] = []
 ) {
 	const medals = (profile.medals as unknown as Record<string, MedalEntry>) || {};
 
 	const totdStats = countCategoryMedals(dailyMaps, 'cotd', medals);
 	const shortsStats = countCategoryMedals(weeklyMaps, 'shorts', medals);
+	const grandStats = countCategoryMedals(weeklyGrandMaps, 'grand', medals);
 	const campaignStats = countCategoryMedals(campaignMaps, 'campaign', medals);
 
 	// Compute perfect groups
@@ -539,6 +549,9 @@ export function computeGamification(
 	const shortsGroups = getGroups(weeklyMaps, medals, 'shorts', (m) => {
 		return { id: `${m.week}-${m.year}`, name: `Week ${m.week}, ${m.year}` };
 	});
+	const grandGroups = getGroups(weeklyGrandMaps, medals, 'grand', (m) => {
+		return { id: `${m.week}-${m.year}`, name: `Week ${m.week}, ${m.year}` };
+	});
 	const campaignGroups = getGroups(campaignMaps, medals, 'campaign', (m) => {
 		const [season, year] = m.campaignUid.split('-');
 		return {
@@ -549,21 +562,24 @@ export function computeGamification(
 
 	totdStats.finishedGroups = totdGroups.filter((g) => g.isFinished).length;
 	shortsStats.finishedGroups = shortsGroups.filter((g) => g.isFinished).length;
+	grandStats.finishedGroups = grandGroups.filter((g) => g.isFinished).length;
 	campaignStats.finishedGroups = campaignGroups.filter((g) => g.isFinished).length;
 
 	totdStats.totalGroups = totdGroups.length;
 	shortsStats.totalGroups = shortsGroups.length;
+	grandStats.totalGroups = grandGroups.length;
 	campaignStats.totalGroups = campaignGroups.length;
 
 	totdStats.authorPerfectGroups = totdGroups.filter((g) => g.isAuthorPerfect).length;
 	shortsStats.authorPerfectGroups = shortsGroups.filter((g) => g.isAuthorPerfect).length;
+	grandStats.authorPerfectGroups = grandGroups.filter((g) => g.isAuthorPerfect).length;
 	campaignStats.authorPerfectGroups = campaignGroups.filter((g) => g.isAuthorPerfect).length;
 
-	const categories = { totd: totdStats, shorts: shortsStats, campaign: campaignStats };
+	const categories = { totd: totdStats, shorts: shortsStats, grands: grandStats, campaign: campaignStats };
 
-	const totalMaps = dailyMaps.length + weeklyMaps.length + campaignMaps.length;
+	const totalMaps = dailyMaps.length + weeklyMaps.length + weeklyGrandMaps.length + campaignMaps.length;
 	const completedMaps =
-		totdStats.completedMaps + shortsStats.completedMaps + campaignStats.completedMaps;
+		totdStats.completedMaps + shortsStats.completedMaps + grandStats.completedMaps + campaignStats.completedMaps;
 
 	const silverPlus = profile.silver + profile.gold + profile.author;
 	const goldPlus = profile.gold + profile.author;
@@ -584,7 +600,7 @@ export function computeGamification(
 	const rank = getRank(profile.score);
 	const level = getLevel(profile.score);
 
-	const allGroups = [...totdGroups, ...shortsGroups, ...campaignGroups];
+	const allGroups = [...totdGroups, ...shortsGroups, ...grandGroups, ...campaignGroups];
 	const achievements = getAllAchievements(profile, medals, categories, totalMaps, completedMaps);
 	const nextMilestones = getNextMilestones(profile, categories, totalMaps, completedMaps);
 
@@ -619,6 +635,7 @@ export function computeGamification(
 		...getUnfinished(totdGroups, 3),
 		...getUnfinished(totdYearGroups, 3),
 		...getUnfinished(shortsGroups, 3),
+		...getUnfinished(grandGroups, 3),
 		...getUnfinished(campaignGroups, 3)
 	]
 		.filter((g) => g.completedCount > 0 && g.completedCount < g.totalCount)
@@ -635,6 +652,7 @@ export function computeGamification(
 		finishedGroups: [
 			{ label: 'Finished Months', count: totdStats.finishedGroups, total: totdGroups.length },
 			{ label: 'Finished Weeks', count: shortsStats.finishedGroups, total: shortsGroups.length },
+			{ label: 'Finished Grands', count: grandStats.finishedGroups, total: grandGroups.length },
 			{
 				label: 'Finished Campaigns',
 				count: campaignStats.finishedGroups,

@@ -18,7 +18,8 @@
 		data.profile,
 		gamifyData.dailyMaps,
 		gamifyData.weeklyMaps,
-		gamifyData.campaignMaps
+		gamifyData.campaignMaps,
+		gamifyData.weeklyGrandMaps
 	)}
 
 	<div class="mt-6 space-y-6">
@@ -135,35 +136,14 @@
 				</div>
 			</div>
 
-			<!-- Score Summary -->
-			<div class="rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-5">
-				<div class="grid h-full grid-cols-2 gap-4">
-					<div class="col-span-2 flex flex-col justify-center text-center">
-						<p class="text-3xl font-bold text-gray-900">{g.overall.score.toLocaleString()}</p>
-						<p class="text-xs font-medium text-gray-500 uppercase">Total Score</p>
-					</div>
-					<div class="col-span-2 flex flex-col justify-center text-center">
-						<p class="text-3xl font-bold text-gray-900">{g.overall.completedMaps}</p>
-						<p class="text-xs font-medium text-gray-500 uppercase">Maps Completed</p>
-					</div>
-					{#if g.rank.next}
-						<div class="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-gray-50 py-2">
-							<span class="text-xs text-gray-500">Next rank:</span>
-							<span class="text-sm font-bold text-gray-900">{g.rank.next.name}</span>
-							<span class="text-xs text-gray-400"
-								>({g.rank.pointsToNext.toLocaleString()} pts needed)</span
-							>
-						</div>
-					{/if}
-				</div>
-			</div>
+			<CategoryStatsCard category="campaign" stats={g.categories.campaign} />
 		</div>
 
 		<!-- Category Mastery -->
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 			<CategoryStatsCard category="totd" stats={g.categories.totd} />
 			<CategoryStatsCard category="shorts" stats={g.categories.shorts} />
-			<CategoryStatsCard category="campaign" stats={g.categories.campaign} />
+			<CategoryStatsCard category="grands" stats={g.categories.grands} />
 		</div>
 
 		<!-- Medal Distribution -->
@@ -181,10 +161,12 @@
 								<span
 									class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600 uppercase"
 								>
-									{group.category === 'totd'
-										? 'Track of the day'
-										: group.category === 'shorts'
-											? 'Shorts'
+								{group.category === 'totd'
+									? 'Track of the day'
+									: group.category === 'shorts'
+										? 'Shorts'
+										: group.category === 'grand'
+											? 'Grands'
 											: 'Campaign'}
 								</span>
 							</div>

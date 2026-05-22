@@ -36,6 +36,12 @@ export type AppwriteWeeklyMaps = {
 	position: number;
 } & AppwriteMap;
 
+export type AppwriteWeeklyGrandMaps = {
+	week: number;
+	year: number;
+	position: number;
+} & AppwriteMap;
+
 export type AppwriteDailyMaps = {
 	day: number;
 	month: number;
@@ -244,6 +250,48 @@ export class AppwriteService {
 			Toastify({
 				...toastConfig,
 				text: 'Could not load weekly shorts: ' + msg
+			}).showToast();
+
+			return [];
+		}
+	}
+
+	static async getWeeklyGrandMaps() {
+		try {
+			const maps = [];
+			let cursor: null | string = null;
+
+			do {
+				const queries = [Query.limit(500), Query.orderDesc('$createdAt')];
+
+				if (cursor) {
+					queries.push(Query.cursorAfter(cursor));
+				}
+
+				const dbRes = await database.listDocuments<AppwriteWeeklyGrandMaps>(
+					'default',
+					'weeklyGrandMaps',
+					queries
+				);
+
+				maps.push(...dbRes.documents);
+
+				if (dbRes.documents.length > 0) {
+					cursor = dbRes.documents[dbRes.documents.length - 1].$id;
+				} else {
+					cursor = null;
+				}
+			} while (cursor !== null);
+
+			return maps;
+		} catch (err: unknown) {
+			console.error(err);
+
+			const msg = err instanceof Error ? err.message : 'An unknown error occurred';
+
+			Toastify({
+				...toastConfig,
+				text: 'Could not load weekly grands: ' + msg
 			}).showToast();
 
 			return [];

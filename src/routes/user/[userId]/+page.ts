@@ -5,11 +5,13 @@ export const load: PageLoad = () => {
 	const gamifyData = Promise.all([
 		AppwriteService.getDailyMaps(),
 		AppwriteService.getWeeklyMaps(),
-		AppwriteService.getCampaignMaps()
-	]).then(([dailyMaps, weeklyMaps, campaignMaps]) => ({
+		AppwriteService.getCampaignMaps(),
+		AppwriteService.getWeeklyGrandMaps()
+	]).then(([dailyMaps, weeklyMaps, campaignMaps, weeklyGrandMaps]) => ({
 		dailyMaps,
 		weeklyMaps,
-		campaignMaps
+		campaignMaps,
+		weeklyGrandMaps
 	}));
 
 	return { gamifyData };

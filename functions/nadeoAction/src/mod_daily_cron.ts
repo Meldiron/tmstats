@@ -36,11 +36,12 @@ const func = async function (context: any) {
 
 	const campaigns = await Daily.fetchMissingMapsCampaign(db);
 	const weeks = await Daily.fetchMissingMapsWeekly(db);
+	const grands = await Daily.fetchMissingMapsWeeklyGrand(db);
 	const ids = await Daily.fetchMissingMaps(db);
 
 	return context.res.json({
 		message:
-			'Map information updated! Dowloaded ' +
+			'Map information updated! Downloaded ' +
 			ids.length +
 			' maps: ' +
 			ids +
@@ -48,6 +49,10 @@ const func = async function (context: any) {
 			weeks.length +
 			' weeks: ' +
 			weeks +
+			' and ' +
+			grands.length +
+			' grands: ' +
+			grands +
 			' and ' +
 			campaigns.length +
 			' campaigns: ' +
