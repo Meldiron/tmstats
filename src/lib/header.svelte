@@ -2,27 +2,16 @@
 	<div
 		class="flex flex-col space-y-4 space-x-0 md:flex-row md:items-center md:space-y-4 md:space-x-4"
 	>
-		<img class="w-24" src="/logo.svg" alt="" />
+		<img class="w-24 my-0" src="/logo.svg" alt="" />
 
 		<div>
 			<h1 class="mb-3 text-2xl font-bold text-black">TMStats | Medal Tracker</h1>
 
 			<div class="prose">
 				<p>
-					Overview of all Trackmania medals you achieved. Share your campaign, weekly, or daily maps
-					medals with anyone!
+					Your ultimate Trackmania medal dashboard. Track every medal across Campaign, Track of the Day, Shorts, and Grands. Compare with friends and climb the ranks.
 				</p>
 			</div>
 		</div>
-	</div>
-
-	<div class="prose mt-4">
-		<p class="text-sm text-gray-400">
-			This website introduces private leaderboard that only consists of players whose profile has
-			been loaded before. If you are looking for worldwide stats, you can visit <a
-				href="https://www.author-tracker.com/"
-				target="_blank">TM Author Tracker</a
-			>.
-		</p>
 	</div>
 </div>
