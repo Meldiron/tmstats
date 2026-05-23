@@ -22,7 +22,7 @@
 	};
 </script>
 
-<div class="rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-4">
+<div class="flex flex-col rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-4">
 	<div class="mb-3 flex items-center justify-between">
 		<h3 class="text-lg font-bold text-gray-900">{catLabel[category] || category}</h3>
 		<span class="text-2xl font-bold text-gray-900"
@@ -30,16 +30,9 @@
 		>
 	</div>
 
-	<SegmentedBar
-		author={stats.author}
-		gold={stats.gold}
-		silver={stats.silver}
-		bronze={stats.bronze}
-		total={stats.totalMaps}
-		height="h-3"
-	/>
+	<div class="flex-1"></div>
 
-	<div class="mt-3 grid grid-cols-4 gap-2 text-center">
+	<div class="mb-3 grid grid-cols-4 gap-2 text-center">
 		<div class="bg-author-50 rounded-lg py-2">
 			<p class="text-lg font-bold {medalColors.author}">{stats.author}</p>
 			<p class="text-[10px] font-medium text-gray-500 uppercase">Author</p>
@@ -58,7 +51,7 @@
 		</div>
 	</div>
 
-	<div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+	<div class="flex items-center justify-between border-t border-gray-100 pt-3">
 		<div class="text-center">
 			<p class="text-xs text-gray-500">Completed</p>
 			<p class="text-sm font-bold text-gray-900">
@@ -75,5 +68,16 @@
 			<p class="text-xs text-gray-500">Score</p>
 			<p class="text-sm font-bold text-gray-900">{stats.score.toLocaleString()}</p>
 		</div>
+	</div>
+
+	<div class="mt-3">
+		<SegmentedBar
+			author={stats.author}
+			gold={stats.gold}
+			silver={stats.silver}
+			bronze={stats.bronze}
+			total={stats.totalMaps}
+			height="h-3"
+		/>
 	</div>
 </div>

@@ -41,7 +41,7 @@
 		</div>
 	</div>
 
-	<div class="flex h-6 w-full overflow-hidden rounded-full">
+	<div class="flex h-4 w-full overflow-hidden rounded-full">
 		{#each segments as seg}
 			{#if seg.count > 0}
 				<div

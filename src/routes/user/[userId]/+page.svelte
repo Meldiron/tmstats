@@ -34,104 +34,106 @@
 
 			<!-- Total Completion -->
 			<div class="rounded-tl-3xl rounded-br-3xl border border-gray-200 bg-white p-5">
-				<div class="flex h-full flex-col justify-center space-y-3">
+				<div class="flex h-full flex-col justify-between space-y-3">
 					<h3 class="text-lg font-bold text-gray-900">Total Completion</h3>
 
-					<!-- Any medal -->
-					<div>
-						<div class="mb-1 flex items-center justify-between text-xs">
-							<div class="flex items-center gap-1.5">
-								<div class="h-2.5 w-2.5 rounded-full bg-gray-500"></div>
-								<span class="font-medium text-gray-700">Any medal</span>
-							</div>
-							<span class="font-bold text-gray-900">
-								{g.overall.completedMaps}
-								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
-								<span class="text-author-600 ml-1"
-									>{Math.round((g.overall.completedMaps / g.overall.totalMaps) * 100)}%</span
-								>
-							</span>
-						</div>
-						<SegmentedBar
-							author={g.overall.author}
-							gold={g.overall.gold}
-							silver={g.overall.silver}
-							bronze={g.overall.bronze}
-							total={g.overall.totalMaps}
-							height="h-2"
-						/>
-					</div>
-
-					<!-- Silver+ -->
-					<div>
-						<div class="mb-1 flex items-center justify-between text-xs">
-							<div class="flex items-center gap-1.5">
-								<div class="bg-silver-400 h-2.5 w-2.5 rounded-full"></div>
-								<span class="font-medium text-gray-700">Silver or higher</span>
-							</div>
-							<span class="font-bold text-gray-900">
-								{g.overall.silverPlus}
-								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
-								<span class="text-author-600 ml-1"
-									>{Math.round((g.overall.silverPlus / g.overall.totalMaps) * 100)}%</span
-								>
-							</span>
-						</div>
-						<ProgressBar
-							value={g.overall.silverPlus}
-							max={g.overall.totalMaps}
-							color="silver"
-							height="h-2"
-							showLabel={false}
-						/>
-					</div>
-
-					<!-- Gold+ -->
-					<div>
-						<div class="mb-1 flex items-center justify-between text-xs">
-							<div class="flex items-center gap-1.5">
-								<div class="h-2.5 w-2.5 rounded-full bg-[#ffd700]"></div>
-								<span class="font-medium text-gray-700">Gold or higher</span>
-							</div>
-							<span class="font-bold text-gray-900">
-								{g.overall.goldPlus}
-								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
-								<span class="text-author-600 ml-1"
-									>{Math.round((g.overall.goldPlus / g.overall.totalMaps) * 100)}%</span
-								>
-							</span>
-						</div>
-						<ProgressBar
-							value={g.overall.goldPlus}
-							max={g.overall.totalMaps}
-							color="gold"
-							height="h-2"
-							showLabel={false}
-						/>
-					</div>
-
-					<!-- Author -->
-					<div>
-						<div class="mb-1 flex items-center justify-between text-xs">
-							<div class="flex items-center gap-1.5">
-								<div class="h-2.5 w-2.5 rounded-full bg-[#14b583]"></div>
-								<span class="font-medium text-gray-700">Author</span>
-							</div>
-							<span class="font-bold text-gray-900">
-								{g.overall.author}
-								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
-								<span class="text-author-600 ml-1"
-									>{Math.round((g.overall.author / g.overall.totalMaps) * 100)}%</span
-								>
-							</span>
-						</div>
-						<ProgressBar
-							value={g.overall.author}
-							max={g.overall.totalMaps}
-							color="author"
-							height="h-2"
-							showLabel={false}
-						/>
+					<div class="flex flex-col justify-between space-y-3">
+    					<!-- Any medal -->
+    					<div>
+    						<div class="mb-1 flex items-center justify-between text-xs">
+    							<div class="flex items-center gap-1.5">
+    								<div class="h-2.5 w-2.5 rounded-full bg-gray-500"></div>
+    								<span class="font-medium text-gray-700">Any medal</span>
+    							</div>
+    							<span class="font-bold text-gray-900">
+    								{g.overall.completedMaps}
+    								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
+    								<span class="text-author-600 ml-1"
+    									>{Math.round((g.overall.completedMaps / g.overall.totalMaps) * 100)}%</span
+    								>
+    							</span>
+    						</div>
+    						<SegmentedBar
+    							author={g.overall.author}
+    							gold={g.overall.gold}
+    							silver={g.overall.silver}
+    							bronze={g.overall.bronze}
+    							total={g.overall.totalMaps}
+    							height="h-2"
+    						/>
+    					</div>
+    
+    					<!-- Silver+ -->
+    					<div>
+    						<div class="mb-1 flex items-center justify-between text-xs">
+    							<div class="flex items-center gap-1.5">
+    								<div class="bg-silver-400 h-2.5 w-2.5 rounded-full"></div>
+    								<span class="font-medium text-gray-700">Silver or higher</span>
+    							</div>
+    							<span class="font-bold text-gray-900">
+    								{g.overall.silverPlus}
+    								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
+    								<span class="text-author-600 ml-1"
+    									>{Math.round((g.overall.silverPlus / g.overall.totalMaps) * 100)}%</span
+    								>
+    							</span>
+    						</div>
+    						<ProgressBar
+    							value={g.overall.silverPlus}
+    							max={g.overall.totalMaps}
+    							color="silver"
+    							height="h-2"
+    							showLabel={false}
+    						/>
+    					</div>
+    
+    					<!-- Gold+ -->
+    					<div>
+    						<div class="mb-1 flex items-center justify-between text-xs">
+    							<div class="flex items-center gap-1.5">
+    								<div class="h-2.5 w-2.5 rounded-full bg-[#ffd700]"></div>
+    								<span class="font-medium text-gray-700">Gold or higher</span>
+    							</div>
+    							<span class="font-bold text-gray-900">
+    								{g.overall.goldPlus}
+    								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
+    								<span class="text-author-600 ml-1"
+    									>{Math.round((g.overall.goldPlus / g.overall.totalMaps) * 100)}%</span
+    								>
+    							</span>
+    						</div>
+    						<ProgressBar
+    							value={g.overall.goldPlus}
+    							max={g.overall.totalMaps}
+    							color="gold"
+    							height="h-2"
+    							showLabel={false}
+    						/>
+    					</div>
+    
+    					<!-- Author -->
+    					<div>
+    						<div class="mb-1 flex items-center justify-between text-xs">
+    							<div class="flex items-center gap-1.5">
+    								<div class="h-2.5 w-2.5 rounded-full bg-[#14b583]"></div>
+    								<span class="font-medium text-gray-700">Author</span>
+    							</div>
+    							<span class="font-bold text-gray-900">
+    								{g.overall.author}
+    								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
+    								<span class="text-author-600 ml-1"
+    									>{Math.round((g.overall.author / g.overall.totalMaps) * 100)}%</span
+    								>
+    							</span>
+    						</div>
+    						<ProgressBar
+    							value={g.overall.author}
+    							max={g.overall.totalMaps}
+    							color="author"
+    							height="h-2"
+    							showLabel={false}
+    						/>
+    					</div>
 					</div>
 				</div>
 			</div>

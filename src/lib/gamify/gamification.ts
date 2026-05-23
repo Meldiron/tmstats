@@ -107,11 +107,16 @@ export const RANKS: RankTier[] = [
 	{ name: 'Trackmaster III', stage: 3, threshold: 12000, color: 'author', baseRank: 'Trackmaster' },
 	{ name: 'Trackmaster IV', stage: 4, threshold: 13000, color: 'author', baseRank: 'Trackmaster' },
 	{ name: 'Trackmaster V', stage: 5, threshold: 14000, color: 'author', baseRank: 'Trackmaster' },
-	{ name: 'Legend I', stage: 1, threshold: 16000, color: 'red', baseRank: 'Legend' },
-	{ name: 'Legend II', stage: 2, threshold: 18000, color: 'red', baseRank: 'Legend' },
-	{ name: 'Legend III', stage: 3, threshold: 20000, color: 'red', baseRank: 'Legend' },
-	{ name: 'Legend IV', stage: 4, threshold: 22500, color: 'red', baseRank: 'Legend' },
-	{ name: 'Legend V', stage: 5, threshold: 25000, color: 'red', baseRank: 'Legend' }
+	{ name: 'Warrior I', stage: 1, threshold: 15000, color: 'blue', baseRank: 'Warrior' },
+	{ name: 'Warrior II', stage: 2, threshold: 17000, color: 'blue', baseRank: 'Warrior' },
+	{ name: 'Warrior III', stage: 3, threshold: 19000, color: 'blue', baseRank: 'Warrior' },
+	{ name: 'Warrior IV', stage: 4, threshold: 21000, color: 'blue', baseRank: 'Warrior' },
+	{ name: 'Warrior V', stage: 5, threshold: 23000, color: 'blue', baseRank: 'Warrior' },
+	{ name: 'Champion I', stage: 1, threshold: 25000, color: 'rose', baseRank: 'Champion' },
+	{ name: 'Champion II', stage: 2, threshold: 27500, color: 'rose', baseRank: 'Champion' },
+	{ name: 'Champion III', stage: 3, threshold: 30000, color: 'rose', baseRank: 'Champion' },
+	{ name: 'Champion IV', stage: 4, threshold: 32500, color: 'rose', baseRank: 'Champion' },
+	{ name: 'Champion V', stage: 5, threshold: 35000, color: 'rose', baseRank: 'Champion' }
 ];
 
 export const MONTH_NAMES = [
