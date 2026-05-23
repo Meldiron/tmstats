@@ -5,7 +5,11 @@
 			<p class="text-xs text-gray-500">Points per medal tier</p>
 		</div>
 
-		<div class="grid grid-cols-4 gap-3">
+		<div class="grid grid-cols-5 gap-3">
+			<div class="flex flex-col items-center gap-1.5 rounded-xl bg-warrior-50 px-3 py-3">
+				<img src="/warrior.png" class="h-6 w-6" alt="Warrior" />
+				<span class="text-xs font-bold text-warrior-700">20 pts</span>
+			</div>
 			<div class="flex flex-col items-center gap-1.5 rounded-xl bg-author-50 px-3 py-3">
 				<img src="/author.png" class="h-6 w-6" alt="Author" />
 				<span class="text-xs font-bold text-author-700">12 pts</span>

@@ -2,6 +2,7 @@
 	interface OverallStats {
 		totalMaps: number;
 		completedMaps: number;
+		warrior: number;
 		author: number;
 		gold: number;
 		silver: number;
@@ -14,10 +15,11 @@
 	}
 	let { overall }: Props = $props();
 
-	const total = overall.author + overall.gold + overall.silver + overall.bronze;
+	const total = overall.warrior + overall.author + overall.gold + overall.silver + overall.bronze;
 	const noMedal = overall.totalMaps - overall.completedMaps;
 
 	const segments = [
+		{ label: 'Warrior', count: overall.warrior, color: 'bg-warrior-500', text: 'text-warrior-600' },
 		{ label: 'Author', count: overall.author, color: 'bg-[#14b583]', text: 'text-[#14b583]' },
 		{ label: 'Gold', count: overall.gold, color: 'bg-[#ffd700]', text: 'text-[#ffd700]' },
 		{ label: 'Silver', count: overall.silver, color: 'bg-[#c8c8c8]', text: 'text-[#9a9a9a]' },
@@ -64,7 +66,12 @@
 		{/each}
 	</div>
 
-	<div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 sm:grid-cols-4">
+	<div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 sm:grid-cols-3 lg:grid-cols-5">
+		<div class="text-center">
+			<p class="text-2xl font-bold text-warrior-600">{overall.warrior}</p>
+			<p class="text-xs text-gray-500">Warrior Medals</p>
+			<p class="text-xs font-medium text-gray-400">{overall.warrior * 20} pts</p>
+		</div>
 		<div class="text-center">
 			<p class="text-2xl font-bold text-[#14b583]">{overall.author}</p>
 			<p class="text-xs text-gray-500">Author Medals</p>

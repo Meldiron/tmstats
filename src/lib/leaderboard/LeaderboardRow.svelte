@@ -12,7 +12,8 @@
 	let { record, index }: Props = $props();
 
 	const rank = index + 1;
-	const totalMedals = record.author + record.gold + record.silver + record.bronze;
+	const warrior = record.warrior ?? 0;
+	const totalMedals = warrior + record.author + record.gold + record.silver + record.bronze;
 	const rankInfo = getRank(record.score);
 
 	const rankTextClass: Record<number, string> = {
@@ -28,6 +29,7 @@
 	};
 
 	const segments = [
+		{ label: 'Warrior', count: warrior, color: 'bg-warrior-500' },
 		{ label: 'Author', count: record.author, color: 'bg-[#14b583]' },
 		{ label: 'Gold', count: record.gold, color: 'bg-[#ffd700]' },
 		{ label: 'Silver', count: record.silver, color: 'bg-[#c8c8c8]' },
@@ -69,6 +71,7 @@
 		<!-- Medal Distribution Bar + Legend -->
 		<div class="min-w-0 flex-1">
 			<SegmentedBar
+				warrior={warrior}
 				author={record.author}
 				gold={record.gold}
 				silver={record.silver}

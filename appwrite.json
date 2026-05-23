@@ -64,6 +64,15 @@
 					"default": null
 				},
 				{
+					"key": "warrior",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
 					"key": "medals",
 					"type": "string",
 					"required": true,
@@ -73,6 +82,13 @@
 				}
 			],
 			"indexes": [
+				{
+					"key": "warriorIndex",
+					"type": "key",
+					"status": "available",
+					"attributes": ["warrior"],
+					"orders": ["ASC"]
+				},
 				{
 					"key": "goldIndex",
 					"type": "key",
@@ -240,6 +256,15 @@
 					"default": null
 				},
 				{
+					"key": "warriorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
 					"key": "year",
 					"type": "integer",
 					"required": true,
@@ -345,6 +370,15 @@
 				},
 				{
 					"key": "authorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "warriorScore",
 					"type": "integer",
 					"required": false,
 					"array": false,
@@ -475,6 +509,15 @@
 					"default": null
 				},
 				{
+					"key": "warriorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
 					"key": "year",
 					"type": "integer",
 					"required": true,
@@ -580,6 +623,15 @@
 				},
 				{
 					"key": "authorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000,
+					"default": null
+				},
+				{
+					"key": "warriorScore",
 					"type": "integer",
 					"required": false,
 					"array": false,

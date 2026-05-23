@@ -2,7 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import type { AppwriteMap } from './appwrite';
 
-	const { title, subtitle, maps, medals, medalType, nadeoAction, canSynchronize, fullWidth = false, subdued = false } = $props();
+	const { title, subtitle, maps, medals, medalType, nadeoAction = async () => {}, canSynchronize, fullWidth = false, subdued = false } = $props();
 
 	let isLoading = $state(false);
 	async function load() {
@@ -117,6 +117,12 @@
 						<h1 class="mb-2 text-xl font-bold">Medal Times</h1>
 
 						<div class="flex flex-col space-y-4">
+								{#if openedMap.warriorScore}
+								<div class="flex items-center space-x-3">
+									<img src="/warrior.png" class="w-7" alt="" />
+									<p class="min-w-[100px] text-lg">{formatTime(openedMap.warriorScore)}</p>
+								</div>
+							{/if}
 							<div class="flex items-center space-x-3">
 								<img src="/author.png" class="w-7" alt="" />
 								<p class="min-w-[100px] text-lg">{formatTime(openedMap.authorScore)}</p>
@@ -141,7 +147,9 @@
 
 						{#if medals[medalType + '-' + openedMap.key]}
 							<div class="flex items-center space-x-3">
-								{#if medals[medalType + '-' + openedMap.key].medal === 4}
+								{#if medals[medalType + '-' + openedMap.key].medal === 5}
+									<img src="/warrior.png" class="w-7" alt="" />
+								{:else if medals[medalType + '-' + openedMap.key].medal === 4}
 									<img src="/author.png" class="w-7" alt="" />
 								{:else if medals[medalType + '-' + openedMap.key].medal === 3}
 									<img src="/gold.png" class="w-7" alt="" />
@@ -229,15 +237,17 @@
 					onclick={(event) => openModal(event, map)}
 					aria-label="View map"
 					class={`${
-						medal === 4
-							? 'bg-[#14b583]'
-							: medal === 3
-								? 'bg-[#ffd700]'
-								: medal === 2
-									? 'bg-[#c8c8c8]'
-									: medal === 1
-										? 'bg-[#cd7f32]'
-										: 'bg-[#374151]'
+						medal === 5
+							? 'bg-warrior-500'
+							: medal === 4
+								? 'bg-[#14b583]'
+								: medal === 3
+									? 'bg-[#ffd700]'
+									: medal === 2
+										? 'bg-[#c8c8c8]'
+										: medal === 1
+											? 'bg-[#cd7f32]'
+											: 'bg-[#374151]'
 					} w-full h-10 rounded-tl-xl rounded-br-xl`}
 				></button>
 			{:else}
@@ -252,15 +262,17 @@
 						onclick={(event) => openModal(event, map)}
 						aria-label="View map"
 						class={`${
-							medal === 4
-								? 'bg-[#14b583]'
-								: medal === 3
-									? 'bg-[#ffd700]'
-									: medal === 2
-										? 'bg-[#c8c8c8]'
-										: medal === 1
-											? 'bg-[#cd7f32]'
-											: 'bg-[#374151]'
+							medal === 5
+								? 'bg-warrior-500'
+								: medal === 4
+									? 'bg-[#14b583]'
+									: medal === 3
+										? 'bg-[#ffd700]'
+										: medal === 2
+											? 'bg-[#c8c8c8]'
+											: medal === 1
+												? 'bg-[#cd7f32]'
+												: 'bg-[#374151]'
 						} h-6 w-6 rounded-tl-lg rounded-br-lg`}
 					></button>
 				</div>

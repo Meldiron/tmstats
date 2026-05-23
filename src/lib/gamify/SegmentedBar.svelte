@@ -1,5 +1,6 @@
 <script lang="ts">
 	interface Props {
+		warrior?: number;
 		author: number;
 		gold: number;
 		silver: number;
@@ -7,11 +8,12 @@
 		total: number;
 		height?: string;
 	}
-	let { author, gold, silver, bronze, total, height = 'h-2' }: Props = $props();
+	let { warrior = 0, author, gold, silver, bronze, total, height = 'h-2' }: Props = $props();
 
-	const noMedal = Math.max(0, total - author - gold - silver - bronze);
+	const noMedal = Math.max(0, total - warrior - author - gold - silver - bronze);
 
 	const segments = [
+		{ count: warrior, color: 'bg-warrior-500' },
 		{ count: author, color: 'bg-[#14b583]' },
 		{ count: gold, color: 'bg-[#ffd700]' },
 		{ count: silver, color: 'bg-[#c8c8c8]' },

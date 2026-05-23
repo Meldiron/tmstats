@@ -14,6 +14,7 @@ export type AppwriteMap = {
 	bronzeScore: number;
 	goldScore: number;
 	authorScore: number;
+	warriorScore: number | null;
 	thumbnailUrl: string; // URL
 	collectionName: string;
 	name: string;
@@ -25,6 +26,7 @@ export type AppwriteProfile = {
 	bronze: number;
 	gold: number;
 	author: number;
+	warrior: number;
 	nickname: string;
 	score: number;
 	medals: string; // Convert to JSON
@@ -103,6 +105,7 @@ export class AppwriteService {
 				author: 0,
 				bronze: 0,
 				silver: 0,
+				warrior: 0,
 				nickname
 			});
 		}
@@ -152,14 +155,26 @@ export class AppwriteService {
 		return token;
 	}
 
+	static normalizeProfile(doc: AppwriteProfile): AppwriteProfile {
+		return {
+			...doc,
+			warrior: (doc.warrior as any) ?? 0,
+			author: (doc.author as any) ?? 0,
+			gold: (doc.gold as any) ?? 0,
+			silver: (doc.silver as any) ?? 0,
+			bronze: (doc.bronze as any) ?? 0,
+			score: (doc.score as any) ?? 0
+		};
+	}
+
 	static async getProfile(id: string) {
 		try {
 			const dbRes = await database.getDocument<AppwriteProfile>('default', 'profiles', id);
 			const dataSet = JSON.parse(dbRes.medals);
-			return {
+			return this.normalizeProfile({
 				...dbRes,
 				medals: dataSet
-			};
+			});
 		} catch (err: unknown) {
 			console.error(err);
 
@@ -350,7 +365,7 @@ export class AppwriteService {
 
 			const docs = await database.listDocuments<AppwriteProfile>('default', 'profiles', queries);
 
-			return docs.documents;
+			return docs.documents.map((doc) => this.normalizeProfile(doc));
 		} catch (err: unknown) {
 			console.error(err);
 

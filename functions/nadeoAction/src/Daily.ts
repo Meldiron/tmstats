@@ -5,6 +5,48 @@ import { OAuth } from './OAuth.ts';
 
 import { getAxiod, sdk } from './deps.ts';
 
+let warriorCache: Record<string, number> | null = null;
+let warriorCacheTime = 0;
+
+async function getWarriorTimes(): Promise<Record<string, number>> {
+	const now = Date.now();
+	if (warriorCache && now - warriorCacheTime < 1000 * 60 * 60) {
+		return warriorCache;
+	}
+
+	try {
+		const res = await (await getAxiod()).get(
+			'https://raw.githubusercontent.com/ezio416/tm-json/refs/heads/main/warrior.json',
+			{
+				headers: {
+					'User-Agent': 'tmstats.almostapps.eu / 0.0.3 matejbaco2000@gmail.com'
+				}
+			}
+		);
+
+		const data = res.data;
+		const times: Record<string, number> = {};
+
+		const categories = ['Grand', 'Seasonal', 'Weekly', 'Totd', 'Other'];
+		for (const cat of categories) {
+			const list = data[cat];
+			if (Array.isArray(list)) {
+				for (const map of list) {
+					if (map.mapUid && typeof map.warriorTime === 'number') {
+						times[map.mapUid] = map.warriorTime;
+					}
+				}
+			}
+		}
+
+		warriorCache = times;
+		warriorCacheTime = now;
+		return times;
+	} catch (_err) {
+		return warriorCache ?? {};
+	}
+}
+
 export class Daily {
 	static formatTMText(str: string): string {
 		let res, resStr;
@@ -116,6 +158,8 @@ export class Daily {
 		const month = dailyRes.data.monthList[0].month;
 		const year = dailyRes.data.monthList[0].year;
 
+		const warriorTimes = await getWarriorTimes();
+
 		return {
 			mapid: mapIdData.mapId,
 			mapUid: mapIdData.mapUid,
@@ -132,6 +176,8 @@ export class Daily {
 			goldScore: mapIdData.goldScore,
 
 			authorScore: mapIdData.authorScore,
+
+			warriorScore: warriorTimes[mapIdData.mapUid] ?? null,
 
 			collectionName: this.formatTMText(mapIdData.collectionName),
 			thumbnailUrl: mapIdData.thumbnailUrl
@@ -283,6 +329,8 @@ export class Daily {
 				const mapSilverTime = mapIdRes.data.silverTime;
 				const mapBronzeTime = mapIdRes.data.bronzeTime;
 
+				const warriorTimes = await getWarriorTimes();
+
 				const doc = {
 					mapid: mapId,
 					mapUid: mapUid,
@@ -299,6 +347,8 @@ export class Daily {
 					goldScore: mapGoldTime,
 
 					authorScore: mapAuthorTime,
+
+					warriorScore: warriorTimes[mapUid] ?? null,
 
 					collectionName: this.formatTMText(mapCollection),
 					thumbnailUrl: mapThumbnail
@@ -400,6 +450,8 @@ export class Daily {
 				const mapSilverTime = mapIdRes.data.silverTime;
 				const mapBronzeTime = mapIdRes.data.bronzeTime;
 
+				const warriorTimes = await getWarriorTimes();
+
 				const doc = {
 					mapid: mapId,
 					mapUid: mapUid,
@@ -416,6 +468,8 @@ export class Daily {
 					goldScore: mapGoldTime,
 
 					authorScore: mapAuthorTime,
+
+					warriorScore: warriorTimes[mapUid] ?? null,
 
 					collectionName: this.formatTMText(mapCollection),
 					thumbnailUrl: mapThumbnail
@@ -520,6 +574,8 @@ export class Daily {
 				const mapSilverTime = mapIdRes.data.silverTime;
 				const mapBronzeTime = mapIdRes.data.bronzeTime;
 
+				const warriorTimes = await getWarriorTimes();
+
 				const doc = {
 					mapid: mapId,
 					mapUid: mapUid,
@@ -536,6 +592,8 @@ export class Daily {
 					goldScore: mapGoldTime,
 
 					authorScore: mapAuthorTime,
+
+					warriorScore: warriorTimes[mapUid] ?? null,
 
 					collectionName: this.formatTMText(mapCollection),
 					thumbnailUrl: mapThumbnail
@@ -604,7 +662,11 @@ export class Daily {
 			.filter((mapId: string) => {
 				const key = mapData[mapId];
 				const existing = existingMedals[key];
-				return !existing || existing.medal !== 4;
+				if (!existing) return true;
+				if (existing.medal < 4) return true;
+				const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+				if (map?.warriorScore && existing.medal !== 5) return true;
+				return false;
 			});
 
 		const responseData: any = {};
@@ -619,10 +681,13 @@ export class Daily {
 						for (const mapId in partialRecords) {
 							const mapInfo = mapData[mapId];
 							if (mapInfo) {
-								partialResponse[mapInfo] = {
-									medal: partialRecords[mapId].medal,
-									time: partialRecords[mapId].time
-								};
+								const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+								let medal = partialRecords[mapId].medal;
+								const time = partialRecords[mapId].time;
+								if (map?.warriorScore && time <= map.warriorScore) {
+									medal = 5;
+								}
+								partialResponse[mapInfo] = { medal, time };
 							}
 						}
 						await onProgress(partialResponse);
@@ -632,11 +697,14 @@ export class Daily {
 
 		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
+			const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+			let medal = mapScores[mapId].medal;
+			const time = mapScores[mapId].time;
+			if (map?.warriorScore && time <= map.warriorScore) {
+				medal = 5;
+			}
 
-			responseData[mapInfo] = {
-				medal: mapScores[mapId].medal,
-				time: mapScores[mapId].time
-			};
+			responseData[mapInfo] = { medal, time };
 		}
 
 		return responseData;
@@ -830,7 +898,11 @@ export class Daily {
 			.filter((mapId: string) => {
 				const key = mapData[mapId];
 				const existing = existingMedals[key];
-				return !existing || existing.medal !== 4;
+				if (!existing) return true;
+				if (existing.medal < 4) return true;
+				const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+				if (map?.warriorScore && existing.medal !== 5) return true;
+				return false;
 			});
 
 		const responseData: any = {};
@@ -845,10 +917,13 @@ export class Daily {
 						for (const mapId in partialRecords) {
 							const mapInfo = mapData[mapId];
 							if (mapInfo) {
-								partialResponse[mapInfo] = {
-									medal: partialRecords[mapId].medal,
-									time: partialRecords[mapId].time
-								};
+								const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+								let medal = partialRecords[mapId].medal;
+								const time = partialRecords[mapId].time;
+								if (map?.warriorScore && time <= map.warriorScore) {
+									medal = 5;
+								}
+								partialResponse[mapInfo] = { medal, time };
 							}
 						}
 						await onProgress(partialResponse);
@@ -858,11 +933,14 @@ export class Daily {
 
 		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
+			const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+			let medal = mapScores[mapId].medal;
+			const time = mapScores[mapId].time;
+			if (map?.warriorScore && time <= map.warriorScore) {
+				medal = 5;
+			}
 
-			responseData[mapInfo] = {
-				medal: mapScores[mapId].medal,
-				time: mapScores[mapId].time
-			};
+			responseData[mapInfo] = { medal, time };
 		}
 
 		return responseData;
@@ -913,7 +991,10 @@ export class Daily {
 		const mapList = downloadedMaps.filter((map: any) => {
 			const key = mapData[map.mapid];
 			const existing = existingMedals[key];
-			return !existing || existing.medal !== 4;
+			if (!existing) return true;
+			if (existing.medal < 4) return true;
+			if (map?.warriorScore && existing.medal !== 5) return true;
+			return false;
 		});
 
 		const responseData: any = {};
@@ -928,10 +1009,13 @@ export class Daily {
 						for (const mapId in partialRecords) {
 							const mapInfo = mapData[mapId];
 							if (mapInfo) {
-								partialResponse[mapInfo] = {
-									medal: partialRecords[mapId].medal,
-									time: partialRecords[mapId].time
-								};
+								const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+								let medal = partialRecords[mapId].medal;
+								const time = partialRecords[mapId].time;
+								if (map?.warriorScore && time <= map.warriorScore) {
+									medal = 5;
+								}
+								partialResponse[mapInfo] = { medal, time };
 							}
 						}
 						await onProgress(partialResponse);
@@ -941,11 +1025,14 @@ export class Daily {
 
 		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
+			const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+			let medal = mapScores[mapId].medal;
+			const time = mapScores[mapId].time;
+			if (map?.warriorScore && time <= map.warriorScore) {
+				medal = 5;
+			}
 
-			responseData[mapInfo] = {
-				medal: mapScores[mapId].medal,
-				time: mapScores[mapId].time
-			};
+			responseData[mapInfo] = { medal, time };
 		}
 
 		return responseData;
@@ -993,7 +1080,11 @@ export class Daily {
 			.filter((mapId: string) => {
 				const key = mapData[mapId];
 				const existing = existingMedals[key];
-				return !existing || existing.medal !== 4;
+				if (!existing) return true;
+				if (existing.medal < 4) return true;
+				const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+				if (map?.warriorScore && existing.medal !== 5) return true;
+				return false;
 			});
 
 		const responseData: any = {};
@@ -1008,10 +1099,13 @@ export class Daily {
 						for (const mapId in partialRecords) {
 							const mapInfo = mapData[mapId];
 							if (mapInfo) {
-								partialResponse[mapInfo] = {
-									medal: partialRecords[mapId].medal,
-									time: partialRecords[mapId].time
-								};
+								const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+								let medal = partialRecords[mapId].medal;
+								const time = partialRecords[mapId].time;
+								if (map?.warriorScore && time <= map.warriorScore) {
+									medal = 5;
+								}
+								partialResponse[mapInfo] = { medal, time };
 							}
 						}
 						await onProgress(partialResponse);
@@ -1021,11 +1115,14 @@ export class Daily {
 
 		for (const mapId in mapScores) {
 			const mapInfo = mapData[mapId];
+			const map = downloadedMaps.find((m: any) => m.mapid === mapId);
+			let medal = mapScores[mapId].medal;
+			const time = mapScores[mapId].time;
+			if (map?.warriorScore && time <= map.warriorScore) {
+				medal = 5;
+			}
 
-			responseData[mapInfo] = {
-				medal: mapScores[mapId].medal,
-				time: mapScores[mapId].time
-			};
+			responseData[mapInfo] = { medal, time };
 		}
 
 		return responseData;

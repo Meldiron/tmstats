@@ -46,6 +46,28 @@
 	--color-bronze-700: #974826;
 	--color-bronze-800: #7c3924;
 	--color-bronze-900: #663121;
+
+	--color-warrior-50: #eff6ff;
+	--color-warrior-100: #dbeafe;
+	--color-warrior-200: #bfdbfe;
+	--color-warrior-300: #93c5fd;
+	--color-warrior-400: #60a5fa;
+	--color-warrior-500: #3b82f6;
+	--color-warrior-600: #2563eb;
+	--color-warrior-700: #1d4ed8;
+	--color-warrior-800: #1e40af;
+	--color-warrior-900: #1e3a8a;
+
+	--color-champion-50: #fff1f2;
+	--color-champion-100: #ffe4e6;
+	--color-champion-200: #fecdd3;
+	--color-champion-300: #fda4af;
+	--color-champion-400: #fb7185;
+	--color-champion-500: #f43f5e;
+	--color-champion-600: #e11d48;
+	--color-champion-700: #be123c;
+	--color-champion-800: #9f1239;
+	--color-champion-900: #881337;
 }
 
 .yearselected {

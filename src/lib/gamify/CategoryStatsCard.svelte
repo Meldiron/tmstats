@@ -15,6 +15,8 @@
 	};
 
 	const medalColors: Record<string, string> = {
+		champion: 'text-champion-700',
+		warrior: 'text-warrior-600',
 		author: 'text-author-600',
 		gold: 'text-gold-600',
 		silver: 'text-silver-600',
@@ -32,22 +34,26 @@
 
 	<div class="flex-1"></div>
 
-	<div class="mb-3 grid grid-cols-4 gap-2 text-center">
+	<div class="mb-3 grid grid-cols-5 gap-2 text-center">
+    	<div class="bg-warrior-50 rounded-lg py-2">
+    		<p class="text-lg font-bold {medalColors.warrior}">{stats.warrior}</p>
+    		<p class="text-[8px] font-medium text-gray-500 uppercase">Warrior</p>
+    	</div>
 		<div class="bg-author-50 rounded-lg py-2">
 			<p class="text-lg font-bold {medalColors.author}">{stats.author}</p>
-			<p class="text-[10px] font-medium text-gray-500 uppercase">Author</p>
+			<p class="text-[8px] font-medium text-gray-500 uppercase">Author</p>
 		</div>
 		<div class="bg-gold-50 rounded-lg py-2">
 			<p class="text-lg font-bold {medalColors.gold}">{stats.gold}</p>
-			<p class="text-[10px] font-medium text-gray-500 uppercase">Gold</p>
+			<p class="text-[8px] font-medium text-gray-500 uppercase">Gold</p>
 		</div>
 		<div class="bg-silver-50 rounded-lg py-2">
 			<p class="text-lg font-bold {medalColors.silver}">{stats.silver}</p>
-			<p class="text-[10px] font-medium text-gray-500 uppercase">Silver</p>
+			<p class="text-[8px] font-medium text-gray-500 uppercase">Silver</p>
 		</div>
 		<div class="bg-bronze-50 rounded-lg py-2">
 			<p class="text-lg font-bold {medalColors.bronze}">{stats.bronze}</p>
-			<p class="text-[10px] font-medium text-gray-500 uppercase">Bronze</p>
+			<p class="text-[8px] font-medium text-gray-500 uppercase">Bronze</p>
 		</div>
 	</div>
 
@@ -72,6 +78,7 @@
 
 	<div class="mt-3">
 		<SegmentedBar
+			warrior={stats.warrior}
 			author={stats.author}
 			gold={stats.gold}
 			silver={stats.silver}

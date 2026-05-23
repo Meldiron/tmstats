@@ -17,6 +17,7 @@ export const load: LayoutLoad = async ({ params, url }) => {
 				bronze: 0,
 				gold: 0,
 				author: 0,
+				warrior: 0,
 				nickname: 'NOT FOUND',
 				score: 0,
 				medals: '{}'

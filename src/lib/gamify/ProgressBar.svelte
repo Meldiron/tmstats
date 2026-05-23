@@ -3,6 +3,7 @@
 		value?: number;
 		max?: number;
 		color?:
+			| 'warrior'
 			| 'author'
 			| 'gold'
 			| 'silver'
@@ -34,6 +35,7 @@
 	const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
 
 	const colorClasses: Record<string, string> = {
+		warrior: 'bg-warrior-500',
 		author: 'bg-author-500',
 		gold: 'bg-gold-500',
 		silver: 'bg-silver-400',
@@ -47,6 +49,7 @@
 	};
 
 	const bgClasses: Record<string, string> = {
+		warrior: 'bg-warrior-100',
 		author: 'bg-author-100',
 		gold: 'bg-gold-100',
 		silver: 'bg-silver-100',

@@ -92,6 +92,7 @@ const func = async function (context: any) {
 		let author = 0;
 		let silver = 0;
 		let bronze = 0;
+		let warrior = 0;
 
 		for (const key in mergedMedals) {
 			const medal = mergedMedals[key].medal;
@@ -108,6 +109,9 @@ const func = async function (context: any) {
 			} else if (medal === 4) {
 				author++;
 				score += 12;
+			} else if (medal === 5) {
+				warrior++;
+				score += 20;
 			}
 		}
 
@@ -118,6 +122,7 @@ const func = async function (context: any) {
 			author,
 			bronze,
 			silver,
+			warrior,
 			nickname
 		};
 

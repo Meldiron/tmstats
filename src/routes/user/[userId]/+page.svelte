@@ -37,32 +37,7 @@
 				<div class="flex h-full flex-col justify-between space-y-3">
 					<h3 class="text-lg font-bold text-gray-900">Total Completion</h3>
 
-					<div class="flex flex-col justify-between space-y-3">
-    					<!-- Any medal -->
-    					<div>
-    						<div class="mb-1 flex items-center justify-between text-xs">
-    							<div class="flex items-center gap-1.5">
-    								<div class="h-2.5 w-2.5 rounded-full bg-gray-500"></div>
-    								<span class="font-medium text-gray-700">Any medal</span>
-    							</div>
-    							<span class="font-bold text-gray-900">
-    								{g.overall.completedMaps}
-    								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
-    								<span class="text-author-600 ml-1"
-    									>{Math.round((g.overall.completedMaps / g.overall.totalMaps) * 100)}%</span
-    								>
-    							</span>
-    						</div>
-    						<SegmentedBar
-    							author={g.overall.author}
-    							gold={g.overall.gold}
-    							silver={g.overall.silver}
-    							bronze={g.overall.bronze}
-    							total={g.overall.totalMaps}
-    							height="h-2"
-    						/>
-    					</div>
-    
+					<div class="flex flex-col justify-between space-y-3">    
     					<!-- Silver+ -->
     					<div>
     						<div class="mb-1 flex items-center justify-between text-xs">
@@ -116,7 +91,7 @@
     						<div class="mb-1 flex items-center justify-between text-xs">
     							<div class="flex items-center gap-1.5">
     								<div class="h-2.5 w-2.5 rounded-full bg-[#14b583]"></div>
-    								<span class="font-medium text-gray-700">Author</span>
+    								<span class="font-medium text-gray-700">Author or higher</span>
     							</div>
     							<span class="font-bold text-gray-900">
     								{g.overall.author}
@@ -130,6 +105,30 @@
     							value={g.overall.author}
     							max={g.overall.totalMaps}
     							color="author"
+    							height="h-2"
+    							showLabel={false}
+    						/>
+    					</div>
+
+    					<!-- Warrior or higher -->
+    					<div>
+    						<div class="mb-1 flex items-center justify-between text-xs">
+    							<div class="flex items-center gap-1.5">
+    								<div class="h-2.5 w-2.5 rounded-full bg-warrior-500"></div>
+    								<span class="font-medium text-gray-700">Warrior or higher</span>
+    							</div>
+    							<span class="font-bold text-gray-900">
+    								{g.overall.warrior}
+    								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
+    								<span class="text-author-600 ml-1"
+    									>{Math.round((g.overall.warrior / g.overall.totalMaps) * 100)}%</span
+    								>
+    							</span>
+    						</div>
+    						<ProgressBar
+    							value={g.overall.warrior}
+    							max={g.overall.totalMaps}
+    							color="warrior"
     							height="h-2"
     							showLabel={false}
     						/>
@@ -177,6 +176,7 @@
 								<span>{Math.floor((group.completedCount / group.totalCount) * 100)}%</span>
 							</div>
 							<SegmentedBar
+								warrior={group.warriorCount}
 								author={group.authorCount}
 								gold={group.goldCount}
 								silver={group.silverCount}

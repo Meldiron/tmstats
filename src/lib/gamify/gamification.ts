@@ -10,6 +10,7 @@ export type MedalEntry = { medal: number; time?: number };
 export interface CategoryStats {
 	totalMaps: number;
 	completedMaps: number;
+	warrior: number;
 	author: number;
 	gold: number;
 	silver: number;
@@ -49,7 +50,7 @@ export interface Achievement {
 	description: string;
 	icon: string;
 	unlocked: boolean;
-	tier: 'bronze' | 'silver' | 'gold' | 'author';
+	tier: 'bronze' | 'silver' | 'gold' | 'author' | 'warrior';
 	progress?: { current: number; target: number };
 }
 
@@ -59,6 +60,7 @@ export interface MapGroup {
 	category: string;
 	completedCount: number;
 	totalCount: number;
+	warriorCount: number;
 	authorCount: number;
 	goldCount: number;
 	silverCount: number;
@@ -167,7 +169,8 @@ export function countCategoryMedals(
 ): CategoryStats {
 	const totalMaps = maps.length;
 	let completedMaps = 0;
-	let author = 0,
+	let warrior = 0,
+		author = 0,
 		gold = 0,
 		silver = 0,
 		bronze = 0;
@@ -177,7 +180,10 @@ export function countCategoryMedals(
 		const entry = medals[`${medalPrefix}-${map.key}`];
 		if (entry) {
 			completedMaps++;
-			if (entry.medal === 4) {
+			if (entry.medal === 5) {
+				warrior++;
+				score += 20;
+			} else if (entry.medal === 4) {
 				author++;
 				score += 12;
 			} else if (entry.medal === 3) {
@@ -196,6 +202,7 @@ export function countCategoryMedals(
 	return {
 		totalMaps,
 		completedMaps,
+		warrior,
 		author,
 		gold,
 		silver,
@@ -225,6 +232,7 @@ export function getGroups(
 				category: medalPrefix,
 				completedCount: 0,
 				totalCount: 0,
+				warriorCount: 0,
 				authorCount: 0,
 				goldCount: 0,
 				silverCount: 0,
@@ -239,7 +247,8 @@ export function getGroups(
 		const entry = medals[`${medalPrefix}-${map.key}`];
 		if (entry) {
 			group.completedCount++;
-			if (entry.medal === 4) group.authorCount++;
+			if (entry.medal === 5) group.warriorCount++;
+			else if (entry.medal === 4) group.authorCount++;
 			else if (entry.medal === 3) group.goldCount++;
 			else if (entry.medal === 2) group.silverCount++;
 			else if (entry.medal === 1) group.bronzeCount++;
@@ -255,13 +264,20 @@ export function getGroups(
 }
 
 export function getAllAchievements(
-	profile: { score: number; author: number; gold: number; silver: number; bronze: number },
+	profile: {
+		score: number;
+		warrior: number;
+		author: number;
+		gold: number;
+		silver: number;
+		bronze: number;
+	},
 	medals: Record<string, MedalEntry>,
 	categories: Record<string, CategoryStats>,
 	totalMaps: number,
 	completedMaps: number
 ): Achievement[] {
-	const totalMedals = profile.author + profile.gold + profile.silver + profile.bronze;
+	const totalMedals = profile.warrior + profile.author + profile.gold + profile.silver + profile.bronze;
 	const hasCategoryMedals = (prefix: string) =>
 		Object.keys(medals).some((k) => k.startsWith(prefix + '-'));
 	const authorRatio = completedMaps > 0 ? profile.author / completedMaps : 0;
@@ -324,6 +340,32 @@ export function getAllAchievements(
 			tier: 'author',
 			unlocked: profile.author >= 50,
 			progress: { current: profile.author, target: 50 }
+		},
+		{
+			id: 'warrior-hunter',
+			name: 'Warrior Hunter',
+			description: 'Earn your first warrior medal',
+			icon: 'swords',
+			tier: 'warrior',
+			unlocked: profile.warrior >= 1
+		},
+		{
+			id: 'warrior-enthusiast',
+			name: 'Warrior Enthusiast',
+			description: 'Earn 10 warrior medals',
+			icon: 'swords',
+			tier: 'warrior',
+			unlocked: profile.warrior >= 10,
+			progress: { current: profile.warrior, target: 10 }
+		},
+		{
+			id: 'warrior-master',
+			name: 'Warrior Master',
+			description: 'Earn 50 warrior medals',
+			icon: 'swords',
+			tier: 'warrior',
+			unlocked: profile.warrior >= 50,
+			progress: { current: profile.warrior, target: 50 }
 		},
 		{
 			id: 'gold-rush',
@@ -469,7 +511,14 @@ export function getAllAchievements(
 }
 
 export function getNextMilestones(
-	profile: { score: number; author: number; gold: number; silver: number; bronze: number },
+	profile: {
+		score: number;
+		warrior: number;
+		author: number;
+		gold: number;
+		silver: number;
+		bronze: number;
+	},
 	categories: Record<string, CategoryStats>,
 	totalMaps: number,
 	completedMaps: number
@@ -485,6 +534,17 @@ export function getNextMilestones(
 			current: profile.score,
 			target: nextScore,
 			unit: 'pts'
+		});
+
+	// Warrior milestones
+	const warriorTargets = [1, 10, 25, 50, 100];
+	const nextWarrior = warriorTargets.find((t) => t > profile.warrior);
+	if (nextWarrior)
+		milestones.push({
+			label: 'Earn ' + nextWarrior + ' Warrior medals',
+			current: profile.warrior,
+			target: nextWarrior,
+			unit: 'medals'
 		});
 
 	// Author milestones
@@ -586,14 +646,15 @@ export function computeGamification(
 	const completedMaps =
 		totdStats.completedMaps + shortsStats.completedMaps + grandStats.completedMaps + campaignStats.completedMaps;
 
-	const silverPlus = profile.silver + profile.gold + profile.author;
-	const goldPlus = profile.gold + profile.author;
+	const silverPlus = profile.silver + profile.gold + profile.author + profile.warrior;
+	const goldPlus = profile.gold + profile.author + profile.warrior;
 
 	const overall = {
 		totalMaps,
 		completedMaps,
 		completionPercent: totalMaps > 0 ? completedMaps / totalMaps : 0,
 		score: profile.score,
+		warrior: profile.warrior,
 		author: profile.author,
 		gold: profile.gold,
 		silver: profile.silver,
