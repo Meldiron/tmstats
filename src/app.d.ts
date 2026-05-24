@@ -13,4 +13,10 @@ declare global {
 declare const moment: any;
 declare const SvelteHeatmap: any;
 
+declare namespace svelteHTML {
+	interface IntrinsicElements {
+		'vibe-flags-toolbar': { position?: string };
+	}
+}
+
 export {};

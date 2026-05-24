@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import '$lib/flags.svelte';
 
 	let { children } = $props();
 </script>
@@ -12,3 +13,5 @@
 		property of their respective owners.
 	</p>
 </div>
+
+<vibe-flags-toolbar></vibe-flags-toolbar>

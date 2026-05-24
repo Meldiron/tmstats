@@ -3,6 +3,7 @@
 	import { AppwriteService, toastConfig } from '$lib/appwrite.js';
 	import Instructions from '$lib/instructions.svelte';
 	import Toastify from 'toastify-js';
+	import { flags } from '$lib/flags.svelte';
 
 	let { children, data } = $props();
 
@@ -110,11 +111,13 @@
 				</div>
 			{/if}
 
-			<div
-				class="bg-warrior-500 text-warrior-800 flex h-10 w-10 items-center justify-center rounded-full text-xs"
-			>
-				{data.profile.warrior ?? 0}
-			</div>
+			{#if flags.warriorMedals}
+				<div
+					class="bg-warrior-500 text-warrior-800 flex h-10 w-10 items-center justify-center rounded-full text-xs"
+				>
+					{data.profile.warrior ?? 0}
+				</div>
+			{/if}
 
 			<div
 				class="bg-author-500 text-author-800 flex h-10 w-10 items-center justify-center rounded-full text-xs"

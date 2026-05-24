@@ -6,6 +6,7 @@
 	import CategoryStatsCard from '$lib/gamify/CategoryStatsCard.svelte';
 	import MedalDistribution from '$lib/gamify/MedalDistribution.svelte';
 	import SkeletonOverview from '$lib/gamify/SkeletonOverview.svelte';
+	import { flags } from '$lib/flags.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -111,28 +112,30 @@
     					</div>
 
     					<!-- Warrior or higher -->
-    					<div>
-    						<div class="mb-1 flex items-center justify-between text-xs">
-    							<div class="flex items-center gap-1.5">
-    								<div class="h-2.5 w-2.5 rounded-full bg-warrior-500"></div>
-    								<span class="font-medium text-gray-700">Warrior or higher</span>
+    					{#if flags.warriorMedals}
+    						<div>
+    							<div class="mb-1 flex items-center justify-between text-xs">
+    								<div class="flex items-center gap-1.5">
+    									<div class="h-2.5 w-2.5 rounded-full bg-warrior-500"></div>
+    									<span class="font-medium text-gray-700">Warrior or higher</span>
+    								</div>
+    								<span class="font-bold text-gray-900">
+    									{g.overall.warrior}
+    									<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
+    									<span class="text-author-600 ml-1"
+    										>{Math.round((g.overall.warrior / g.overall.totalMaps) * 100)}%</span
+    									>
+    								</span>
     							</div>
-    							<span class="font-bold text-gray-900">
-    								{g.overall.warrior}
-    								<span class="font-normal text-gray-400">/ {g.overall.totalMaps}</span>
-    								<span class="text-author-600 ml-1"
-    									>{Math.round((g.overall.warrior / g.overall.totalMaps) * 100)}%</span
-    								>
-    							</span>
+    							<ProgressBar
+    								value={g.overall.warrior}
+    								max={g.overall.totalMaps}
+    								color="warrior"
+    								height="h-2"
+    								showLabel={false}
+    							/>
     						</div>
-    						<ProgressBar
-    							value={g.overall.warrior}
-    							max={g.overall.totalMaps}
-    							color="warrior"
-    							height="h-2"
-    							showLabel={false}
-    						/>
-    					</div>
+    					{/if}
 					</div>
 				</div>
 			</div>
@@ -176,8 +179,8 @@
 								<span>{Math.floor((group.completedCount / group.totalCount) * 100)}%</span>
 							</div>
 							<SegmentedBar
-								warrior={group.warriorCount}
-								author={group.authorCount}
+								warrior={flags.warriorMedals ? group.warriorCount : 0}
+								author={group.authorCount + (flags.warriorMedals ? 0 : group.warriorCount)}
 								gold={group.goldCount}
 								silver={group.silverCount}
 								bronze={group.bronzeCount}

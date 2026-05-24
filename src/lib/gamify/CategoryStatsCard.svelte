@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SegmentedBar from './SegmentedBar.svelte';
+	import { flags } from '$lib/flags.svelte';
 	import type { CategoryStats } from './gamification';
 	interface Props {
 		category: 'totd' | 'shorts' | 'grands' | 'campaign';
@@ -34,13 +35,15 @@
 
 	<div class="flex-1"></div>
 
-	<div class="mb-3 grid grid-cols-5 gap-2 text-center">
-    	<div class="bg-warrior-50 rounded-lg py-2">
-    		<p class="text-lg font-bold {medalColors.warrior}">{stats.warrior}</p>
-    		<p class="text-[8px] font-medium text-gray-500 uppercase">Warrior</p>
-    	</div>
+	<div class="mb-3 grid {flags.warriorMedals ? 'grid-cols-5' : 'grid-cols-4'} gap-2 text-center">
+    	{#if flags.warriorMedals}
+    		<div class="bg-warrior-50 rounded-lg py-2">
+    			<p class="text-lg font-bold {medalColors.warrior}">{stats.warrior}</p>
+    			<p class="text-[8px] font-medium text-gray-500 uppercase">Warrior</p>
+    		</div>
+    	{/if}
 		<div class="bg-author-50 rounded-lg py-2">
-			<p class="text-lg font-bold {medalColors.author}">{stats.author}</p>
+			<p class="text-lg font-bold {medalColors.author}">{stats.author + (flags.warriorMedals ? 0 : stats.warrior)}</p>
 			<p class="text-[8px] font-medium text-gray-500 uppercase">Author</p>
 		</div>
 		<div class="bg-gold-50 rounded-lg py-2">
@@ -78,8 +81,8 @@
 
 	<div class="mt-3">
 		<SegmentedBar
-			warrior={stats.warrior}
-			author={stats.author}
+			warrior={flags.warriorMedals ? stats.warrior : 0}
+			author={stats.author + (flags.warriorMedals ? 0 : stats.warrior)}
 			gold={stats.gold}
 			silver={stats.silver}
 			bronze={stats.bronze}

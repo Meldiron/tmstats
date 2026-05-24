@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { flags } from '$lib/flags.svelte';
+
 	interface OverallStats {
 		totalMaps: number;
 		completedMaps: number;
@@ -15,17 +17,32 @@
 	}
 	let { overall }: Props = $props();
 
-	const total = overall.warrior + overall.author + overall.gold + overall.silver + overall.bronze;
-	const noMedal = overall.totalMaps - overall.completedMaps;
+	const noMedal = $derived(overall.totalMaps - overall.completedMaps);
 
-	const segments = [
-		{ label: 'Warrior', count: overall.warrior, color: 'bg-warrior-500', text: 'text-warrior-600' },
-		{ label: 'Author', count: overall.author, color: 'bg-[#14b583]', text: 'text-[#14b583]' },
-		{ label: 'Gold', count: overall.gold, color: 'bg-[#ffd700]', text: 'text-[#ffd700]' },
-		{ label: 'Silver', count: overall.silver, color: 'bg-[#c8c8c8]', text: 'text-[#9a9a9a]' },
-		{ label: 'Bronze', count: overall.bronze, color: 'bg-[#cd7f32]', text: 'text-[#cd7f32]' },
-		{ label: 'No Medal', count: noMedal, color: 'bg-gray-50', text: 'text-gray-500' }
-	];
+	const segments = $derived(
+		[
+			flags.warriorMedals
+				? {
+						label: 'Warrior',
+						count: overall.warrior,
+						color: 'bg-warrior-500',
+						text: 'text-warrior-600'
+					}
+				: null,
+			{
+				label: 'Author',
+				count: flags.warriorMedals ? overall.author : overall.author + overall.warrior,
+				color: 'bg-[#14b583]',
+				text: 'text-[#14b583]'
+			},
+			{ label: 'Gold', count: overall.gold, color: 'bg-[#ffd700]', text: 'text-[#ffd700]' },
+			{ label: 'Silver', count: overall.silver, color: 'bg-[#c8c8c8]', text: 'text-[#9a9a9a]' },
+			{ label: 'Bronze', count: overall.bronze, color: 'bg-[#cd7f32]', text: 'text-[#cd7f32]' },
+			{ label: 'No Medal', count: noMedal, color: 'bg-gray-50', text: 'text-gray-500' }
+		].filter(
+			(s): s is { label: string; count: number; color: string; text: string } => s !== null
+		)
+	);
 
 	function pct(count: number) {
 		return overall.totalMaps > 0 ? Math.round((count / overall.totalMaps) * 100) : 0;
@@ -67,11 +84,13 @@
 	</div>
 
 	<div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 sm:grid-cols-3 lg:grid-cols-5">
-		<div class="text-center">
-			<p class="text-2xl font-bold text-warrior-600">{overall.warrior}</p>
-			<p class="text-xs text-gray-500">Warrior Medals</p>
-			<p class="text-xs font-medium text-gray-400">{overall.warrior * 20} pts</p>
-		</div>
+		{#if flags.warriorMedals}
+			<div class="text-center">
+				<p class="text-2xl font-bold text-warrior-600">{overall.warrior}</p>
+				<p class="text-xs text-gray-500">Warrior Medals</p>
+				<p class="text-xs font-medium text-gray-400">{overall.warrior * 20} pts</p>
+			</div>
+		{/if}
 		<div class="text-center">
 			<p class="text-2xl font-bold text-[#14b583]">{overall.author}</p>
 			<p class="text-xs text-gray-500">Author Medals</p>

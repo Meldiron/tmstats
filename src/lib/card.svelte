@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import type { AppwriteMap } from './appwrite';
+	import { flags } from '$lib/flags.svelte';
 
 	const { title, subtitle, maps, medals, medalType, nadeoAction = async () => {}, canSynchronize, fullWidth = false, subdued = false } = $props();
 
@@ -117,7 +118,7 @@
 						<h1 class="mb-2 text-xl font-bold">Medal Times</h1>
 
 						<div class="flex flex-col space-y-4">
-								{#if openedMap.warriorScore}
+								{#if flags.warriorMedals && openedMap.warriorScore}
 								<div class="flex items-center space-x-3">
 									<img src="/warrior.png" class="w-7" alt="" />
 									<p class="min-w-[100px] text-lg">{formatTime(openedMap.warriorScore)}</p>
@@ -147,9 +148,9 @@
 
 						{#if medals[medalType + '-' + openedMap.key]}
 							<div class="flex items-center space-x-3">
-								{#if medals[medalType + '-' + openedMap.key].medal === 5}
+								{#if medals[medalType + '-' + openedMap.key].medal === 5 && flags.warriorMedals}
 									<img src="/warrior.png" class="w-7" alt="" />
-								{:else if medals[medalType + '-' + openedMap.key].medal === 4}
+								{:else if medals[medalType + '-' + openedMap.key].medal === 5 || medals[medalType + '-' + openedMap.key].medal === 4}
 									<img src="/author.png" class="w-7" alt="" />
 								{:else if medals[medalType + '-' + openedMap.key].medal === 3}
 									<img src="/gold.png" class="w-7" alt="" />
@@ -237,9 +238,9 @@
 					onclick={(event) => openModal(event, map)}
 					aria-label="View map"
 					class={`${
-						medal === 5
+						medal === 5 && flags.warriorMedals
 							? 'bg-warrior-500'
-							: medal === 4
+							: medal === 5 || medal === 4
 								? 'bg-[#14b583]'
 								: medal === 3
 									? 'bg-[#ffd700]'
@@ -262,9 +263,9 @@
 						onclick={(event) => openModal(event, map)}
 						aria-label="View map"
 						class={`${
-							medal === 5
+							medal === 5 && flags.warriorMedals
 								? 'bg-warrior-500'
-								: medal === 4
+								: medal === 5 || medal === 4
 									? 'bg-[#14b583]'
 									: medal === 3
 										? 'bg-[#ffd700]'

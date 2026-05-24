@@ -46,6 +46,7 @@
 		"vitest": "^3.0.0"
 	},
 	"dependencies": {
+		"@vibe-flags/core": "^0.1.20",
 		"appwrite": "^17.0.1",
 		"node-appwrite": "^15.0.1",
 		"toastify-js": "^1.12.0"

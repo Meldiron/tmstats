@@ -3,6 +3,7 @@
 	import RankBadge from '$lib/gamify/RankBadge.svelte';
 	import { getRank } from '$lib/gamify/gamification';
 	import type { AppwriteProfile } from '$lib/appwrite';
+	import { flags } from '$lib/flags.svelte';
 
 	interface Props {
 		record: AppwriteProfile;
@@ -12,8 +13,10 @@
 	let { record, index }: Props = $props();
 
 	const rank = index + 1;
-	const warrior = record.warrior ?? 0;
-	const totalMedals = warrior + record.author + record.gold + record.silver + record.bronze;
+	const warrior = $derived(flags.warriorMedals ? (record.warrior ?? 0) : 0);
+	const totalMedals = $derived(
+		warrior + record.author + record.gold + record.silver + record.bronze
+	);
 	const rankInfo = getRank(record.score);
 
 	const rankTextClass: Record<number, string> = {
@@ -28,13 +31,17 @@
 		3: 'border-l-bronze-400'
 	};
 
-	const segments = [
-		{ label: 'Warrior', count: warrior, color: 'bg-warrior-500' },
-		{ label: 'Author', count: record.author, color: 'bg-[#14b583]' },
-		{ label: 'Gold', count: record.gold, color: 'bg-[#ffd700]' },
-		{ label: 'Silver', count: record.silver, color: 'bg-[#c8c8c8]' },
-		{ label: 'Bronze', count: record.bronze, color: 'bg-[#cd7f32]' }
-	];
+	const segments = $derived(
+		[
+			flags.warriorMedals
+				? { label: 'Warrior', count: warrior, color: 'bg-warrior-500' }
+				: null,
+			{ label: 'Author', count: record.author, color: 'bg-[#14b583]' },
+			{ label: 'Gold', count: record.gold, color: 'bg-[#ffd700]' },
+			{ label: 'Silver', count: record.silver, color: 'bg-[#c8c8c8]' },
+			{ label: 'Bronze', count: record.bronze, color: 'bg-[#cd7f32]' }
+		].filter((s): s is { label: string; count: number; color: string } => s !== null)
+	);
 
 	function pct(count: number) {
 		return totalMedals > 0 ? Math.round((count / totalMedals) * 100) : 0;
