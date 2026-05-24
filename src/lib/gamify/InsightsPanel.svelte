@@ -117,10 +117,12 @@
 						<div class="mb-1 flex items-center justify-between">
 							<span class="text-sm font-bold text-gray-900">{group.name}</span>
 							<span class="text-xs font-medium text-gray-500">
-								{group.category === 'totd'
-									? 'Track of the day'
-									: group.category === 'shorts'
-										? 'Shorts'
+							{group.category === 'cotd' || group.category === 'totd'
+								? 'Track of the day'
+								: group.category === 'shorts'
+									? 'Shorts'
+									: group.category === 'grand' || group.category === 'grands'
+										? 'Grands'
 										: 'Campaign'}
 							</span>
 						</div>

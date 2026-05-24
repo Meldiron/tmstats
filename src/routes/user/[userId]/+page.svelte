@@ -162,11 +162,11 @@
 								<span
 									class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600 uppercase"
 								>
-								{group.category === 'totd'
+								{group.category === 'cotd' || group.category === 'totd'
 									? 'Track of the day'
 									: group.category === 'shorts'
 										? 'Shorts'
-										: group.category === 'grand'
+										: group.category === 'grand' || group.category === 'grands'
 											? 'Grands'
 											: 'Campaign'}
 								</span>
