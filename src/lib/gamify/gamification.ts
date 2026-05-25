@@ -256,7 +256,7 @@ export function getGroups(
 	}
 
 	for (const group of groups.values()) {
-		group.isFinished = group.completedCount > 0;
+		group.isFinished = group.totalCount > 0 && group.completedCount === group.totalCount;
 		group.isAuthorPerfect = group.authorCount === group.totalCount;
 	}
 
