@@ -546,10 +546,11 @@ export class Daily {
 				const mapUid = map.mapUid;
 				const position = map.position;
 
+				// Campaigns can be released in weekly drops, so skip maps we
+				// already have instead of assuming the whole campaign is done.
 				const exists = downloadedMapKeys.includes(`${position}-${campaignUid}`);
 				if (exists) {
-					// && offset > 0
-					break;
+					continue;
 				}
 
 				console.log('Fetching map ' + mapUid);
