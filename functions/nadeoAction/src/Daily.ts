@@ -622,7 +622,8 @@ export class Daily {
 		year: number | null,
 		month: number | null,
 		existingMedals: any = {},
-		onProgress?: (data: any) => void | Promise<void>
+		onProgress?: (data: any) => void | Promise<void>,
+		onTick?: (processed: number, total: number) => void | Promise<void>
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -672,6 +673,11 @@ export class Daily {
 
 		const responseData: any = {};
 
+		// Report the denominator before any fetching starts
+		if (onTick) {
+			await onTick(0, mapIdList.length);
+		}
+
 		const mapScores = await Daily.getMapScores(
 			db,
 			userId,
@@ -693,7 +699,8 @@ export class Daily {
 						}
 						await onProgress(partialResponse);
 					}
-				: undefined
+				: undefined,
+			onTick
 		);
 
 		for (const mapId in mapScores) {
@@ -715,8 +722,10 @@ export class Daily {
 		db: sdk.Databases,
 		userId: string,
 		mapIdList: string[],
-		onProgress?: (records: any) => void | Promise<void>
+		onProgress?: (records: any) => void | Promise<void>,
+		onTick?: (processed: number, total: number) => void | Promise<void>
 	) {
+		let processed = 0;
 		let oauth: null | OAuth = null;
 		try {
 			// Use OAuth for quick fetch
@@ -770,6 +779,12 @@ export class Daily {
 				if (onProgress) {
 					await onProgress({ ...records });
 				}
+
+				processed += mapIdBatch.length;
+
+				if (onTick) {
+					await onTick(processed, mapIdList.length);
+				}
 			}
     } else {
       for (const mapId of mapIdList) {
@@ -803,6 +818,12 @@ export class Daily {
             await onProgress({ ...records });
           }
         }
+
+        processed++;
+
+        if (onTick) {
+          await onTick(processed, mapIdList.length);
+        }
       }
 		}
 
@@ -813,9 +834,12 @@ export class Daily {
 		db: sdk.Databases,
 		userId: string,
 		maps: any[],
-		onProgress?: (records: any) => void | Promise<void>
+		onProgress?: (records: any) => void | Promise<void>,
+		onTick?: (processed: number, total: number) => void | Promise<void>
 	) {
 		const records: any = {};
+
+		let processed = 0;
 
 		for (const map of maps) {
 			console.log('Fetching grand record for map ' + map.mapid);
@@ -847,6 +871,12 @@ export class Daily {
 			if (onProgress) {
 				await onProgress({ ...records });
 			}
+
+			processed++;
+
+			if (onTick) {
+				await onTick(processed, maps.length);
+			}
 		}
 
 		return records;
@@ -858,7 +888,8 @@ export class Daily {
 		year: number | null,
 		week: number | null,
 		existingMedals: any = {},
-		onProgress?: (data: any) => void | Promise<void>
+		onProgress?: (data: any) => void | Promise<void>,
+		onTick?: (processed: number, total: number) => void | Promise<void>
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -908,6 +939,11 @@ export class Daily {
 
 		const responseData: any = {};
 
+		// Report the denominator before any fetching starts
+		if (onTick) {
+			await onTick(0, mapIdList.length);
+		}
+
 		const mapScores = await Daily.getMapScores(
 			db,
 			userId,
@@ -929,7 +965,8 @@ export class Daily {
 						}
 						await onProgress(partialResponse);
 					}
-				: undefined
+				: undefined,
+			onTick
 		);
 
 		for (const mapId in mapScores) {
@@ -953,7 +990,8 @@ export class Daily {
 		year: number | null,
 		week: number | null,
 		existingMedals: any = {},
-		onProgress?: (data: any) => void | Promise<void>
+		onProgress?: (data: any) => void | Promise<void>,
+		onTick?: (processed: number, total: number) => void | Promise<void>
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -1000,6 +1038,11 @@ export class Daily {
 
 		const responseData: any = {};
 
+		// Report the denominator before any fetching starts
+		if (onTick) {
+			await onTick(0, mapList.length);
+		}
+
 		const mapScores = await Daily.getMapScoresGrand(
 			db,
 			userId,
@@ -1021,7 +1064,8 @@ export class Daily {
 						}
 						await onProgress(partialResponse);
 					}
-				: undefined
+				: undefined,
+			onTick
 		);
 
 		for (const mapId in mapScores) {
@@ -1044,7 +1088,8 @@ export class Daily {
 		db: sdk.Databases,
 		campaignUid: string | null,
 		existingMedals: any = {},
-		onProgress?: (data: any) => void | Promise<void>
+		onProgress?: (data: any) => void | Promise<void>,
+		onTick?: (processed: number, total: number) => void | Promise<void>
 	): Promise<any> {
 		const downloadedMaps: any[] = [];
 
@@ -1090,6 +1135,11 @@ export class Daily {
 
 		const responseData: any = {};
 
+		// Report the denominator before any fetching starts
+		if (onTick) {
+			await onTick(0, mapIdList.length);
+		}
+
 		const mapScores = await Daily.getMapScores(
 			db,
 			userId,
@@ -1111,7 +1161,8 @@ export class Daily {
 						}
 						await onProgress(partialResponse);
 					}
-				: undefined
+				: undefined,
+			onTick
 		);
 
 		for (const mapId in mapScores) {

@@ -917,6 +917,42 @@
 					"size": 10000,
 					"default": null,
 					"encrypt": false
+				},
+				{
+					"key": "processed",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				},
+				{
+					"key": "total",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				},
+				{
+					"key": "phase",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				},
+				{
+					"key": "phaseCount",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
 				}
 			],
 			"indexes": [

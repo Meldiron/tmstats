@@ -13,6 +13,41 @@
 
 	const label = $derived(sync.sync ? (labels[sync.sync.type] ?? sync.sync.type) : '');
 	const elapsed = $derived(formatDuration(sync.elapsedMs));
+
+	/** The category being worked on right now, plus its position in a multi-part sync. */
+	const step = $derived.by(() => {
+		const doc = sync.sync;
+
+		if (!doc?.progress) {
+			return label;
+		}
+
+		return doc.phaseCount && doc.phaseCount > 1
+			? `${doc.progress} (${(doc.phase ?? 0) + 1}/${doc.phaseCount})`
+			: doc.progress;
+	});
+
+	const detail = $derived.by(() => {
+		const doc = sync.sync;
+
+		if (!doc) {
+			return '';
+		}
+
+		if (doc.status === 'queued') {
+			return 'Waiting to start';
+		}
+
+		if (doc.total === null) {
+			return 'Counting maps';
+		}
+
+		if (doc.total === 0) {
+			return 'Nothing new to check';
+		}
+
+		return `${doc.processed ?? 0} of ${doc.total} maps checked`;
+	});
 </script>
 
 {#if sync.isVisible && sync.sync}
@@ -94,33 +129,48 @@
 		</div>
 	{:else}
 		<div
-			class="mt-3 flex items-center space-x-3 rounded-tl-3xl rounded-br-3xl border border-gray-900 bg-gray-800 p-4 text-white"
+			class="mt-3 rounded-tl-3xl rounded-br-3xl border border-gray-900 bg-gray-800 p-4 text-white"
 		>
-			<svg
-				class="size-6 shrink-0 animate-spin text-blue-400"
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-			>
-				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
-				></circle>
-				<path
-					class="opacity-75"
-					fill="currentColor"
-					d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z"
-				></path>
-			</svg>
+			<div class="flex items-center space-x-3">
+				{#if sync.percent === null}
+					<svg
+						class="size-6 shrink-0 animate-spin text-blue-400"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+					>
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+						></circle>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z"
+						></path>
+					</svg>
+				{:else}
+					<span class="w-12 shrink-0 text-right text-xl font-bold text-blue-400 tabular-nums">
+						{sync.percent}%
+					</span>
+				{/if}
 
-			<div>
-				<p class="font-bold">
-					Syncing your profile &middot; {elapsed}
-				</p>
-				<p class="text-sm text-gray-400">
-					{label} &middot; {sync.sync.progress ??
-						(sync.sync.status === 'queued' ? 'Waiting to start' : 'Fetching your times')}
-					&middot; you can keep browsing, this runs in the background.
-				</p>
+				<div>
+					<p class="font-bold">
+						Syncing your profile &middot; {elapsed}
+					</p>
+					<p class="text-sm text-gray-400">
+						{step} &middot; {detail}
+					</p>
+				</div>
 			</div>
+
+			{#if sync.percent !== null}
+				<div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-700">
+					<div
+						class="h-2 rounded-full bg-blue-500 transition-all duration-700 ease-out"
+						style="width: {sync.percent}%"
+					></div>
+				</div>
+			{/if}
 		</div>
 	{/if}
 {/if}

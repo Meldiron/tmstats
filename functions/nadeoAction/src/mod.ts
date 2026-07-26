@@ -20,8 +20,8 @@ let db: sdk.Databases = null as any;
 /** Keep in sync with the `nadeoAction` timeout in appwrite.json and SYNC_FUNCTION_TIMEOUT_MS. */
 const FUNCTION_TIMEOUT_MS = 900_000;
 const DEADLINE_GRACE_MS = 60_000;
-/** Heartbeats are cheap, but not free - one write per 10s of work is plenty. */
-const HEARTBEAT_THROTTLE_MS = 10_000;
+/** Heartbeats are cheap, but not free. 5s keeps the progress bar moving smoothly. */
+const HEARTBEAT_THROTTLE_MS = 5_000;
 
 const nowIso = () => new Date().toISOString();
 
@@ -33,7 +33,12 @@ class SyncTracker {
 	#lastHeartbeatAt = 0;
 	#done = false;
 
-	step = '';
+	#phase = 0;
+	#phaseCount = 1;
+	/** null means "not counted yet", which the UI shows as an indeterminate spinner. */
+	#processed: number | null = null;
+	#total: number | null = null;
+	#step = '';
 
 	constructor(
 		private context: any,
@@ -73,21 +78,55 @@ class SyncTracker {
 		}
 	}
 
-	async begin() {
+	async begin(phaseCount: number) {
 		this.#lastHeartbeatAt = Date.now();
+		this.#phaseCount = phaseCount;
 
 		await this.#write({
 			status: 'processing',
 			type: this.type,
 			heartbeatAt: nowIso(),
-			progress: 'Starting',
+			progress: 'Preparing',
+			phase: 0,
+			phaseCount,
+			processed: null,
+			total: null,
 			finishedAt: null,
 			error: null
 		});
 	}
 
-	async heartbeat(progress: string) {
-		if (this.#done || Date.now() - this.#lastHeartbeatAt < HEARTBEAT_THROTTLE_MS) {
+	/** Moves to the next unit of work. Always written, so the bar never stalls. */
+	async setPhase(phase: number, step: string) {
+		this.#phase = phase;
+		this.#step = step;
+		this.#processed = null;
+		this.#total = null;
+
+		await this.#flush();
+	}
+
+	/** Called for every map checked. Throttled, except when the total first arrives. */
+	async report(processed: number, total: number) {
+		const isNewTotal = total !== this.#total;
+
+		this.#processed = processed;
+		this.#total = total;
+
+		if (isNewTotal || Date.now() - this.#lastHeartbeatAt >= HEARTBEAT_THROTTLE_MS) {
+			await this.#flush();
+		}
+	}
+
+	/** Keeps the heartbeat guard fed during work that reports no ticks. */
+	async touch() {
+		if (Date.now() - this.#lastHeartbeatAt >= HEARTBEAT_THROTTLE_MS) {
+			await this.#flush();
+		}
+	}
+
+	async #flush() {
+		if (this.#done) {
 			return;
 		}
 
@@ -96,7 +135,11 @@ class SyncTracker {
 		await this.#write({
 			status: 'processing',
 			heartbeatAt: nowIso(),
-			progress: progress.slice(0, 255)
+			progress: this.#step.slice(0, 255),
+			phase: this.#phase,
+			phaseCount: this.#phaseCount,
+			processed: this.#processed,
+			total: this.#total
 		});
 	}
 
@@ -202,23 +245,27 @@ const run = async function (context: any, tracker: SyncTracker, appwriteUserId: 
 			await db.createDocument('default', 'profiles', appwriteUserId, newDocData);
 		}
 
-		await tracker.heartbeat(`${tracker.step} - ${Object.keys(newMedals).length} maps checked`);
+		await tracker.touch();
+	};
+
+	const reportProgress = async (processed: number, total: number) => {
+		await tracker.report(processed, total);
 	};
 
 	if (payload.type === 'all') {
 		newMedals = {};
 
-		tracker.step = 'Weekly shorts';
-		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+		await tracker.setPhase(0, 'Weekly shorts');
+		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null, existingMedals, saveProgress, reportProgress)) };
 
-		tracker.step = 'Weekly grands';
-		newMedals = { ...newMedals, ...(await Daily.getMedalsWeeklyGrand(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+		await tracker.setPhase(1, 'Weekly grands');
+		newMedals = { ...newMedals, ...(await Daily.getMedalsWeeklyGrand(appwriteUserId, db, null, null, existingMedals, saveProgress, reportProgress)) };
 
-		tracker.step = 'Campaigns';
-		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null, existingMedals, saveProgress)) };
+		await tracker.setPhase(2, 'Campaigns');
+		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null, existingMedals, saveProgress, reportProgress)) };
 
-		tracker.step = 'Track of the day';
-		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+		await tracker.setPhase(3, 'Track of the day');
+		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null, existingMedals, saveProgress, reportProgress)) };
 	} else if (payload.type === 'cotd') {
 		if (!payload.year) {
 			return { message: "This action requires 'year'.", code: 400 };
@@ -228,8 +275,8 @@ const run = async function (context: any, tracker: SyncTracker, appwriteUserId: 
 			return { message: "This action requires 'month'.", code: 400 };
 		}
 
-		tracker.step = 'Track of the day';
-		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month, existingMedals, saveProgress);
+		await tracker.setPhase(0, 'Track of the day');
+		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month, existingMedals, saveProgress, reportProgress);
 	} else if (payload.type === 'shorts') {
 		if (!payload.year) {
 			return { message: "This action requires 'year'.", code: 400 };
@@ -238,22 +285,22 @@ const run = async function (context: any, tracker: SyncTracker, appwriteUserId: 
 			return { message: "This action requires 'week'.", code: 400 };
 		}
 
-		tracker.step = 'Weekly shorts';
-		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week, existingMedals, saveProgress);
+		await tracker.setPhase(0, 'Weekly shorts');
+		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week, existingMedals, saveProgress, reportProgress);
 	} else if (payload.type === 'grands') {
 		if (!payload.year) {
 			return { message: "This action requires 'year'.", code: 400 };
 		}
 
-		tracker.step = 'Weekly grands';
-		newMedals = await Daily.getMedalsWeeklyGrand(appwriteUserId, db, payload.year, payload.week ?? null, existingMedals, saveProgress);
+		await tracker.setPhase(0, 'Weekly grands');
+		newMedals = await Daily.getMedalsWeeklyGrand(appwriteUserId, db, payload.year, payload.week ?? null, existingMedals, saveProgress, reportProgress);
 	} else if (payload.type === 'campaign') {
 		if (!payload.campaignUid) {
 			return { message: "This action requires 'campaignUid'.", code: 400 };
 		}
 
-		tracker.step = 'Campaigns';
-		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid, existingMedals, saveProgress);
+		await tracker.setPhase(0, 'Campaigns');
+		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid, existingMedals, saveProgress, reportProgress);
 	} else {
 		return {
 			message: "This action requires 'type' and it must be one of 'all', 'cotd', 'shorts', 'grands', or 'campaign'.",
@@ -306,8 +353,9 @@ export default async function (context: any) {
 			.setProject(Deno.env.get('APPWRITE_FUNCTION_PROJECT_ID') as string)
 			.setKey(context.req.headers['x-appwrite-key'] as string);
 
+		// A full sync walks four categories, everything else is a single unit of work
 		tracker = new SyncTracker(context, appwriteUserId, payload.type ?? 'all');
-		await tracker.begin();
+		await tracker.begin(payload.type === 'all' ? 4 : 1);
 
 		if (!Deno.env.get('NADE_AUTH')) {
 			await tracker.finish('error', 'Missing environment variables.');

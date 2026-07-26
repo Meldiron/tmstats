@@ -3,6 +3,7 @@ import Toastify from 'toastify-js';
 import {
 	AppwriteService,
 	isSyncPending,
+	syncPercent,
 	syncStaleReason,
 	toastConfig,
 	type AppwriteSync,
@@ -33,6 +34,9 @@ class SyncStore {
 	/** Ticks every second so elapsed time and staleness stay live. */
 	now = $state(Date.now());
 	starting = $state(false);
+
+	/** Never goes backwards, even if a phase reports a smaller total than the last one. */
+	percent = $state<number | null>(null);
 
 	isActive = $derived(this.starting || isSyncPending(this.sync));
 	isFailed = $derived(this.sync?.status === 'error');
@@ -144,11 +148,13 @@ class SyncStore {
 	}
 
 	#apply(doc: AppwriteSync | null) {
+		const previous = this.sync;
 		this.sync = doc;
 
 		if (!doc) {
 			this.#observedSignature = '';
 			this.#stopPolling();
+			this.percent = null;
 			return;
 		}
 
@@ -157,6 +163,16 @@ class SyncStore {
 			this.#observedSignature = signature;
 			this.#observedAt = Date.now();
 		}
+
+		// A different run restarts the bar, otherwise it only ever moves forward
+		const isSameRun = previous !== null && previous.startedAt === doc.startedAt;
+		const reported = syncPercent(doc);
+		this.percent =
+			reported === null
+				? isSameRun
+					? this.percent
+					: null
+				: Math.max(isSameRun ? (this.percent ?? 0) : 0, reported);
 
 		if (this.#checkStale()) {
 			return;

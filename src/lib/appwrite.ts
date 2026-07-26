@@ -54,6 +54,10 @@ export type AppwriteSync = {
 	deadlineAt: string;
 	progress: string | null;
 	error: string | null;
+	processed: number | null;
+	total: number | null;
+	phase: number | null;
+	phaseCount: number | null;
 } & Models.Document;
 
 export type SyncParams = {
@@ -74,6 +78,27 @@ export const SYNC_HEARTBEAT_TIMEOUT_MS = 180_000;
 
 export function isSyncPending(sync: AppwriteSync | null): boolean {
 	return sync !== null && (sync.status === 'queued' || sync.status === 'processing');
+}
+
+/**
+ * Overall completion, or null while the function has not reported a total yet - that
+ * gap is what the indeterminate spinner covers.
+ *
+ * A full sync walks four categories whose sizes are only known once each one starts,
+ * so phases are weighted equally rather than by map count. Within a phase the count is
+ * exact. Capped at 99% until the document actually reports success, so the bar never
+ * sits at 100% while work is still happening.
+ */
+export function syncPercent(sync: AppwriteSync | null): number | null {
+	if (!sync || sync.total === null || sync.phase === null || sync.phaseCount === null) {
+		return null;
+	}
+
+	const phaseCount = Math.max(1, sync.phaseCount);
+	const fraction = sync.total > 0 ? Math.min(1, (sync.processed ?? 0) / sync.total) : 1;
+	const overall = (Math.min(sync.phase, phaseCount - 1) + fraction) / phaseCount;
+
+	return Math.max(0, Math.min(99, Math.round(overall * 100)));
 }
 
 /**
@@ -515,7 +540,11 @@ export class AppwriteService {
 			finishedAt: null,
 			deadlineAt: deadlineAt.toISOString(),
 			progress: null,
-			error: null
+			error: null,
+			processed: null,
+			total: null,
+			phase: null,
+			phaseCount: null
 		};
 
 		try {
