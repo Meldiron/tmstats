@@ -1,9 +1,8 @@
 <script>
-	import { invalidateAll } from '$app/navigation';
-	import { AppwriteService, toastConfig } from '$lib/appwrite.js';
 	import Instructions from '$lib/instructions.svelte';
-	import Toastify from 'toastify-js';
+	import SyncStatus from '$lib/SyncStatus.svelte';
 	import { flags } from '$lib/flags.svelte';
+	import { sync } from '$lib/sync.svelte';
 
 	let { children, data } = $props();
 
@@ -45,31 +44,15 @@
 		}
 	});
 
-	let isSynchronizing = $state(false);
-	async function onSynchronize() {
-		if (isSynchronizing) {
+	const isOwner = $derived(Boolean(data.user && data.user.$id === data.profile.$id));
+
+	$effect(() => {
+		if (!isOwner) {
 			return;
 		}
 
-		isSynchronizing = true;
-
-		try {
-			Toastify({
-				...toastConfig,
-				style: {
-					background: '#3b82f6'
-				},
-				duration: 2800,
-				stopOnFocus: false,
-				text: 'Sync of entire profile takes few minutes.'
-			}).showToast();
-
-			await AppwriteService.nadeoActionAll();
-			await invalidateAll();
-		} finally {
-			isSynchronizing = false;
-		}
-	}
+		return sync.init(data.profile.$id);
+	});
 </script>
 
 <div class="mx-auto mt-6 w-full max-w-5xl">
@@ -98,12 +81,12 @@
 			</h1>
 		</div>
 		<div class="flex items-center justify-center space-x-3">
-			{#if data.user && data.user.$id === data.profile.$id}
+			{#if isOwner}
 				<div>
 					<button
 						aria-label="Synchronize data"
-						disabled={isSynchronizing}
-						onclick={onSynchronize}
+						disabled={sync.isActive}
+						onclick={() => sync.start('all')}
 						class="rounded-tl-2xl rounded-br-2xl bg-gray-700 px-4 py-3 text-sm font-semibold text-white enabled:hover:bg-gray-600 disabled:opacity-50"
 					>
 						Sync
@@ -144,6 +127,10 @@
 			</div>
 		</div>
 	</div>
+
+	{#if isOwner}
+		<SyncStatus />
+	{/if}
 
 	<div class="mt-3 mb-6">
 		<div class="flex flex-col items-center justify-between gap-3 md:flex-row">

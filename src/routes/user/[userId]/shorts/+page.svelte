@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { AppwriteService } from '$lib/appwrite';
 	import Card from '$lib/card.svelte';
+	import { sync } from '$lib/sync.svelte';
 	import SkeletonCard from '$lib/gamify/SkeletonCard.svelte';
 	import type { PageProps } from './$types';
 
@@ -16,13 +16,11 @@
 		{#each weeks as week (week.uid)}
 			<Card
 				canSynchronize={data.user && data.user.$id === data.profile.$id}
-				nadeoAction={async () => {
-					return await AppwriteService.nadeoAction(
-						'shorts',
-						+week.uid.split('-')[1],
-						undefined,
-						+week.uid.split('-')[0]
-					);
+				onSync={async () => {
+					return await sync.start('shorts', {
+						year: +week.uid.split('-')[1],
+						week: +week.uid.split('-')[0]
+					});
 				}}
 				medalType="shorts"
 				maps={week.maps}

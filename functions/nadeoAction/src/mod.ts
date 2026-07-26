@@ -17,40 +17,107 @@ setInterval(() => {
 let client: sdk.Client = null as any;
 let db: sdk.Databases = null as any;
 
-const func = async function (context: any) {
-	if (!Deno.env.get('NADE_AUTH')) {
-		return context.res.json({ message: 'Missing environment variables', code: 500 });
-  }
+/** Keep in sync with the `nadeoAction` timeout in appwrite.json and SYNC_FUNCTION_TIMEOUT_MS. */
+const FUNCTION_TIMEOUT_MS = 900_000;
+const DEADLINE_GRACE_MS = 60_000;
+/** Heartbeats are cheap, but not free - one write per 10s of work is plenty. */
+const HEARTBEAT_THROTTLE_MS = 10_000;
 
-  context.log(context.req.bodyText);
-  context.log('---');
+const nowIso = () => new Date().toISOString();
 
-	const payload = JSON.parse(context.req.bodyText || '{}');
+/**
+ * Owns the `syncs/<userId>` document for the lifetime of this execution. Every exit
+ * path writes a terminal status, so the UI never waits on a sync that is already over.
+ */
+class SyncTracker {
+	#lastHeartbeatAt = 0;
+	#done = false;
 
-  let appwriteUserId = context.req.headers['x-appwrite-user-id'] as string;
+	step = '';
 
-  context.log(payload);
+	constructor(
+		private context: any,
+		private userId: string,
+		private type: string
+	) {}
 
-	if (payload.adminPassword) {
-		if (payload.adminPassword !== Deno.env.get('ADMIN_PASSWORD')) {
-			return context.res.json({ message: 'Invalid admin password.', code: 403 });
+	async #write(data: any) {
+		try {
+			await db.updateDocument('default', 'syncs', this.userId, data);
+		} catch (_err) {
+			// No document yet (admin-triggered run), create one so the state is still visible
+			try {
+				const startedAt = nowIso();
+
+				await db.createDocument(
+					'default',
+					'syncs',
+					this.userId,
+					{
+						status: 'processing',
+						type: this.type,
+						startedAt,
+						heartbeatAt: startedAt,
+						deadlineAt: new Date(Date.now() + FUNCTION_TIMEOUT_MS + DEADLINE_GRACE_MS).toISOString(),
+						...data
+					},
+					[
+						`read("user:${this.userId}")`,
+						`update("user:${this.userId}")`,
+						`delete("user:${this.userId}")`
+					]
+				);
+			} catch (err) {
+				this.context.log('Could not write sync state: ' + err);
+			}
 		}
-
-		if (!payload.userId) {
-			return context.res.json({ message: "This action requires 'userId' when using admin password.", code: 500 });
-		}
-
-		appwriteUserId = payload.userId;
 	}
 
-	client = new sdk.Client();
-	db = new sdk.Databases(client);
+	async begin() {
+		this.#lastHeartbeatAt = Date.now();
 
-	client
-		.setEndpoint(Deno.env.get('APPWRITE_FUNCTION_API_ENDPOINT') as string)
-		.setProject(Deno.env.get('APPWRITE_FUNCTION_PROJECT_ID') as string)
-		.setKey(context.req.headers['x-appwrite-key'] as string);
+		await this.#write({
+			status: 'processing',
+			type: this.type,
+			heartbeatAt: nowIso(),
+			progress: 'Starting',
+			finishedAt: null,
+			error: null
+		});
+	}
 
+	async heartbeat(progress: string) {
+		if (this.#done || Date.now() - this.#lastHeartbeatAt < HEARTBEAT_THROTTLE_MS) {
+			return;
+		}
+
+		this.#lastHeartbeatAt = Date.now();
+
+		await this.#write({
+			status: 'processing',
+			heartbeatAt: nowIso(),
+			progress: progress.slice(0, 255)
+		});
+	}
+
+	async finish(status: 'success' | 'error', error: string | null = null) {
+		if (this.#done) {
+			return;
+		}
+
+		this.#done = true;
+
+		await this.#write({
+			status,
+			heartbeatAt: nowIso(),
+			finishedAt: nowIso(),
+			progress: null,
+			error: error === null ? null : error.slice(0, 9999)
+		});
+	}
+}
+
+const run = async function (context: any, tracker: SyncTracker, appwriteUserId: string, payload: any) {
 	const nadeoAuth = Deno.env.get('NADE_AUTH') as string;
 
 	if (!Auth.Live) {
@@ -134,66 +201,138 @@ const func = async function (context: any) {
 		} catch (_err) {
 			await db.createDocument('default', 'profiles', appwriteUserId, newDocData);
 		}
+
+		await tracker.heartbeat(`${tracker.step} - ${Object.keys(newMedals).length} maps checked`);
 	};
 
 	if (payload.type === 'all') {
 		newMedals = {};
+
+		tracker.step = 'Weekly shorts';
 		newMedals = { ...newMedals, ...(await Daily.getMedalsShorts(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+
+		tracker.step = 'Weekly grands';
 		newMedals = { ...newMedals, ...(await Daily.getMedalsWeeklyGrand(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
+
+		tracker.step = 'Campaigns';
 		newMedals = { ...newMedals, ...(await Daily.getMedalsCampaign(appwriteUserId, db, null, existingMedals, saveProgress)) };
+
+		tracker.step = 'Track of the day';
 		newMedals = { ...newMedals, ...(await Daily.getMedals(appwriteUserId, db, null, null, existingMedals, saveProgress)) };
 	} else if (payload.type === 'cotd') {
 		if (!payload.year) {
-			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+			return { message: "This action requires 'year'.", code: 400 };
 		}
 
 		if (!payload.month) {
-			return context.res.json({ message: "This action requires 'month'.", code: 500 });
+			return { message: "This action requires 'month'.", code: 400 };
 		}
 
+		tracker.step = 'Track of the day';
 		newMedals = await Daily.getMedals(appwriteUserId, db, payload.year, payload.month, existingMedals, saveProgress);
 	} else if (payload.type === 'shorts') {
 		if (!payload.year) {
-			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+			return { message: "This action requires 'year'.", code: 400 };
 		}
 		if (!payload.week) {
-			return context.res.json({ message: "This action requires 'week'.", code: 500 });
+			return { message: "This action requires 'week'.", code: 400 };
 		}
 
+		tracker.step = 'Weekly shorts';
 		newMedals = await Daily.getMedalsShorts(appwriteUserId, db, payload.year, payload.week, existingMedals, saveProgress);
 	} else if (payload.type === 'grands') {
 		if (!payload.year) {
-			return context.res.json({ message: "This action requires 'year'.", code: 500 });
+			return { message: "This action requires 'year'.", code: 400 };
 		}
 
+		tracker.step = 'Weekly grands';
 		newMedals = await Daily.getMedalsWeeklyGrand(appwriteUserId, db, payload.year, payload.week ?? null, existingMedals, saveProgress);
 	} else if (payload.type === 'campaign') {
 		if (!payload.campaignUid) {
-			return context.res.json({ message: "This action requires 'campaignUid'.", code: 500 });
+			return { message: "This action requires 'campaignUid'.", code: 400 };
 		}
 
+		tracker.step = 'Campaigns';
 		newMedals = await Daily.getMedalsCampaign(appwriteUserId, db, payload.campaignUid, existingMedals, saveProgress);
 	} else {
-		return context.res.json({
-			message: "This action requires 'type' and it must be one of 'cotd', 'shorts', 'grands', or 'campaign'.",
-			code: 500
-		});
+		return {
+			message: "This action requires 'type' and it must be one of 'all', 'cotd', 'shorts', 'grands', or 'campaign'.",
+			code: 400
+		};
 	}
 
 	await saveProgress({});
 
-	return context.res.json({
-		message: 'Profile successfully updated!'
-	});
+	return { message: 'Profile successfully updated!', code: 200 };
 };
 
 export default async function (context: any) {
+	let tracker: SyncTracker | null = null;
+
 	try {
-		return await func(context);
+		context.log(context.req.bodyText);
+		context.log('---');
+
+		const payload = JSON.parse(context.req.bodyText || '{}');
+
+		context.log(payload);
+
+		let appwriteUserId = context.req.headers['x-appwrite-user-id'] as string;
+
+		if (payload.adminPassword) {
+			if (payload.adminPassword !== Deno.env.get('ADMIN_PASSWORD')) {
+				return context.res.json({ message: 'Invalid admin password.', code: 403 }, 403);
+			}
+
+			if (!payload.userId) {
+				return context.res.json(
+					{ message: "This action requires 'userId' when using admin password.", code: 400 },
+					400
+				);
+			}
+
+			appwriteUserId = payload.userId;
+		}
+
+		if (!appwriteUserId) {
+			return context.res.json({ message: 'This action requires a logged in user.', code: 401 }, 401);
+		}
+
+		client = new sdk.Client();
+		db = new sdk.Databases(client);
+
+		client
+			.setEndpoint(Deno.env.get('APPWRITE_FUNCTION_API_ENDPOINT') as string)
+			.setProject(Deno.env.get('APPWRITE_FUNCTION_PROJECT_ID') as string)
+			.setKey(context.req.headers['x-appwrite-key'] as string);
+
+		tracker = new SyncTracker(context, appwriteUserId, payload.type ?? 'all');
+		await tracker.begin();
+
+		if (!Deno.env.get('NADE_AUTH')) {
+			await tracker.finish('error', 'Missing environment variables.');
+			return context.res.json({ message: 'Missing environment variables', code: 500 }, 500);
+		}
+
+		const result = await run(context, tracker, appwriteUserId, payload);
+
+		if (result.code >= 400) {
+			await tracker.finish('error', result.message);
+		} else {
+			await tracker.finish('success');
+		}
+
+		return context.res.json(result, result.code);
 	} catch (err) {
 		console.log(err);
-		return context.res.json({
-			message: err
-		});
+
+		const message = err instanceof Error ? (err.stack ?? err.message) : String(err);
+
+		// Never leave a sync pending - the UI would otherwise wait for the deadline
+		if (tracker) {
+			await tracker.finish('error', message);
+		}
+
+		return context.res.json({ message, code: 500 }, 500);
 	}
 }

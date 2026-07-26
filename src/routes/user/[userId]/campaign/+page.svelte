@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { AppwriteService } from '$lib/appwrite';
 	import Card from '$lib/card.svelte';
+	import { sync } from '$lib/sync.svelte';
 	import SkeletonCard from '$lib/gamify/SkeletonCard.svelte';
 	import type { PageProps } from './$types';
 
@@ -17,14 +17,8 @@
 			{@const season = campaign.uid.split('-')[0]}
 			<Card
 				canSynchronize={data.user && data.user.$id === data.profile.$id}
-				nadeoAction={async () => {
-					return await AppwriteService.nadeoAction(
-						'campaign',
-						undefined,
-						undefined,
-						undefined,
-						campaign.uid
-					);
+				onSync={async () => {
+					return await sync.start('campaign', { campaignUid: campaign.uid });
 				}}
 				medalType="campaign"
 				maps={campaign.maps}

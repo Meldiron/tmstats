@@ -1,25 +1,19 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import type { AppwriteMap } from './appwrite';
 	import { flags } from '$lib/flags.svelte';
+	import { sync } from '$lib/sync.svelte';
 
-	const { title, subtitle, maps, medals, medalType, nadeoAction = async () => {}, canSynchronize, fullWidth = false, subdued = false } = $props();
-
-	let isLoading = $state(false);
-	async function load() {
-		if (isLoading) {
-			return;
-		}
-
-		isLoading = true;
-
-		try {
-			await nadeoAction();
-			await invalidateAll();
-		} finally {
-			isLoading = false;
-		}
-	}
+	const {
+		title,
+		subtitle,
+		maps,
+		medals,
+		medalType,
+		onSync = async () => {},
+		canSynchronize,
+		fullWidth = false,
+		subdued = false
+	} = $props();
 
 	let isOpened = $state(false);
 	let openedMap = $state<null | AppwriteMap>(null);
@@ -118,7 +112,7 @@
 						<h1 class="mb-2 text-xl font-bold">Medal Times</h1>
 
 						<div class="flex flex-col space-y-4">
-								{#if flags.warriorMedals && openedMap.warriorScore}
+							{#if flags.warriorMedals && openedMap.warriorScore}
 								<div class="flex items-center space-x-3">
 									<img src="/warrior.png" class="w-7" alt="" />
 									<p class="min-w-[100px] text-lg">{formatTime(openedMap.warriorScore)}</p>
@@ -190,21 +184,23 @@
 	class={[
 		'relative',
 		'col-span-6 sm:col-span-6 md:col-span-4 lg:col-span-4',
-			subdued
-				? 'rounded-tl-2xl rounded-br-2xl border border-slate-600/40 bg-slate-700/60 p-3'
-				: 'rounded-tl-3xl rounded-br-3xl border border-gray-900 bg-gray-800 p-4'
+		subdued
+			? 'rounded-tl-2xl rounded-br-2xl border border-slate-600/40 bg-slate-700/60 p-3'
+			: 'rounded-tl-3xl rounded-br-3xl border border-gray-900 bg-gray-800 p-4'
 	].join(' ')}
 >
 	<div class="flex items-center justify-between">
-		<h3 class={subdued ? 'text-sm font-semibold text-slate-300' : 'text-2xl font-bold text-gray-200'}>
+		<h3
+			class={subdued ? 'text-sm font-semibold text-slate-300' : 'text-2xl font-bold text-gray-200'}
+		>
 			{title}
 		</h3>
 		{#if canSynchronize}
 			<div>
 				<button
 					aria-label="Synchronize data"
-					disabled={isLoading}
-					onclick={load}
+					disabled={sync.isActive}
+					onclick={() => onSync()}
 					class="rounded-tl-2xl rounded-br-2xl bg-gray-700 px-4 py-2 font-bold text-white enabled:hover:bg-gray-600 disabled:opacity-50"
 				>
 					<svg
@@ -230,7 +226,12 @@
 		<h4 class="-mt-1 mb-3 font-semibold text-gray-400">{subtitle}</h4>
 	{/if}
 
-	<div class="mt-4" class:flex-wrap={!fullWidth} class:gap-x-[0.35rem]={!fullWidth} class:flex={!fullWidth}>
+	<div
+		class="mt-4"
+		class:flex-wrap={!fullWidth}
+		class:gap-x-[0.35rem]={!fullWidth}
+		class:flex={!fullWidth}
+	>
 		{#each maps as map (map['$id'])}
 			{@const medal = medals[medalType + '-' + map.key]?.medal ?? 0}
 			{#if fullWidth}
@@ -249,7 +250,7 @@
 										: medal === 1
 											? 'bg-[#cd7f32]'
 											: 'bg-[#374151]'
-					} w-full h-10 rounded-tl-xl rounded-br-xl`}
+					} h-10 w-full rounded-tl-xl rounded-br-xl`}
 				></button>
 			{:else}
 				<div class="group relative">

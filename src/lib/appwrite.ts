@@ -1,4 +1,13 @@
-import { Client, Databases, Query, Functions, type Models, Account } from 'appwrite';
+import {
+	Client,
+	Databases,
+	Query,
+	Functions,
+	Permission,
+	Role,
+	type Models,
+	Account
+} from 'appwrite';
 import {
 	Client as ServerClient,
 	Databases as ServerDatabases,
@@ -31,6 +40,74 @@ export type AppwriteProfile = {
 	score: number;
 	medals: string; // Convert to JSON
 } & Models.Document;
+
+export type SyncStatus = 'queued' | 'processing' | 'success' | 'error';
+
+export type AppwriteSync = {
+	status: SyncStatus;
+	type: string;
+	params: string | null;
+	executionId: string | null;
+	startedAt: string;
+	heartbeatAt: string;
+	finishedAt: string | null;
+	deadlineAt: string;
+	progress: string | null;
+	error: string | null;
+} & Models.Document;
+
+export type SyncParams = {
+	year?: number;
+	month?: number;
+	week?: number;
+	campaignUid?: string;
+};
+
+/** Must stay in sync with the `nadeoAction` timeout in appwrite.json. */
+export const SYNC_FUNCTION_TIMEOUT_MS = 900_000;
+/** Extra room on top of the function timeout before we call a sync dead. */
+export const SYNC_DEADLINE_GRACE_MS = 60_000;
+/** A queued execution that was never picked up by a worker. */
+export const SYNC_QUEUE_TIMEOUT_MS = 300_000;
+/** A running execution that stopped writing heartbeats. */
+export const SYNC_HEARTBEAT_TIMEOUT_MS = 180_000;
+
+export function isSyncPending(sync: AppwriteSync | null): boolean {
+	return sync !== null && (sync.status === 'queued' || sync.status === 'processing');
+}
+
+/**
+ * The zombie guard: a pending sync is dead the moment any of these trip, no matter
+ * what the database says, so the UI can never show a spinner forever - even if nothing
+ * ever writes to the document again.
+ *
+ * `observedAt` is the local timestamp of the last time the document actually changed.
+ * The queue and heartbeat guards measure against it rather than against the document's
+ * own timestamps, because those are written by the function's clock, not the browser's.
+ */
+export function syncStaleReason(
+	sync: AppwriteSync | null,
+	observedAt: number,
+	now = Date.now()
+): string | null {
+	if (!isSyncPending(sync) || !sync) {
+		return null;
+	}
+
+	if (now > new Date(sync.deadlineAt).getTime()) {
+		return 'Sync timed out. The update ran longer than the maximum allowed time and was stopped.';
+	}
+
+	if (sync.status === 'queued' && now > observedAt + SYNC_QUEUE_TIMEOUT_MS) {
+		return 'Sync never started. The request was accepted but no worker picked it up.';
+	}
+
+	if (sync.status === 'processing' && now > observedAt + SYNC_HEARTBEAT_TIMEOUT_MS) {
+		return 'Sync stopped responding. The update crashed or was interrupted mid-run.';
+	}
+
+	return null;
+}
 
 export type AppwriteWeeklyMaps = {
 	week: number;
@@ -380,132 +457,95 @@ export class AppwriteService {
 		return [];
 	}
 
-	static async nadeoActionAll(): Promise<boolean> {
+	static async getSync(userId: string): Promise<AppwriteSync | null> {
 		try {
-			const execInterval = setInterval(() => {
-				Toastify({
-					...toastConfig,
-					style: {
-						background: '#3b82f6'
-					},
-					duration: 2800,
-					stopOnFocus: false,
-					text: 'Your profile update is still being processed ...'
-				}).showToast();
-			}, 3000);
-
-			let res = await functions.createExecution(
-				'nadeoAction',
-				JSON.stringify({
-					type: 'all'
-				}),
-				true
-			);
-
-			const terminalStatuses = ['completed', 'failed', 'cancelled'];
-			do {
-				res = await functions.getExecution('nadeoAction', res.$id);
-				await new Promise((r) => setTimeout(() => r(true), 1000));
-			} while (!terminalStatuses.includes(res.status));
-
-			if (execInterval) {
-				clearInterval(execInterval);
-			}
-
-			if (res.responseStatusCode >= 400) {
-				throw new Error('An internal error occured.');
-			}
-
-			Toastify({
-				...toastConfig,
-				text: 'Medals successfully updated.',
-				style: {
-					background: '#14b583'
-				}
-			}).showToast();
-
-			return true;
-		} catch (err: unknown) {
-			let msg = err instanceof Error ? err.message : 'An unknown error occurred';
-
-			msg = 'Could not update profile: ' + msg;
-
-			Toastify({
-				...toastConfig,
-				text: msg
-			}).showToast();
+			return await database.getDocument<AppwriteSync>('default', 'syncs', userId);
+		} catch {
+			return null;
 		}
-
-		return false;
 	}
 
-	static async nadeoAction(
-		type: string,
-		year?: number,
-		month?: number,
-		week?: number,
-		campaignUid?: string
-	): Promise<boolean> {
-		try {
-			const execInterval = setInterval(() => {
-				Toastify({
-					...toastConfig,
-					style: {
-						background: '#3b82f6'
-					},
-					duration: 2800,
-					stopOnFocus: false,
-					text: 'Your profile update is still being processed ...'
-				}).showToast();
-			}, 3000);
+	static subscribeSync(userId: string, onChange: (sync: AppwriteSync | null) => void) {
+		return client.subscribe<AppwriteSync>(
+			`databases.default.collections.syncs.documents.${userId}`,
+			(message) => {
+				if (message.events.some((event) => event.endsWith('.delete'))) {
+					onChange(null);
+					return;
+				}
 
-			let res = await functions.createExecution(
+				onChange(message.payload);
+			}
+		);
+	}
+
+	static async updateSync(userId: string, data: Partial<AppwriteSync>) {
+		return await database.updateDocument<AppwriteSync>('default', 'syncs', userId, data);
+	}
+
+	static async clearSync(userId: string) {
+		try {
+			await database.deleteDocument('default', 'syncs', userId);
+		} catch {
+			// Already gone, nothing to clear
+		}
+	}
+
+	/**
+	 * Queues a profile sync. Returns as soon as the execution is accepted - progress
+	 * is tracked through the `syncs` document, never through the execution itself.
+	 */
+	static async startSync(
+		userId: string,
+		type: string,
+		params: SyncParams = {}
+	): Promise<AppwriteSync> {
+		const startedAt = new Date();
+		const deadlineAt = new Date(
+			startedAt.getTime() + SYNC_FUNCTION_TIMEOUT_MS + SYNC_DEADLINE_GRACE_MS
+		);
+
+		const data = {
+			status: 'queued' as SyncStatus,
+			type,
+			params: JSON.stringify(params),
+			executionId: null,
+			startedAt: startedAt.toISOString(),
+			heartbeatAt: startedAt.toISOString(),
+			finishedAt: null,
+			deadlineAt: deadlineAt.toISOString(),
+			progress: null,
+			error: null
+		};
+
+		try {
+			await database.updateDocument<AppwriteSync>('default', 'syncs', userId, data);
+		} catch {
+			await database.createDocument<AppwriteSync>('default', 'syncs', userId, data, [
+				Permission.read(Role.user(userId)),
+				Permission.update(Role.user(userId)),
+				Permission.delete(Role.user(userId))
+			]);
+		}
+
+		try {
+			const execution = await functions.createExecution(
 				'nadeoAction',
-				JSON.stringify({
-					year,
-					week,
-					month,
-					type,
-					campaignUid
-				}),
+				JSON.stringify({ type, ...params }),
 				true
 			);
 
-			const terminalStatuses = ['completed', 'failed', 'cancelled'];
-			do {
-				res = await functions.getExecution('nadeoAction', res.$id);
-				await new Promise((r) => setTimeout(() => r(true), 1000));
-			} while (!terminalStatuses.includes(res.status));
-
-			if (execInterval) {
-				clearInterval(execInterval);
-			}
-
-			if (res.responseStatusCode >= 400) {
-				throw new Error('An internal error occured.');
-      }
-
-			Toastify({
-				...toastConfig,
-				text: 'Medals updated successfully.',
-				style: {
-					background: '#14b583'
-				}
-			}).showToast();
-
-			return true;
+			return await this.updateSync(userId, { executionId: execution.$id });
 		} catch (err: unknown) {
-			let msg = err instanceof Error ? err.message : 'An unknown error occurred';
+			// The execution was never accepted, so nothing will ever finish this document
+			const msg = err instanceof Error ? err.message : 'An unknown error occurred';
 
-			msg = 'Could not update profile: ' + msg;
-
-			Toastify({
-				...toastConfig,
-				text: msg
-			}).showToast();
+			return await this.updateSync(userId, {
+				status: 'error',
+				error: 'Could not start sync: ' + msg,
+				finishedAt: new Date().toISOString()
+			});
 		}
-
-		return false;
 	}
 
 	static async getId(nick: string): Promise<string> {
