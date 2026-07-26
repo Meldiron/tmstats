@@ -1,701 +1,42 @@
 {
 	"projectId": "tmStats",
 	"projectName": "tmStats",
-	"collections": [
-		{
-			"$id": "profiles",
-			"$permissions": ["read(\"any\")"],
-			"databaseId": "default",
-			"name": "profiles",
-			"enabled": true,
-			"documentSecurity": false,
-			"attributes": [
-				{
-					"key": "silver",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "bronze",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "author",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "nickname",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "score",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "gold",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "warrior",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "medals",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 999999,
-					"default": null
-				}
-			],
-			"indexes": [
-				{
-					"key": "warriorIndex",
-					"type": "key",
-					"status": "available",
-					"attributes": ["warrior"],
-					"orders": ["ASC"]
-				},
-				{
-					"key": "goldIndex",
-					"type": "key",
-					"status": "available",
-					"attributes": ["gold"],
-					"orders": ["ASC"]
-				},
-				{
-					"key": "authorIndex",
-					"type": "key",
-					"status": "available",
-					"attributes": ["author"],
-					"orders": ["ASC"]
-				},
-				{
-					"key": "scoreIndex",
-					"type": "key",
-					"status": "available",
-					"attributes": ["score"],
-					"orders": ["ASC"]
-				},
-				{
-					"key": "bronzeIndex",
-					"type": "key",
-					"status": "available",
-					"attributes": ["bronze"],
-					"orders": ["ASC"]
-				},
-				{
-					"key": "silverIndex",
-					"type": "key",
-					"status": "available",
-					"attributes": ["silver"],
-					"orders": ["ASC"]
-				}
-			]
+	"settings": {
+		"services": {
+			"account": true,
+			"avatars": true,
+			"databases": true,
+			"locale": true,
+			"health": true,
+			"storage": true,
+			"teams": true,
+			"users": true,
+			"functions": true,
+			"graphql": true,
+			"messaging": true
 		},
-		{
-			"$id": "nadeoCache",
-			"$permissions": [],
-			"databaseId": "default",
-			"name": "nadeoCache",
-			"enabled": true,
-			"documentSecurity": false,
-			"attributes": [
-				{
-					"key": "value",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 999999,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "dailyMaps",
-			"$permissions": ["read(\"any\")"],
-			"databaseId": "default",
-			"name": "dailyMaps",
-			"enabled": true,
-			"documentSecurity": false,
-			"attributes": [
-				{
-					"key": "mapid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "mapUid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "day",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "silverScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "thumbnailUrl",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "month",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "bronzeScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "collectionName",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "goldScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "name",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "key",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "authorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "warriorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "year",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "weeklyMaps",
-			"$permissions": ["read(\"any\")"],
-			"databaseId": "default",
-			"name": "weeklyMaps",
-			"enabled": true,
-			"documentSecurity": false,
-			"attributes": [
-				{
-					"key": "mapid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "mapUid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "week",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "silverScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "thumbnailUrl",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "bronzeScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "collectionName",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "goldScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "name",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "key",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "authorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "warriorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "year",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "position",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "weeklyGrandMaps",
-			"$permissions": ["read(\"any\")"],
-			"databaseId": "default",
-			"name": "weeklyGrandMaps",
-			"enabled": true,
-			"documentSecurity": false,
-			"attributes": [
-				{
-					"key": "mapid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "mapUid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "week",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "silverScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "thumbnailUrl",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "bronzeScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "collectionName",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "goldScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "name",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "key",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "authorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "warriorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "year",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "position",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "campaignMaps",
-			"$permissions": ["read(\"any\")"],
-			"databaseId": "default",
-			"name": "campaignMaps",
-			"enabled": true,
-			"documentSecurity": false,
-			"attributes": [
-				{
-					"key": "mapid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "mapUid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "silverScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "thumbnailUrl",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 2048,
-					"default": null
-				},
-				{
-					"key": "bronzeScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "collectionName",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "goldScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "name",
-					"type": "string",
-					"required": false,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "key",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				},
-				{
-					"key": "authorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "warriorScore",
-					"type": "integer",
-					"required": false,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "position",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9123372036854776000,
-					"max": 9123372036854776000,
-					"default": null
-				},
-				{
-					"key": "campaignUid",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 255,
-					"default": null
-				}
-			],
-			"indexes": []
-		},
-		{
-			"$id": "oauthTokens",
-			"$permissions": [],
-			"databaseId": "default",
-			"name": "oauthTokens",
-			"enabled": true,
-			"documentSecurity": false,
-			"attributes": [
-				{
-					"key": "accessToken",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 100000,
-					"default": null
-				},
-				{
-					"key": "refreshToken",
-					"type": "string",
-					"required": true,
-					"array": false,
-					"size": 100000,
-					"default": null
-				},
-				{
-					"key": "expiresAt",
-					"type": "integer",
-					"required": true,
-					"array": false,
-					"min": -9223372036854775808,
-					"max": 9223372036854775807,
-					"default": null
-				}
-			],
-			"indexes": []
+		"auth": {
+			"methods": {
+				"jwt": true,
+				"phone": true,
+				"invites": true,
+				"anonymous": true,
+				"email-otp": true,
+				"magic-url": true,
+				"email-password": true
+			},
+			"security": {
+				"duration": 31536000,
+				"limit": 0,
+				"sessionsLimit": 10,
+				"passwordHistory": 0,
+				"passwordDictionary": false,
+				"personalDataCheck": false,
+				"sessionAlerts": false,
+				"mockNumbers": []
+			}
 		}
-	],
+	},
 	"functions": [
 		{
 			"$id": "nadeoAction",
@@ -752,47 +93,855 @@
 			"commands": ""
 		}
 	],
-	"databases": [
+	"tablesDB": [
 		{
 			"$id": "default",
 			"name": "default",
 			"enabled": true
 		}
 	],
-	"settings": {
-		"services": {
-			"account": true,
-			"avatars": true,
-			"databases": true,
-			"locale": true,
-			"health": true,
-			"storage": true,
-			"teams": true,
-			"users": true,
-			"functions": true,
-			"graphql": true,
-			"messaging": true
+	"tables": [
+		{
+			"$id": "profiles",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "profiles",
+			"enabled": true,
+			"rowSecurity": false,
+			"columns": [
+				{
+					"key": "silver",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "bronze",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "author",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "nickname",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "score",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "gold",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "medals",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 999999,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "warrior",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				}
+			],
+			"indexes": [
+				{
+					"key": "goldIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["gold"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "authorIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["author"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "scoreIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["score"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "bronzeIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["bronze"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "silverIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["silver"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "index_6",
+					"type": "key",
+					"status": "available",
+					"columns": ["warrior"],
+					"orders": ["asc"]
+				}
+			]
 		},
-		"auth": {
-			"methods": {
-				"jwt": true,
-				"phone": true,
-				"invites": true,
-				"anonymous": true,
-				"email-otp": true,
-				"magic-url": true,
-				"email-password": true
-			},
-			"security": {
-				"duration": 31536000,
-				"limit": 0,
-				"sessionsLimit": 10,
-				"passwordHistory": 0,
-				"passwordDictionary": false,
-				"personalDataCheck": false,
-				"sessionAlerts": false,
-				"mockNumbers": []
-			}
+		{
+			"$id": "nadeoCache",
+			"$permissions": [],
+			"databaseId": "default",
+			"name": "nadeoCache",
+			"enabled": true,
+			"rowSecurity": false,
+			"columns": [
+				{
+					"key": "value",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 999999,
+					"default": null,
+					"encrypt": false
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "dailyMaps",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "dailyMaps",
+			"enabled": true,
+			"rowSecurity": false,
+			"columns": [
+				{
+					"key": "mapid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "mapUid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "day",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "silverScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "thumbnailUrl",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 2048,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "month",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "bronzeScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "collectionName",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "goldScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "name",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "key",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "authorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "year",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "warriorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "weeklyMaps",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "weeklyMaps",
+			"enabled": true,
+			"rowSecurity": false,
+			"columns": [
+				{
+					"key": "mapid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "mapUid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "week",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "silverScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "thumbnailUrl",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 2048,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "bronzeScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "collectionName",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "goldScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "name",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "key",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "authorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "year",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "position",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "warriorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "campaignMaps",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "campaignMaps",
+			"enabled": true,
+			"rowSecurity": false,
+			"columns": [
+				{
+					"key": "mapid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "mapUid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "silverScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "thumbnailUrl",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 2048,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "bronzeScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "collectionName",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "goldScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "name",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "key",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "authorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "position",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "campaignUid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "warriorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "oauthTokens",
+			"$permissions": [],
+			"databaseId": "default",
+			"name": "oauthTokens",
+			"enabled": true,
+			"rowSecurity": false,
+			"columns": [
+				{
+					"key": "accessToken",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 100000,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "refreshToken",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 100000,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "expiresAt",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "weeklyGrandMaps",
+			"$permissions": ["read(\"any\")"],
+			"databaseId": "default",
+			"name": "weeklyGrandMaps",
+			"enabled": true,
+			"rowSecurity": false,
+			"columns": [
+				{
+					"key": "mapid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "mapUid",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "week",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "silverScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "thumbnailUrl",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 2048,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "bronzeScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "collectionName",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "goldScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "name",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "key",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "authorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "year",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "position",
+					"type": "integer",
+					"required": true,
+					"array": false,
+					"default": null,
+					"min": -9123372036854776000,
+					"max": 9123372036854776000
+				},
+				{
+					"key": "warriorScore",
+					"type": "integer",
+					"required": false,
+					"array": false,
+					"default": null,
+					"min": -9223372036854775808,
+					"max": 9223372036854775807
+				}
+			],
+			"indexes": []
+		},
+		{
+			"$id": "syncs",
+			"$permissions": ["create(\"users\")"],
+			"databaseId": "default",
+			"name": "syncs",
+			"enabled": true,
+			"rowSecurity": true,
+			"columns": [
+				{
+					"key": "status",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 20,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "type",
+					"type": "string",
+					"required": true,
+					"array": false,
+					"size": 32,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "params",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 1000,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "executionId",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 64,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "startedAt",
+					"type": "datetime",
+					"required": true,
+					"array": false,
+					"format": "datetime",
+					"default": null
+				},
+				{
+					"key": "heartbeatAt",
+					"type": "datetime",
+					"required": true,
+					"array": false,
+					"format": "datetime",
+					"default": null
+				},
+				{
+					"key": "finishedAt",
+					"type": "datetime",
+					"required": false,
+					"array": false,
+					"format": "datetime",
+					"default": null
+				},
+				{
+					"key": "deadlineAt",
+					"type": "datetime",
+					"required": true,
+					"array": false,
+					"format": "datetime",
+					"default": null
+				},
+				{
+					"key": "progress",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 255,
+					"default": null,
+					"encrypt": false
+				},
+				{
+					"key": "error",
+					"type": "string",
+					"required": false,
+					"array": false,
+					"size": 10000,
+					"default": null,
+					"encrypt": false
+				}
+			],
+			"indexes": [
+				{
+					"key": "statusIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["status"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "deadlineIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["deadlineAt"],
+					"orders": ["ASC"]
+				},
+				{
+					"key": "heartbeatIndex",
+					"type": "key",
+					"status": "available",
+					"columns": ["heartbeatAt"],
+					"orders": ["ASC"]
+				}
+			]
 		}
-	}
+	]
 }
